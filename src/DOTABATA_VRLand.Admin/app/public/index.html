@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin</title>
-    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
     <h1>User List</h1>
@@ -12,11 +12,18 @@
     <form id="form">
       <label for="name">名前:</label>
       <input type="text" id="name" placeholder="名前を入力" required />
+      <input type="text" id="level" placeholder="level" required />
       <button type="submit">追加</button>
+    </form>
+
+    <form id="search">
+      <label for="id">ID:</label>
+      <input type="text" id="id" placeholder="idを入力" required />
+      <button type="submit">検索</button>
     </form>
 
     <ul id="list"></ul>
 
-    <script src="/js/api.js"></script>
+    <script src="./js/api.js"></script>
   </body>
 </html>

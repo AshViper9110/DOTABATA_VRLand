@@ -1,4 +1,3 @@
-// src/index.js
 const express = require("express");
 const db = require("./db");
 
@@ -13,7 +12,7 @@ app.use(express.static("public"));
 /**
  * API: 一覧取得
  */
-app.get("/api/users", async (req, res) => {
+app.get("/api/users/get", async (req, res) => {
   const [rows] = await db.query("SELECT * FROM Users");
   res.json(rows);
 });
@@ -21,18 +20,30 @@ app.get("/api/users", async (req, res) => {
 /**
  * API: id指定取得
  */
-app.get("/api/user", async (req, res) => {
-  const id = req.query.id;
-  const [rows] = await db.query("SELECT * FROM Users WHERE id = ?", [id]);
+app.get("/api/user/search/id", async (req, res) => {
+  const value = req.query.value;
+  const [rows] = await db.query("SELECT * FROM Users WHERE id = ?", [value]);
   res.json(rows);
 });
 
 /**
- * API: 追加
+ * API: level指定取得
  */
-app.post("/api/users", async (req, res) => {
-  const { name } = req.body;
-  await db.query("INSERT INTO Users (name) VALUES (?)", [name]);
+app.get("/api/user/search/level", async (req, res) => {
+  const value = req.query.value;
+  const [rows] = await db.query("SELECT * FROM Users WHERE level = ?", [value]);
+  res.json(rows);
+});
+
+/**
+ * API: user追加
+ */
+app.post("/api/user/add", async (req, res) => {
+  const { name, level } = req.body;
+  await db.query("INSERT INTO Users (name, level) VALUES (?, ?)", [
+    name,
+    level,
+  ]);
   res.json({ success: true });
 });
 

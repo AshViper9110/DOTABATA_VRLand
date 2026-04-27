@@ -1,5 +1,12 @@
-1:docker-composeがある階層までcmdで移動。
+--初回起動方法
+1:docker-composeがある階層までコマンドプロンプトで移動。
 (右クリック->ターミナルを開くでも可)
+2:"docker compose build"を実行。
+3:"docker compose up -d"を実行。
+4:"http://localhost:3000"にアクセス。
+
+--2回目以降の起動方法
+1:"docker compose down"を実行。
 2:"docker compose build"を実行。
 3:"docker compose up -d"を実行。
 4:"http://localhost:3000"にアクセス。
