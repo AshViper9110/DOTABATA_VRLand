@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
+namespace DOTABATA_VRLand.Shared.Models.Entities {
     /// <summary>
     /// 接続済みユーザー
     /// </summary>

@@ -1,4 +1,5 @@
 ﻿using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using DOTABATA_VRLand.Shared.Models.Entities;
 using System;
 using UnityEngine;
 

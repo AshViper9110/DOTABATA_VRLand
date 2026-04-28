@@ -31,6 +31,20 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
+        /// ルーム作成
+        /// </summary>
+        public Task CreateRoom(string roomName) {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("{CreateRoom}");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("RoomName : " + roomName + "\n");
+
+            this._roomContext = _roomContextRepository.CreateContext(roomName);
+            
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
         /// ルームに接続
         /// </summary>
         public async Task<JoinedUser[]> JoinRoomAsync(string roomName, string userName) {
@@ -41,12 +55,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 if (this._roomContext == null) {
                     // なかったら生成
 
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("{CreateRoom}");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("RoomName : " + roomName + "\n");
-
-                    this._roomContext = _roomContextRepository.CreateContext(roomName);
+                    CreateRoom(roomName);
                 }
             }
             // ルームに参加 ＆ ルームを保持
@@ -79,7 +88,6 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             // 入室リクエストをしたユーザーに、参加者の情報をリストで返す
             return this._roomContext.RoomUserDataList.Select(f => f.Value.joinedUser).ToArray();
-
         }
 
         /// <summary>
@@ -131,5 +139,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public Task<Guid> GetConnectionId() {
             return Task.FromResult<Guid>(this.ConnectionId);
         }
+
+        
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DOTABATA_VRLand.Shared.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 

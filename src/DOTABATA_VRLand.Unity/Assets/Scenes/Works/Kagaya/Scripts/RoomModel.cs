@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion;
 using MagicOnion.Client;
 using System;
@@ -87,7 +88,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             }
         }
     }
-
 
     /// <summary>
     /// [サーバー通知]

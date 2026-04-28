@@ -21,7 +21,7 @@ namespace DOTABATA_VRLand.Server.Services {
         /// <summary>
         /// DBにサーバーログを追加
         /// </summary>
-        private async void AddServerLogs(string content) {
+        private void AddServerLogs(string content) {
             ServerLogs serverLogs = new ServerLogs() {
                 Content = content,
             };
