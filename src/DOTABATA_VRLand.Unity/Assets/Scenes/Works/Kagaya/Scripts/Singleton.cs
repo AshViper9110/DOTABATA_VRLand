@@ -60,8 +60,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour {
         }
         else if (i != this) {
             // 2つ目以降を破棄して一意性を担保
-            Debug.LogWarning($"[Singleton] Duplicate {typeof(T).Name} detected. Destroying the new one on {name}.");
-
+            Debug.LogWarning($"{typeof(T).Name} の重複が検出されました。{name} にある新しいインスタンスを破棄します。");
             Destroy(gameObject);
         }
     }

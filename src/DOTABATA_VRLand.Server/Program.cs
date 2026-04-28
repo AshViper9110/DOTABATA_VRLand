@@ -9,20 +9,20 @@ builder.Services.AddMagicOnion();
 builder.Services.AddSingleton<RoomContextRepository>();
 builder.Services.AddMvcCore().AddApiExplorer();
 
-//builder.Services.AddDbContext<GameDbContext>(options => {
-//#if DEBUG
-//    var connectionString = builder.Configuration.GetConnectionString("Default");
-//#else
-//    var connectionString = builder.Configuration.GetConnectionString("Production");
-//#endif
+builder.Services.AddDbContext<GameDbContext>(options => {
+#if DEBUG
+    var connectionString = builder.Configuration.GetConnectionString("Default");
+#else
+    var connectionString = builder.Configuration.GetConnectionString("Production");
+#endif
 
-//    options.UseMySql(
-//        connectionString,
-//        ServerVersion.AutoDetect(connectionString),
-//        mySqlOptions => {
-//            mySqlOptions.EnableStringComparisonTranslations();
-//        });
-//});
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString),
+        mySqlOptions => {
+            mySqlOptions.EnableStringComparisonTranslations();
+        });
+});
 
 
 var app = builder.Build();
