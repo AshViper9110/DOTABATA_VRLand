@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.cysharp.magiconion.client.unity": "https://github.com/Cysharp/MagicOnion.git?path=src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion.Client.Unity#7.0.2",
+    "com.cysharp.magiconion.client.unity": "https://github.com/Cysharp/MagicOnion.git?path=src/MagicOnion.Client.Unity/Assets/Scripts/MagicOnion.Client.Unity#7.0.6",
     "com.cysharp.slnmerge": "https://github.com/Cysharp/SlnMerge.git?path=src",
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.cysharp.yetanotherhttphandler": "https://github.com/Cysharp/YetAnotherHttpHandler.git?path=src/YetAnotherHttpHandler#1.10.0",
@@ -17,6 +17,10 @@
     "com.unity.timeline": "1.8.12",
     "com.unity.ugui": "2.0.0",
     "com.unity.visualscripting": "1.9.11",
+    "com.unity.xr.interaction.toolkit": "3.0.10",
+    "com.unity.xr.management": "4.5.4",
+    "com.unity.xr.oculus": "4.5.4",
+    "com.unity.xr.openxr": "1.16.1",
     "dotabata_vrland.shared.unity": "file:../../DOTABATA_VRLand.Shared",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.ai": "1.0.0",
