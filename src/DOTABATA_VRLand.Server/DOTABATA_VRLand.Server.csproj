@@ -19,8 +19,4 @@
     <ProjectReference Include="..\DOTABATA_VRLand.Shared\DOTABATA_VRLand.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Entities\" />
-  </ItemGroup>
-
 </Project>

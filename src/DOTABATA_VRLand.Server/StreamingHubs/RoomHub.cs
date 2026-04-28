@@ -1,23 +1,24 @@
 ﻿using DOTABATA_VRLand.Server.Models.Contexts;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion.Server.Hubs;
 using Microsoft.EntityFrameworkCore;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub :StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub {
         private readonly RoomContextRepository _roomContextRepository;
-        //private readonly GameDbContext _dbContext;
+        private readonly GameDbContext _dbContext;
 
         private RoomContext? _roomContext;
 
-        public RoomHub(RoomContextRepository roomContextRepository) {
-            _roomContextRepository = roomContextRepository;
-        }
-
-        //public RoomHub(RoomContextRepository roomContextRepository, GameDbContext dbContext) {
+        //public RoomHub(RoomContextRepository roomContextRepository) {
         //    _roomContextRepository = roomContextRepository;
-        //    _dbContext = dbContext;
         //}
+
+        public RoomHub(RoomContextRepository roomContextRepository, GameDbContext dbContext) {
+            _roomContextRepository = roomContextRepository;
+            _dbContext = dbContext;
+        }
 
         /// <summary>
         /// 切断時の処理
@@ -32,7 +33,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ルームに接続
         /// </summary>
-        public Task<JoinedUser[]> JoinRoomAsync(string roomName, string userName) {
+        public async Task<JoinedUser[]> JoinRoomAsync(string roomName, string userName) {
             // 同時に生成しない用に排他制御
             lock (_roomContextRepository) {
                 // 指定の名前のルームがあるかどうかを確認
@@ -50,6 +51,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             }
             // ルームに参加 ＆ ルームを保持
             this._roomContext.Group.Add(this.ConnectionId, Client);
+
+            //// DBからユーザー情報取得
+            //User user = await _dbContext.Users.FirstAsync(user => user.Name == userName);
 
             // 入室済みユーザーのデータを作成
             var joinedUser = new JoinedUser();
@@ -74,7 +78,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             this._roomContext.Group.All.OnJoinRoom(joinedUser);
 
             // 入室リクエストをしたユーザーに、参加者の情報をリストで返す
-            return Task.FromResult<JoinedUser[]> (this._roomContext.RoomUserDataList.Select(f => f.Value.joinedUser).ToArray());
+            return this._roomContext.RoomUserDataList.Select(f => f.Value.joinedUser).ToArray();
 
         }
 

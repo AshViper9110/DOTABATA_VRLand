@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using DOTABATA_VRLand.Shared.Models.Entities;
+using MagicOnion;
 using System;
 using System.Collections.Generic;
 using System.Text;
