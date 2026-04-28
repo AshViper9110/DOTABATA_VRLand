@@ -1,3 +1,5 @@
+using Assets.Scenes.Works.otake.script;
+using DG.Tweening;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SearchService;
@@ -22,6 +24,17 @@ public class GameManager : MonoBehaviour
 
     bool isSpin;
 
+    //ランキングUI
+    List<Transform> rankingPosList;
+    List<Transform> rankingUis;
+
+    //あとで消す変数
+   public List<int> rankList = new List<int>();
+
+    public List<int> playerWinlist = new List<int>();//勝利数
+
+    public List<Rank> RankingList = new List<Rank>();
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -29,6 +42,12 @@ public class GameManager : MonoBehaviour
         CenterObjRb = CenterObj.GetComponent<Rigidbody>();
         selPointManager = selectPoint.GetComponent<SelPointManager>();
         isSpin = false;
+
+        //ここで順位が決定されている状態だったらランキング処理のフラグを建てる
+        if (rankList[0] != 0)
+        {
+            SetResult();
+        }
     }
 
     // Update is called once per frame
@@ -89,6 +108,25 @@ public class GameManager : MonoBehaviour
             MiniGameObjManager manager = obj.GetComponent<MiniGameObjManager>();
             manager.ID = i;
 
+        }
+    }
+
+    public void SetResult()
+    {
+        for (int i = 0; i < rankList.Count; i++)
+        {
+            if(rankList[i] == 1)
+            {
+                playerWinlist[i]++;
+            }
+        }
+    }
+
+    public void SetRanking()
+    {
+        for (int i = 0; i < rankList.Count; i++)
+        {
+            rankingUis[i].transform.DOMove(rankingPosList[RankingList[i].rank].transform.position,0.4f);
         }
     }
 }

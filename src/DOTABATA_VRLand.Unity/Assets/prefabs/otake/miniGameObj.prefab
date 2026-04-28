@@ -87,7 +87,7 @@ GameObject:
   - component: {fileID: 5906153247764446356}
   - component: {fileID: 2618913727642912957}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: miniGameObj
   m_TagString: MinigameObj
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -158,7 +158,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &1659019390397323816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,6 +188,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196241b6add2ca645b34bbe0ed708609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ID: 0
 --- !u!65 &2618913727642912957
 BoxCollider:
   m_ObjectHideFlags: 0
