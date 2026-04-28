@@ -115,18 +115,15 @@ app.post("/api/user/add", async (req, res) => {
   try {
     const db = await getDB();
 
-    const { name, level } = req.body;
+    const { name } = req.body;
 
     // バリデーション（最低限）
-    if (!name || level == null) {
+    if (!name) {
       return res.status(400).json({ error: "name and level required" });
     }
 
     // INSERT処理
-    await db.query("INSERT INTO users (name, level) VALUES (?, ?)", [
-      name,
-      level,
-    ]);
+    await db.query("INSERT INTO users (name) VALUES (?)", [name]);
 
     res.json({ success: true });
   } catch (err) {

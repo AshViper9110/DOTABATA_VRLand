@@ -1,11 +1,3 @@
-// ログアウト処理
-function logout() {
-  // /logout エンドポイントにPOST送信（セッション破棄想定）
-  fetch("/logout", { method: "POST" })
-    // 完了後にログイン画面へ遷移
-    .then(() => (location.href = "/login.html"));
-}
-
 // ユーザー一覧を取得して表示
 async function loadUsers() {
   // APIから全ユーザー取得
@@ -21,15 +13,9 @@ async function loadUsers() {
   // データが存在する場合
   if (users != null) {
     users.forEach((user) => {
-      // ユーザー名表示用li
       const li = document.createElement("li");
-      li.textContent = user.name;
+      li.textContent = `ID:${user.id} ) Name:${user.name} (time:${user.created_at})`;
       list.appendChild(li);
-
-      // レベル表示用li
-      const li2 = document.createElement("li");
-      li2.textContent = user.level;
-      list.appendChild(li2);
     });
   }
 }
@@ -41,15 +27,13 @@ document.getElementById("form").addEventListener("submit", async (e) => {
 
   // 入力値取得
   const name = document.getElementById("name").value;
-  const level = document.getElementById("level").value;
-
   // APIへPOST送信（JSON形式）
   await fetch("/api/user/add", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ name, level }),
+    body: JSON.stringify({ name }),
   });
 
   // 登録後に一覧を再取得
@@ -74,7 +58,7 @@ document.getElementById("idSearch").addEventListener("submit", async (e) => {
   if (user && user.length > 0) {
     user.forEach((user) => {
       const li = document.createElement("li");
-      li.textContent = `${user.name} (Lv.${user.level})`;
+      li.textContent = `ID:${user.id} ) Name:${user.name} (time:${user.created_at})`;
       list.appendChild(li);
     });
   } else {
