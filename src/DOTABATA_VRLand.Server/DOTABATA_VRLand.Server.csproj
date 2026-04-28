@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MagicOnion.Server" Version="7.0.2" />
+    <PackageReference Include="Grpc.AspNetCore.Web" Version="2.76.0" />
+    <PackageReference Include="MagicOnion.Server" Version="7.0.6" />
+    <PackageReference Include="MagicOnion.Server.JsonTranscoding" Version="7.0.6" />
+    <PackageReference Include="MagicOnion.Server.JsonTranscoding.Swagger" Version="7.0.6" />
+    <PackageReference Include="MessagePack.UnityShims" Version="3.1.4" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
   </ItemGroup>
 
   <ItemGroup>
