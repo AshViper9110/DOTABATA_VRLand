@@ -24,5 +24,12 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// 接続ID取得
         /// </summary>
         Task<Guid> GetConnectionId();
+
+
+
+        /// <summary>
+        /// Transform同期
+        /// </summary>
+        Task UpdateUserTransformAsync(SimpleTransform simpleTransform);
     }
 }

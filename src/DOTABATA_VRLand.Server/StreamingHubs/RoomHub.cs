@@ -141,5 +141,21 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         
+
+        /// <summary>
+        /// ユーザーのTransform同期
+        /// </summary>
+        public Task UpdateUserTransformAsync(SimpleTransform simpleTransform) {
+            if (!_roomContext.RoomUserDataList.Any(_=> _.Value.joinedUser.ConnectionId == this.ConnectionId)) {
+                return Task.CompletedTask;
+            }
+
+            // サーバーに保持
+            _roomContext.RoomUserDataList.First(_ => _.Value.joinedUser.ConnectionId == this.ConnectionId).Value.simpleTransform = simpleTransform;
+            // 他のプレイヤーに通知
+            _roomContext.Group.Except([this.ConnectionId]).OnUpdateUserTransform(this.ConnectionId, simpleTransform);
+
+            return Task.CompletedTask;
+        }
     }
 }

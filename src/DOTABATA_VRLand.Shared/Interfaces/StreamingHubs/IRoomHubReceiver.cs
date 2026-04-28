@@ -17,5 +17,13 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ユーザーの退室通知
         /// </summary>
         public void OnLeaveRoom(Guid connectionId, int joinOrder);
+
+
+
+
+        /// <summary>
+        /// ユーザーのTransform通知
+        /// </summary>
+        public void OnUpdateUserTransform(Guid connectionId, SimpleTransform simpleTransform);
     }
 }

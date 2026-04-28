@@ -30,6 +30,12 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid, int> OnLeavedUser { get; set; }
 
+
+    /// <summary>
+    /// ユーザーのTransform通知
+    /// </summary>
+    public Action<Guid, SimpleTransform> OnUpdatedUserTransform { get; set; }
+
     /*
      * 処理
      */
@@ -115,6 +121,27 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnLeaveRoom(Guid connectionId, int joinOrder) {
         if (OnLeavedUser != null) {
             OnLeavedUser(connectionId, joinOrder);
+        }
+    }
+
+    /// <summary>
+    /// ユーザーのTransform同期
+    /// </summary>
+    public async UniTask UpdateUserTransformAsync(SimpleTransform simpleTransform) {
+        if (roomHub == null) {
+            return;
+        }
+
+        await roomHub.UpdateUserTransformAsync(simpleTransform);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ユーザーのTransform通知
+    /// </summary>
+    public void OnUpdateUserTransform(Guid connectionId, SimpleTransform simpleTransform) {
+        if (OnUpdatedUserTransform != null) {
+            OnUpdatedUserTransform(connectionId, simpleTransform);
         }
     }
 }
