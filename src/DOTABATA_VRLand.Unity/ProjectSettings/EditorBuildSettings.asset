@@ -12,5 +12,8 @@ EditorBuildSettings:
     path: Assets/Scenes/Works/otake/GameScene.unity
     guid: 41a2d0a112918f140a5741db1c92c93b
   m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 6d22c2554161d7d418a4eae51b5042cf, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 8bc5f506f0aa9964ebe62dfb1fe84253, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: a2ee644b7884d904494c766fbb137ac3, type: 2}
   m_UseUCBPForAssetBundles: 0
