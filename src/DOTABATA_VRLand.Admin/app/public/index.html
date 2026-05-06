@@ -6,13 +6,24 @@
     <title>Admin</title>
     <link rel="stylesheet" href="./css/style.css" />
   </head>
-
   <body>
-    <div class="container">
-      <h1>ほーーーーーーーーむ</h1>
-      <a href="./users.html">user</a>
-      <button class="logout" onclick="logout()">ログアウト</button>
-    <script src="./js/logincheck.js"></script>
-    <script src="./js/index.js"></script>
+    <h1>User List</h1>
+
+    <form id="form">
+      <label for="name">名前:</label>
+      <input type="text" id="name" placeholder="名前を入力" required />
+      <input type="text" id="level" placeholder="level" required />
+      <button type="submit">追加</button>
+    </form>
+
+    <form id="search">
+      <label for="id">ID:</label>
+      <input type="text" id="id" placeholder="idを入力" required />
+      <button type="submit">検索</button>
+    </form>
+
+    <ul id="list"></ul>
+
+    <script src="./js/api.js"></script>
   </body>
 </html>
