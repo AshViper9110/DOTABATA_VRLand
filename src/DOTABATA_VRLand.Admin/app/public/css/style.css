@@ -1,51 +1,34 @@
+/* public/css/style.css */
+
 body {
   font-family: Arial, sans-serif;
   background: #f5f6fa;
   margin: 0;
-}
-
-.container {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 10px;
+  padding: 20px;
 }
 
 h1 {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-/* カードUI */
-.card {
-  background: #fff;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.card h2 {
-  margin-top: 0;
+  color: #333;
 }
 
 /* フォーム */
 form {
-  display: flex;
-  gap: 10px;
+  margin-bottom: 20px;
 }
 
-input {
-  flex: 1;
+input[type="text"] {
   padding: 8px;
+  font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
 button {
   padding: 8px 12px;
+  font-size: 14px;
+  border: none;
   background: #4caf50;
   color: white;
-  border: none;
   border-radius: 4px;
   cursor: pointer;
 }
@@ -55,23 +38,15 @@ button:hover {
 }
 
 /* リスト */
-.user-list {
+ul {
+  list-style: none;
   padding: 0;
 }
 
-.user-list li {
-  display: flex;
-  justify-content: space-between;
+li {
+  background: white;
+  margin-bottom: 8px;
   padding: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-/* ログアウト */
-.logout {
-  width: 100%;
-  background: #e74c3c;
-}
-
-.logout:hover {
-  background: #c0392b;
+  border-radius: 4px;
+  border: 1px solid #ddd;
 }
