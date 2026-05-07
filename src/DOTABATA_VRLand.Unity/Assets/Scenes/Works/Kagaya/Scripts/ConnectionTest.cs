@@ -32,7 +32,6 @@ public class ConnectionTest : MonoBehaviour {
         }
         Debug.Log(text);
 
-        
     }
 
     /// <summary>
