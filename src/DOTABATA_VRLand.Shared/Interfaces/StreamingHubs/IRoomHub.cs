@@ -13,16 +13,28 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// ルームに接続
         /// </summary>
-        public Task<JoinedUser[]> JoinRoomAsync(string roomName, string userName);
+        Task<JoinedUser[]> JoinRoomAsync(string roomName, string userName);
 
         /// <summary>
         /// 退出処理
         /// </summary>
-        public Task LeaveRoomAsync();
+        Task LeaveRoomAsync();
 
         /// <summary>
         /// 接続ID取得
         /// </summary>
         Task<Guid> GetConnectionId();
+
+
+        /// <summary>
+        /// ユーザーのTransfrom同期
+        /// </summary>
+        Task UpdateUserTransformAsync(SimpleTransform simpleTransform);
+
+
+        /// <summary>
+        /// ミニゲームの選択
+        /// </summary>
+        Task SelectMiniGameAsync(int miniGameId);
     }
 }

@@ -131,5 +131,35 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public Task<Guid> GetConnectionId() {
             return Task.FromResult<Guid>(this.ConnectionId);
         }
+
+
+
+
+        /// <summary>
+        /// ユーザーのTransfrom同期
+        /// </summary>
+        public Task UpdateUserTransformAsync(SimpleTransform simpleTransform) {
+            // サーバーに保持
+            _roomContext.RoomUserDataList[this.ConnectionId].transform = simpleTransform;
+
+            // 自分以外のユーザーに通知
+            _roomContext.Group.Except([this.ConnectionId]).OnUpdateUserTransform(this.ConnectionId, simpleTransform);
+
+            return Task.CompletedTask;
+        }
+
+
+        /// <summary>
+        /// ミニゲームの選択
+        /// </summary>
+        public Task SelectMiniGameAsync(int miniGameId) {
+            // サーバーに保持
+            _roomContext.MiniGameId = miniGameId;
+
+            // 自分以外に通知
+            _roomContext.Group.Except([this.ConnectionId]).OnSelectMiniGame(miniGameId);
+            
+            return Task.CompletedTask;
+        }
     }
 }

@@ -8,6 +8,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public Guid Id { get; } // ルームid
         public string Name { get; } // ルーム名
         public IMulticastSyncGroup<Guid, IRoomHubReceiver> Group { get; } // グループ
+
+        public int MiniGameId { get; set; } // ミニゲームid
+
         public Dictionary<Guid, RoomUserData> RoomUserDataList { get; } =
             new Dictionary<Guid, RoomUserData>(); // ユーザーデータ一覧
 
