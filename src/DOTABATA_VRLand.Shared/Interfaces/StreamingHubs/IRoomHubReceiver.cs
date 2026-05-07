@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DOTABATA_VRLand.Shared.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,5 +17,11 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ユーザーの退室通知
         /// </summary>
         public void OnLeaveRoom(Guid connectionId, int joinOrder);
+
+
+        /// <summary>
+        /// ユーザーのTransfrom通知
+        /// </summary>
+        public void OnUpdateUserTransform(Guid connectionId, SimpleTransform simpleTransform);
     }
 }
