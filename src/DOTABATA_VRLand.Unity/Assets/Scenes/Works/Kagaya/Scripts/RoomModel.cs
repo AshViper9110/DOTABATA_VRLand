@@ -42,6 +42,11 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<int> OnSelectedMiniGame { get; set; }
 
+    /// <summary>
+    /// ゲームスタート通知
+    /// </summary>
+    public Action OnGameStarted { get; set; }
+
     /*
      * 処理
      */
@@ -173,6 +178,25 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnSelectMiniGame(int miniGameId) {
         if (OnSelectedMiniGame != null) {
             OnSelectedMiniGame(miniGameId);
+        }
+    }
+
+    /// <summary>
+    /// ゲームスタート
+    /// </summary>
+    public async UniTask GameStartAsync() {
+        if (roomHub != null) {
+            await roomHub.GameStartAsync();
+        }
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ゲームスタート通知
+    /// </summary>
+    public void OnGameStart() {
+        if (OnGameStarted != null) {
+            OnGameStarted();
         }
     }
 }

@@ -36,5 +36,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ミニゲームの選択
         /// </summary>
         Task SelectMiniGameAsync(int miniGameId);
+
+        /// <summary>
+        /// ゲームスタート
+        /// </summary>
+        Task GameStartAsync();
     }
 }

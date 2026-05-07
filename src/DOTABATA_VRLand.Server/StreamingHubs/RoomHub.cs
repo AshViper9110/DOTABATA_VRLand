@@ -179,5 +179,15 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// ゲームスタート
+        /// </summary>
+        public Task GameStartAsync() {
+            // 全員に通知
+            _roomContext.Group.All.OnGameStart();
+
+            return Task.CompletedTask;
+        }
     }
 }
