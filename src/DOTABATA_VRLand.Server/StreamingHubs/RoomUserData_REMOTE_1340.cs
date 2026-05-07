@@ -9,14 +9,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public JoinedUser joinedUser = new JoinedUser();
 
         /// <summary>
-        /// ミニゲーム準備完了情報
-        /// </summary>
-        public bool IsReady;
-
-        /// <summary>
         /// ユーザーのTransform情報
         /// </summary>
         public SimpleTransform transform = new SimpleTransform();
-
     }
 }

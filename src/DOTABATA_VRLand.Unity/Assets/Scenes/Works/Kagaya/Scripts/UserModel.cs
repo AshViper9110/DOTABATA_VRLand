@@ -35,6 +35,18 @@ public class UserModel : Singleton<UserModel> {
     }
 
     /// <summary>
+    /// Idからユーザー情報取得
+    /// </summary>
+    public async UniTask<User> GetUserFromIdAsync(int id) {
+        try {
+            return await client.GetUserFromIdAsync(id);
+        }catch (Exception e) {
+            Debug.LogException(e);
+            throw;
+        }
+    }
+
+    /// <summary>
     /// ユーザー登録
     /// </summary>
     public async UniTask<bool> RegistUserAsync(string name) {
