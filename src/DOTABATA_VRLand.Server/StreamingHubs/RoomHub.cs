@@ -31,9 +31,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
-        /// ルームに接続
+        /// ルーム作成
         /// </summary>
-        public async Task<JoinedUser[]> JoinRoomAsync(string roomName, string userName) {
+        public Task CreateRoomAsync(string roomName) {
             // 同時に生成しない用に排他制御
             lock (_roomContextRepository) {
                 // 指定の名前のルームがあるかどうかを確認
@@ -49,6 +49,30 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                     this._roomContext = _roomContextRepository.CreateContext(roomName);
                 }
             }
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// ルーム削除
+        /// </summary>
+        public Task DeleteRoomAsync() {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("{DeleteRoom}");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("RoomName : " + _roomContext.Name + "\n");
+
+            _roomContextRepository.RemoveContext(_roomContext.Name);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// ルームに接続
+        /// </summary>
+        public async Task<JoinedUser[]> JoinRoomAsync(string roomName, string userName) {
+            await CreateRoomAsync(roomName);
+
             // ルームに参加 ＆ ルームを保持
             this._roomContext.Group.Add(this.ConnectionId, Client);
 
@@ -113,13 +137,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             // ルーム内にユーザーが一人もいなかったらルームを削除
             if (this._roomContext.RoomUserDataList.Count == 0) {
-
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("{DeleteRoom}");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("RoomName : " + _roomContext.Name + "\n");
-
-                _roomContextRepository.RemoveContext(_roomContext.Name);
+                DeleteRoomAsync();
             }
 
             return Task.CompletedTask;
@@ -130,6 +148,36 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public Task<Guid> GetConnectionId() {
             return Task.FromResult<Guid>(this.ConnectionId);
+        }
+
+
+
+
+        /// <summary>
+        /// ユーザーのTransfrom同期
+        /// </summary>
+        public Task UpdateUserTransformAsync(SimpleTransform simpleTransform) {
+            // サーバーに保持
+            _roomContext.RoomUserDataList[this.ConnectionId].transform = simpleTransform;
+
+            // 自分以外のユーザーに通知
+            _roomContext.Group.Except([this.ConnectionId]).OnUpdateUserTransform(this.ConnectionId, simpleTransform);
+
+            return Task.CompletedTask;
+        }
+
+
+        /// <summary>
+        /// ミニゲームの選択
+        /// </summary>
+        public Task SelectMiniGameAsync(int miniGameId) {
+            // サーバーに保持
+            _roomContext.MiniGameId = miniGameId;
+
+            // 自分以外に通知
+            _roomContext.Group.Except([this.ConnectionId]).OnSelectMiniGame(miniGameId);
+            
+            return Task.CompletedTask;
         }
     }
 }

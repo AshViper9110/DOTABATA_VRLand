@@ -21,7 +21,7 @@ namespace DOTABATA_VRLand.Server.Services {
         /// <summary>
         /// DBにサーバーログを追加
         /// </summary>
-        private async void AddServerLogs(string content) {
+        private void AddServerLogs(string content) {
             ServerLogs serverLogs = new ServerLogs() {
                 Content = content,
             };
@@ -32,10 +32,26 @@ namespace DOTABATA_VRLand.Server.Services {
         /// 全ユーザー情報取得
         /// </summary>
         public async UnaryResult<User[]> GetAllUsersAsync() {
-            AddServerLogs($"User search ID:All");
+            AddServerLogs($"User Search All");
             await _context.SaveChangesAsync();
             return await _context.Users.ToArrayAsync();
         }
+
+        /// <summary>
+        /// Idからユーザー情報取得
+        /// </summary>
+        /// <returns></returns>
+        public async UnaryResult<User> GetUserFromIdAsync(int id) {
+            if (!_context.Users.Any(user=> user.Id == id)){
+                throw new Exception();
+            }
+
+            AddServerLogs($"User Search ID:{id}");
+            await _context.SaveChangesAsync();
+
+            return await _context.Users.FirstAsync(user => user.Id == id);
+        }
+
 
         /// <summary>
         /// ユーザー登録
@@ -50,7 +66,7 @@ namespace DOTABATA_VRLand.Server.Services {
                 };
                 _context.Users.Add(user);
 
-                AddServerLogs($"Add user Name:{name}");
+                AddServerLogs($"Add User Name:{name}");
 
                 await _context.SaveChangesAsync();
 
