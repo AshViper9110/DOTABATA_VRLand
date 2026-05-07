@@ -25,15 +25,21 @@ public class GameManager : MonoBehaviour
     bool isSpin;
 
     //ランキングUI
-    List<Transform> rankingPosList;
-    List<Transform> rankingUis;
+    public List<RectTransform> rankingPosList;
+    public List<RectTransform> rankingUis;
 
     //あとで消す変数
-   public List<int> rankList = new List<int>();
+    List<int> rankList = new List<int>();
 
     public List<int> playerWinlist = new List<int>();//勝利数
 
-    public List<Rank> RankingList = new List<Rank>();
+    public List<Rank> RankingList = new List<Rank>()
+    {
+        new Rank(1,2),
+        new Rank(2,4),
+        new Rank(3,3),
+        new Rank(4,1),
+    };
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -44,10 +50,12 @@ public class GameManager : MonoBehaviour
         isSpin = false;
 
         //ここで順位が決定されている状態だったらランキング処理のフラグを建てる
-        if (rankList[0] != 0)
-        {
-            SetResult();
-        }
+        //if (rankList[0] != 0)
+        //{
+        //    SetResult();
+        //}
+        SetRanking();
+        
     }
 
     // Update is called once per frame
@@ -124,9 +132,12 @@ public class GameManager : MonoBehaviour
 
     public void SetRanking()
     {
-        for (int i = 0; i < rankList.Count; i++)
+        
+
+        for (int i = 0; i < RankingList.Count; i++)
         {
-            rankingUis[i].transform.DOMove(rankingPosList[RankingList[i].rank].transform.position,0.4f);
+            rankingUis[i].DOAnchorPosY(rankingPosList[RankingList[i].rank-1].anchoredPosition.y,1f);
         }
+        Debug.Log("移動させます");
     }
 }
