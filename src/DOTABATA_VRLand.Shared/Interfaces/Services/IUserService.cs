@@ -12,6 +12,12 @@ namespace DOTABATA_VRLand.Shared.Interfaces.Services {
         UnaryResult<User[]> GetAllUsersAsync();
 
         /// <summary>
+        /// idからユーザー情報取得
+        /// </summary>
+        UnaryResult<User> GetUserFromIdAsync(int id);
+
+
+        /// <summary>
         /// ユーザー登録
         /// </summary>
         UnaryResult<bool> RegistUserAsync(string name);
