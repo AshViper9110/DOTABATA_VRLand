@@ -6,5 +6,6 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// 接続済みユーザー情報
         /// </summary>
         public JoinedUser joinedUser = new JoinedUser();
+        public bool IsReady;
     }
 }
