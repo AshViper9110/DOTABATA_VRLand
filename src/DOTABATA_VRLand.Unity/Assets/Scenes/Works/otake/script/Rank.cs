@@ -10,5 +10,11 @@ namespace Assets.Scenes.Works.otake.script
     {
         public int Id { get; set; } 
         public int rank { get; set; }
+
+        public Rank(int id, int rank)
+        {
+            Id = id;
+            this.rank = rank;
+        }
     }
 }
