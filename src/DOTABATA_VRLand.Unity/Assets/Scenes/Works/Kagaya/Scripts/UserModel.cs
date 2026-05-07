@@ -15,9 +15,11 @@ public class UserModel : Singleton<UserModel> {
     /// <summary>
     /// MagicOnion接続処理
     /// </summary>
-    public async UniTask CreateUserModel() {
+    public UniTask CreateUserModel() {
         channelx = GrpcChannelx.ForAddress(ServerURL);
         client = MagicOnionClient.Create<IUserService>(channelx);
+
+        return UniTask.CompletedTask;
     }
 
     /// <summary>
