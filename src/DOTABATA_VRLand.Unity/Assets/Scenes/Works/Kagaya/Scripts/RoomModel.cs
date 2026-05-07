@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion;
 using MagicOnion.Client;
 using System;
@@ -28,6 +29,12 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// ユーザー退出通知
     /// </summary>
     public Action<Guid, int> OnLeavedUser { get; set; }
+
+
+    /// <summary>
+    /// ユーザーのTransfrom通知
+    /// </summary>
+    public Action<Guid, SimpleTransform> OnUpdatedUserTransfrom { get; set; }
 
     /*
      * 処理
@@ -115,6 +122,26 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnLeaveRoom(Guid connectionId, int joinOrder) {
         if (OnLeavedUser != null) {
             OnLeavedUser(connectionId, joinOrder);
+        }
+    }
+
+
+    /// <summary>
+    /// ユーザーのTransform同期
+    /// </summary>
+    public async UniTask UpdateUserTransformAsync(SimpleTransform simpleTransform) {
+        if(roomHub != null) {
+            await roomHub.UpdateUserTransformAsync(simpleTransform);
+        }
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ユーザーのTransfrom通知
+    /// </summary>
+    public void OnUpdateUserTransform(Guid connectionId, SimpleTransform simpleTransform) {
+        if (OnUpdatedUserTransfrom != null) {
+            OnUpdatedUserTransfrom(connectionId, simpleTransform);
         }
     }
 }
