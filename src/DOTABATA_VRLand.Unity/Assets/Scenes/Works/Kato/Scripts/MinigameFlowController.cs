@@ -43,7 +43,7 @@ public class MinigameFlowController : MonoBehaviour
 
     void Update()
     {
-        // ▼ リザルト
+        // リザルト
         if (gameUI.activeSelf && !isResultShown && Input.GetKeyDown(KeyCode.Space))
         {
             isResultShown = true;
@@ -75,7 +75,7 @@ public class MinigameFlowController : MonoBehaviour
         resultUI.SetActive(false);
         countdownText.gameObject.SetActive(false);
 
-        // 最初のフェード（残す）
+        // 最初のフェード
         yield return StartCoroutine(Fade(1f, 0f, 1f));
 
         // 説明表示
@@ -110,19 +110,26 @@ public class MinigameFlowController : MonoBehaviour
 
     public void OnReadyButton()
     {
-        // 仮でPlayer1だけReadyにする
-        ready[0] = true;
+        // Ready切り替え
+        ready[0] = !ready[0];
 
         UpdateReadyUI();
 
-        // ボタン消す
-        readyButton.gameObject.SetActive(false);
+        // Ready状態
+        if (ready[0])
+        {
+            readyButton.GetComponentInChildren<Text>().text = "取り消し";
+            waitingText.gameObject.SetActive(true);
+        }
+        // 未Ready状態
+        else
+        {
+            readyButton.GetComponentInChildren<Text>().text = "準備OK！";
+            waitingText.gameObject.SetActive(false);
+        }
 
-        // 待機表示
-        waitingText.gameObject.SetActive(true);
-
-        // 全員揃ったら開始
-        if (AllReady())
+        // 全員Readyなら開始
+        if (AllReady() && !isGameStarted)
         {
             StartCoroutine(StartGameFlow());
         }
@@ -137,7 +144,7 @@ public class MinigameFlowController : MonoBehaviour
 
         isGameStarted = true;
 
-        // ★ 説明とReady両方消す
+        // 説明とReady両方消す
         descriptionPanel.SetActive(false);
         readyPanel.SetActive(false);
 
@@ -222,7 +229,7 @@ public class MinigameFlowController : MonoBehaviour
             // 背景フェード
             fadeImage.color = new Color(fadeColor.r, fadeColor.g, fadeColor.b, alpha);
 
-            // テキストもフェードアウト（逆にする）
+            // テキストもフェードアウト
             float textAlpha = 1f - t;
 
             SetTextAlpha(rank1Text, textAlpha);
@@ -265,8 +272,5 @@ public class MinigameFlowController : MonoBehaviour
     void EndGame()
     {
         Debug.Log("ゲーム終了！");
-
-        // 仮：止めるだけ
-        //Time.timeScale = 0f;
     }
 }
