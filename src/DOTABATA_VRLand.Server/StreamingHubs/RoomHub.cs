@@ -156,12 +156,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ユーザーのTransfrom同期
         /// </summary>
-        public Task UpdateUserTransformAsync(SimpleTransform simpleTransform) {
+        public Task UpdateUserTransformAsync(PlayerTransform playerTransform) {
             // サーバーに保持
-            _roomContext.RoomUserDataList[this.ConnectionId].transform = simpleTransform;
+            _roomContext.RoomUserDataList[this.ConnectionId].transform = playerTransform;
 
             // 自分以外のユーザーに通知
-            _roomContext.Group.Except([this.ConnectionId]).OnUpdateUserTransform(this.ConnectionId, simpleTransform);
+            _roomContext.Group.Except([this.ConnectionId]).OnUpdateUserTransform(this.ConnectionId, playerTransform);
 
             return Task.CompletedTask;
         }

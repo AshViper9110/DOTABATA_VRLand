@@ -7,8 +7,7 @@ using System;
 using UnityEngine;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
-    //protected const string ServerURL = "http://localhost:5244";
-    [SerializeField] private ServerConfigSO ServerConfig;
+    protected const string ServerURL = "http://10.70.41.152:5244";
 
     private GrpcChannelx channelx;
     private IRoomHub roomHub;
@@ -35,17 +34,12 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ユーザーのTransfrom通知
     /// </summary>
-    public Action<Guid, SimpleTransform> OnUpdatedUserTransfrom { get; set; }
+    public Action<Guid, PlayerTransform> OnUpdatedUserTransfrom { get; set; }
 
     /// <summary>
     /// ミニゲーム選択通知
     /// </summary>
     public Action<int> OnSelectedMiniGame { get; set; }
-
-    /// <summary>
-    /// ゲームスタート通知
-    /// </summary>
-    public Action OnGameStarted { get; set; }
 
     /*
      * 処理
@@ -55,13 +49,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// 　MagicOnion接続処理
     /// </summary>
     public async UniTask ConnectAsync() {
-        channelx = GrpcChannelx.ForAddress(
-#if DEBUG
-            ServerConfig.DEBUG.url
-#else
-            ServerConfig.PRODUCTION.url
-#endif
-            );
+        channelx = GrpcChannelx.ForAddress(ServerURL);
         roomHub = await StreamingHubClient.
              ConnectAsync<IRoomHub, IRoomHubReceiver>(channelx, this);
         this.ConnectionId = await roomHub.GetConnectionId();
@@ -100,11 +88,13 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             try {
                 JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync("Test", "1");
 
-                //if (joinedUsers != null) {
-                //    foreach (var user in joinedUsers) {
-                //        OnJoinedUser(user);
-                //    }
-                //}
+                if (joinedUsers != null)
+                {
+                    foreach (var user in joinedUsers)
+                    {
+                        OnJoinedUser(user);
+                    }
+                }
             }
             catch(Exception e) {
                 Debug.LogException(e);
@@ -146,9 +136,9 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ユーザーのTransform同期
     /// </summary>
-    public async UniTask UpdateUserTransformAsync(SimpleTransform simpleTransform) {
+    public async UniTask UpdateUserTransformAsync(PlayerTransform playerTransform) {
         if(roomHub != null) {
-            await roomHub.UpdateUserTransformAsync(simpleTransform);
+            await roomHub.UpdateUserTransformAsync(playerTransform);
         }
     }
 
@@ -156,9 +146,9 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// ユーザーのTransfrom通知
     /// </summary>
-    public void OnUpdateUserTransform(Guid connectionId, SimpleTransform simpleTransform) {
+    public void OnUpdateUserTransform(Guid connectionId, PlayerTransform playerTransform) {
         if (OnUpdatedUserTransfrom != null) {
-            OnUpdatedUserTransfrom(connectionId, simpleTransform);
+            OnUpdatedUserTransfrom(connectionId, playerTransform);
         }
     }
 
@@ -178,25 +168,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnSelectMiniGame(int miniGameId) {
         if (OnSelectedMiniGame != null) {
             OnSelectedMiniGame(miniGameId);
-        }
-    }
-
-    /// <summary>
-    /// ゲームスタート
-    /// </summary>
-    public async UniTask GameStartAsync() {
-        if (roomHub != null) {
-            await roomHub.GameStartAsync();
-        }
-    }
-
-    /// <summary>
-    /// [サーバー通知]
-    /// ゲームスタート通知
-    /// </summary>
-    public void OnGameStart() {
-        if (OnGameStarted != null) {
-            OnGameStarted();
         }
     }
 }
