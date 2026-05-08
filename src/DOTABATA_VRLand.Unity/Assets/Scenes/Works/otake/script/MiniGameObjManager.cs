@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MiniGameObjManager : MonoBehaviour
 {
     public int ID;
+    public RawImage Image;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

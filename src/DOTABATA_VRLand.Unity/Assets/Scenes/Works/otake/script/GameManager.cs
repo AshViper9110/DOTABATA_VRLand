@@ -5,12 +5,32 @@ using UnityEditor;
 using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using static UnityEditor.ShaderData;
 
 
 public class GameManager : MonoBehaviour
 {
    public List<SceneAsset> miniGames = new List<SceneAsset>();
+
+    /// <summary>
+    /// 進行UI関係
+    /// </summary>
+
+    public Text MainText;
+    public int textIndex;
+
+    public bool onResult;
+
+    //進行テキスト(最初)
+    List<string> StartText = new List<string>()
+    {
+        "ミニゲーム大会を始めるよ！",
+        "先に三勝したプレイヤーが勝ちだよ！",
+        "それじゃあ早速ミニゲームを決めていくよ！"
+    };
+
+
 
     //ミニゲームのUI配置関係
     public float radius;
@@ -21,6 +41,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] GameObject selectPoint;
     SelPointManager selPointManager;
+
+    [SerializeField] List<Sprite> miniGameTitleImages = new List<Sprite>();
 
     bool isSpin;
 
@@ -41,6 +63,8 @@ public class GameManager : MonoBehaviour
         new Rank(4,1),
     };
 
+  
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -48,13 +72,18 @@ public class GameManager : MonoBehaviour
         CenterObjRb = CenterObj.GetComponent<Rigidbody>();
         selPointManager = selectPoint.GetComponent<SelPointManager>();
         isSpin = false;
+        onResult = false;
 
         //ここで順位が決定されている状態だったらランキング処理のフラグを建てる
-        //if (rankList[0] != 0)
-        //{
-        //    SetResult();
-        //}
+        if (rankList[0] != 0)
+        {
+            onResult = true;
+        }
         SetRanking();
+
+        MainText.text = "";
+        textIndex = 0;
+        MainText.DOText(StartText[textIndex],1.0f);
         
     }
 
@@ -63,22 +92,43 @@ public class GameManager : MonoBehaviour
     {
         if (!isSpin)
         {
-            CenterObjRb.angularVelocity = new Vector3(0, 0.3f, 0);
+            if (CenterObjRb.angularVelocity.y < 0.29f) {
+                CenterObjRb.angularVelocity = new Vector3(0, 0.3f, 0);
+                }
         }
         else if (isSpin)
         {
             if (CenterObjRb.angularVelocity.y < 0.01f)
             {
-                Debug.Log(selPointManager.SelectId+"にゲームが決まりました");
+                Debug.Log(selPointManager.SelectId + "にゲームが決まりました");
                 MoveScene(miniGames[selPointManager.SelectId]);
                 enabled = false;
             }
         }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            textIndex++;
+            MainText.text = "";
+            if (textIndex >= StartText.Count)
+            {
+                SelectMiniGame();
+                return;
+            }
+           
+            MainText.DOText(StartText[textIndex], 1.0f);
+        }
+
+
+        //TODO：自身がホストの場合はミニゲーム一覧の回転同期
     }
 
+    //ミニゲーム抽選開始(ホストのみ実行)
     public void SelectMiniGame()
     {
         isSpin = true;
+        //TODO：抽選開始通知
+
        float spinPower = Random.Range(3, 6);
 
        CenterObjRb.angularVelocity = new Vector3(0, spinPower, 0);
@@ -114,8 +164,9 @@ public class GameManager : MonoBehaviour
                 CenterObj.transform);
 
             MiniGameObjManager manager = obj.GetComponent<MiniGameObjManager>();
+            RawImage Image = manager.GetComponentInChildren<RawImage>();
             manager.ID = i;
-
+            Image.texture = miniGameTitleImages[i].texture;
         }
     }
 
@@ -138,6 +189,12 @@ public class GameManager : MonoBehaviour
         {
             rankingUis[i].DOAnchorPosY(rankingPosList[RankingList[i].rank-1].anchoredPosition.y,1f);
         }
-        Debug.Log("移動させます");
+   
+    }
+
+    //テキスト遷移
+    public void MoveText()
+    {
+
     }
 }
