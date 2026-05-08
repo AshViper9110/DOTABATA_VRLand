@@ -16,6 +16,9 @@ public class MinigameFlowController : MonoBehaviour
 
     public MinigameInfo info;
 
+    public Button readyButton;
+    public Text waitingText;
+
     public Image fadeImage;
     public Text countdownText;
 
@@ -28,8 +31,6 @@ public class MinigameFlowController : MonoBehaviour
 
     private bool[] ready = new bool[4];
 
-    private bool allReady = false;
-
     private bool isReadyPhase = false;
     private bool isGameStarted = false;
     private bool isResultShown = false;
@@ -37,50 +38,30 @@ public class MinigameFlowController : MonoBehaviour
     void Start()
     {
         StartCoroutine(GameFlow());
+        waitingText.gameObject.SetActive(false);
     }
 
     void Update()
     {
-        // ▼ 説明→Ready移行
-        if (!isReadyPhase && introUI.activeSelf && Input.GetKeyDown(KeyCode.Space))
-        {
-            isReadyPhase = true;
-
-            descriptionPanel.SetActive(false); // ←説明消す
-            readyPanel.SetActive(true);        // ←Ready表示
-
-            UpdateReadyUI();
-        }
-
-        // ▼ Ready操作
-        if (isReadyPhase && !isGameStarted)
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) ready[0] = !ready[0];
-            if (Input.GetKeyDown(KeyCode.Alpha2)) ready[1] = !ready[1];
-            if (Input.GetKeyDown(KeyCode.Alpha3)) ready[2] = !ready[2];
-            if (Input.GetKeyDown(KeyCode.Alpha4)) ready[3] = !ready[3];
-
-            UpdateReadyUI();
-
-            // 全員Readyになったら
-            if (AllReady())
-            {
-                allReady = true;
-                readyText.text = "全員準備OK！\nスペースでスタート！";
-            }
-
-            // ★ スタート待ち
-            if (allReady && Input.GetKeyDown(KeyCode.Space))
-            {
-                StartCoroutine(StartGameFlow());
-            }
-        }
-
         // ▼ リザルト
         if (gameUI.activeSelf && !isResultShown && Input.GetKeyDown(KeyCode.Space))
         {
             isResultShown = true;
             StartCoroutine(ShowResult());
+        }
+
+        if (waitingText.gameObject.activeSelf)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) ready[1] = true;
+            if (Input.GetKeyDown(KeyCode.Alpha2)) ready[2] = true;
+            if (Input.GetKeyDown(KeyCode.Alpha3)) ready[3] = true;
+
+            UpdateReadyUI();
+
+            if (AllReady() && !isGameStarted)
+            {
+                StartCoroutine(StartGameFlow());
+            }
         }
     }
 
@@ -108,11 +89,14 @@ public class MinigameFlowController : MonoBehaviour
     // =========================
     void UpdateReadyUI()
     {
-        readyText.text =
-            $"Player1：{(ready[0] ? "○" : "×")}（1キー）\n" +
-            $"Player2：{(ready[1] ? "○" : "×")}（2キー）\n" +
-            $"Player3：{(ready[2] ? "○" : "×")}（3キー）\n" +
-            $"Player4：{(ready[3] ? "○" : "×")}（4キー）";
+        int readyCount = 0;
+
+        foreach (bool r in ready)
+        {
+            if (r) readyCount++;
+        }
+
+        readyText.text = $"{readyCount}/4 プレイヤー準備完了";
     }
 
     bool AllReady()
@@ -124,23 +108,41 @@ public class MinigameFlowController : MonoBehaviour
         return true;
     }
 
+    public void OnReadyButton()
+    {
+        // 仮でPlayer1だけReadyにする
+        ready[0] = true;
+
+        UpdateReadyUI();
+
+        // ボタン消す
+        readyButton.gameObject.SetActive(false);
+
+        // 待機表示
+        waitingText.gameObject.SetActive(true);
+
+        // 全員揃ったら開始
+        if (AllReady())
+        {
+            StartCoroutine(StartGameFlow());
+        }
+    }
+
     // =========================
     // ゲーム開始
     // =========================
     IEnumerator StartGameFlow()
     {
+        if (isGameStarted) yield break;
+
         isGameStarted = true;
 
-        // ★ Ready表示を消す
+        // ★ 説明とReady両方消す
+        descriptionPanel.SetActive(false);
         readyPanel.SetActive(false);
 
-        // （ちょい間を入れると気持ちいい）
-        yield return new WaitForSecondsRealtime(0.3f);
-
-        // カウントダウン
         yield return StartCoroutine(Countdown());
 
-        // ゲーム開始
         introUI.SetActive(false);
         gameUI.SetActive(true);
     }
