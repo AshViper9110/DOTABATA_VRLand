@@ -29,7 +29,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// ユーザーのTransfrom同期
         /// </summary>
-        Task UpdateUserTransformAsync(PlayerTransform playerTransform);
+        Task UpdateUserTransformAsync(PlayerTransformDTO playerTransform);
 
 
         /// <summary>
