@@ -34,7 +34,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ユーザーのTransfrom通知
     /// </summary>
-    public Action<Guid, PlayerTransform> OnUpdatedUserTransfrom { get; set; }
+    public Action<Guid, PlayerTransformDTO> OnUpdatedUserTransfrom { get; set; }
 
     /// <summary>
     /// ミニゲーム選択通知
@@ -136,7 +136,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ユーザーのTransform同期
     /// </summary>
-    public async UniTask UpdateUserTransformAsync(PlayerTransform playerTransform) {
+    public async UniTask UpdateUserTransformAsync(PlayerTransformDTO playerTransform) {
         if(roomHub != null) {
             await roomHub.UpdateUserTransformAsync(playerTransform);
         }
@@ -146,7 +146,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// ユーザーのTransfrom通知
     /// </summary>
-    public void OnUpdateUserTransform(Guid connectionId, PlayerTransform playerTransform) {
+    public void OnUpdateUserTransform(Guid connectionId, PlayerTransformDTO playerTransform) {
         if (OnUpdatedUserTransfrom != null) {
             OnUpdatedUserTransfrom(connectionId, playerTransform);
         }
@@ -169,5 +169,13 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (OnSelectedMiniGame != null) {
             OnSelectedMiniGame(miniGameId);
         }
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ゲームスタート通知
+    /// </summary>
+    public void OnGameStart() {
+
     }
 }

@@ -16,7 +16,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ユーザーのTransform情報
         /// </summary>
-        public PlayerTransform transform = new PlayerTransform();
+        public PlayerTransformDTO transform = new PlayerTransformDTO();
 
     }
 }

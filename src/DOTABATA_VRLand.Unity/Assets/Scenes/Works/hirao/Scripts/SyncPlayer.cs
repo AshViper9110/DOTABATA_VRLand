@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using System;
 using UnityEngine;
@@ -43,7 +43,7 @@ public class SyncPlayer : MonoBehaviour
         }
     }
 
-    private void OnSyncPlayer(Guid connectionId, PlayerTransform data)
+    private void OnSyncPlayer(Guid connectionId, PlayerTransformDTO data)
     {
         if (connectionId != this.connectionId)
             return;
@@ -65,7 +65,7 @@ public class SyncPlayer : MonoBehaviour
         if (!TitleMana.isJoin)
             return;
 
-        PlayerTransform data = new PlayerTransform
+        PlayerTransformDTO data = new PlayerTransformDTO
         {
             Head = head.ToSimpleTransform(),
             LeftHand = leftHand.ToSimpleTransform(),
