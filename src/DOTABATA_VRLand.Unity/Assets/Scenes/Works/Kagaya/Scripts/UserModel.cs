@@ -7,7 +7,7 @@ using System;
 using UnityEngine;
 
 public class UserModel : Singleton<UserModel> {
-    protected const string ServerURL = "http://localhost:5244";
+    protected const string ServerURL = "http://10.70.41.152:5244";
 
     private GrpcChannelx channelx;
     private IUserService client;

@@ -2,15 +2,12 @@ using Assets.Scenes.Works.otake.script;
 using DG.Tweening;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.SearchService;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using static UnityEditor.ShaderData;
 
 
 public class GameManager : MonoBehaviour
 {
-   public List<SceneAsset> miniGames = new List<SceneAsset>();
+   //public List<SceneAsset> miniGames = new List<SceneAsset>();
 
     //É~ÉjÉQÅ[ÉÄÇÃUIîzíuä÷åW
     public float radius;
@@ -70,7 +67,7 @@ public class GameManager : MonoBehaviour
             if (CenterObjRb.angularVelocity.y < 0.01f)
             {
                 Debug.Log(selPointManager.SelectId+"Ç…ÉQÅ[ÉÄÇ™åàÇ‹ÇËÇ‹ÇµÇΩ");
-                MoveScene(miniGames[selPointManager.SelectId]);
+                //MoveScene(miniGames[selPointManager.SelectId]);
                 enabled = false;
             }
         }
@@ -84,10 +81,10 @@ public class GameManager : MonoBehaviour
        CenterObjRb.angularVelocity = new Vector3(0, spinPower, 0);
     }
 
-    public void MoveScene(SceneAsset scene)
-    {
-        Initiate.Fade(scene.name, Color.black, 1.0f);
-    }
+    //public void MoveScene(SceneAsset scene)
+    //{
+    //    //Initiate.Fade(scene.name, Color.black, 1.0f);
+    //}
 
     public void SetMiniGame()
     {
@@ -98,25 +95,25 @@ public class GameManager : MonoBehaviour
         Vector3 pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
         selectPoint.transform.position = CenterObj.transform.position + pos;
 
-        int count = miniGames.Count;
-        for (int i = 0; i < count; i++)
-        {
-            // äpìxÇåvéZ
-             angle = i * Mathf.PI * 2 / count;
+        //int count = miniGames.Count;
+        //for (int i = 0; i < count; i++)
+        //{
+        //    // äpìxÇåvéZ
+        //     angle = i * Mathf.PI * 2 / count;
 
-            // à íuÇåvéZ (X, ZïΩñ )
-             pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
+        //    // à íuÇåvéZ (X, ZïΩñ )
+        //     pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
 
-            // ê∂ê¨ÇµÇƒâÒì]ÇìKóp
-            GameObject obj = Instantiate(MinigamePrefab, 
-                CenterObj.transform.position + pos,
-                Quaternion.identity,
-                CenterObj.transform);
+        //    // ê∂ê¨ÇµÇƒâÒì]ÇìKóp
+        //    GameObject obj = Instantiate(MinigamePrefab, 
+        //        CenterObj.transform.position + pos,
+        //        Quaternion.identity,
+        //        CenterObj.transform);
 
-            MiniGameObjManager manager = obj.GetComponent<MiniGameObjManager>();
-            manager.ID = i;
+        //    MiniGameObjManager manager = obj.GetComponent<MiniGameObjManager>();
+        //    manager.ID = i;
 
-        }
+        //}
     }
 
     public void SetResult()
