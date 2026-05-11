@@ -5,75 +5,76 @@ using UnityEngine;
 
 [CreateAssetMenu(menuName = "Config/ServerConfig")]
 public class ServerConfigSO : ScriptableObject {
-    [SerializeField] private List<ServerConfig> debug = new List<ServerConfig>();
-    public ServerConfig DEBUG {
-        get { return debug.FirstOrDefault(_=> _.use); }
-    }
+    [SerializeField] private List<ServerConfig> debugs = new();
+    [SerializeField] private List<ServerConfig> productions = new();
 
-    [SerializeField] private List<ServerConfig> production = new List<ServerConfig>();
-    public ServerConfig PRODUCTION {
-        get { return production.FirstOrDefault(_ => _.use); }
-    }
-
-    private List<ServerConfig> saveDebug;
-    private List<ServerConfig> saveProduction;
+    public ServerConfig DEBUG => debugs.FirstOrDefault(_ => _.use);
+    public ServerConfig PRODUCTION => productions.FirstOrDefault(_ => _.use);
 
     private void OnValidate() {
-        ValidateDebug();
-        ValidateProduction();
+        Validate(debugs);
+        Validate(productions);
     }
 
-    private void ValidateDebug() {
-        if (debug.Count(_ => _.use) <= 1 ||
-            debug.Count() != saveDebug.Count()) {
-            if (debug.Count() > 1) {
-                debug.Last().use = false;
+    /// <summary>
+    /// チェックを一つだけに
+    /// </summary>
+    private void Validate(List<ServerConfig> condigs) {
+        int index;
+
+        if (debugs.Count(_ => _.use) <= 1) {
+            index = debugs.FindIndex(_ => _.use);
+            if (index == -1) {
+                return;
             }
-            saveDebug = debug.Select(_ => _.DeepCopy()).ToList();
-            return;
-        }
 
-        int index = saveDebug.FindIndex(_ => _.use);
-        if (index < 0 || index > debug.Count() - 1) {
-            debug.All(_ => _.use = false);
-            saveDebug = debug.Select(_ => _.DeepCopy()).ToList();
-            return;
-        }
-
-        debug[index].use = false;
-        saveDebug = debug.Select(_ => _.DeepCopy()).ToList();
-    }
-
-    private void ValidateProduction() {
-        if (production.Count(_ => _.use) <= 1 ||
-            production.Count() != saveProduction.Count()) {
-            if (production.Count() > 1) {
-                production.Last().use = false;
+            foreach (var item in debugs) {
+                item.saveUse = false;
             }
-            saveProduction = production.Select(_ => _.DeepCopy()).ToList();
-            return;
-        }
-            int index = saveProduction.FindIndex(_ => _.use);
-        if (index < 0 || index > production.Count() - 1) {
-            production.All(_ => _.use = false);
-            saveProduction = production.Select(_ => _.DeepCopy()).ToList();
+
+            debugs[index].saveUse = true;
+
             return;
         }
 
-        production[index].use = false;
-        saveProduction = production.Select(_ => _.DeepCopy()).ToList();
+        index = debugs.FindIndex(_ => _.saveUse);
+        if (index < 0 || index > debugs.Count() - 1) {
+            foreach (var item in debugs) {
+                item.use = false;
+            }
+
+            index = debugs.FindIndex(_ => _.use);
+            if (index == -1) {
+                return;
+            }
+
+            foreach (var item in debugs) {
+                item.saveUse = false;
+            }
+
+            debugs[index].saveUse = true;
+
+            return;
+        }
+
+        debugs[index].use = false;
+
+        index = debugs.FindIndex(_ => _.use);
+        if (index == -1) {
+            return;
+        }
+
+        foreach (var item in debugs) {
+            item.saveUse = false;
+        }
+
+        debugs[index].saveUse = true;
     }
 }
 
 [System.Serializable]
 public class ServerConfig {
     public bool use;
+    [HideInInspector] public bool saveUse = false;
     public string url;
-
-    public ServerConfig DeepCopy() {
-        return new ServerConfig {
-            use = this.use,
-            url = this.url
-        };
-    }
 }
