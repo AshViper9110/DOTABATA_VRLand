@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae8200f6c874634428868019a3c912aa, type: 3}
   m_Name: ServerConfig
   m_EditorClassIdentifier: 
-  DEBUG:
+  debug:
+  - use: 1
     url: http://localhost:5244
-  PRODUCTION:
+  production:
+  - use: 1
     url: http://localhost:5244

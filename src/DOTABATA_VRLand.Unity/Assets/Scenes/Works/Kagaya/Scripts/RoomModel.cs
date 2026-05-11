@@ -7,7 +7,7 @@ using System;
 using UnityEngine;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
-    protected const string ServerURL = "http://10.70.41.152:5244";
+    [SerializeField] private ServerConfigSO serverConfig;
 
     private GrpcChannelx channelx;
     private IRoomHub roomHub;
@@ -49,7 +49,13 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// 　MagicOnion接続処理
     /// </summary>
     public async UniTask ConnectAsync() {
-        channelx = GrpcChannelx.ForAddress(ServerURL);
+        channelx = GrpcChannelx.ForAddress(
+#if DEBUG
+            serverConfig.DEBUG.url
+#else
+            serverConfig.PRODUCTION.url
+#endif
+            );
         roomHub = await StreamingHubClient.
              ConnectAsync<IRoomHub, IRoomHubReceiver>(channelx, this);
         this.ConnectionId = await roomHub.GetConnectionId();
