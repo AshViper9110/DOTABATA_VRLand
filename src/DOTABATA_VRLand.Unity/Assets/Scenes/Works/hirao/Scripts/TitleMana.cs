@@ -1,4 +1,5 @@
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using DOTABATA_VRLand.Shared.Models.Entities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,7 @@ public class TitleMana : MonoBehaviour
     public GameObject player;
     private Guid myConnectionId;
     static public bool isJoin = false;
+    public Dictionary<Guid, GameObject> playerList = new Dictionary<Guid, GameObject>();
 
     /// <summary>
     /// TextにLogを表示
@@ -30,6 +32,7 @@ public class TitleMana : MonoBehaviour
     {
         RoomModel.I.OnJoinedUser += OnJoinedUser;
         RoomModel.I.OnLeavedUser += OnLeavedUser;
+        RoomModel.I.OnUpdatedUserTransfrom += OnSyncPlayer;
     }
 
     private void OnDisable()
@@ -54,10 +57,8 @@ public class TitleMana : MonoBehaviour
 
         myConnectionId = RoomModel.I.ConnectionId;
 
-        SyncPlayer syncplayer = player.GetComponent<SyncPlayer>();
-
-        syncplayer.connectionId = myConnectionId;
-        syncplayer.isLocalPlayer = true;  
+        SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
+        syncPlayer.isLocalPlayer = true;  // これだけでOK
     }
 
     /// <summary>
@@ -85,8 +86,24 @@ public class TitleMana : MonoBehaviour
         TextLogs($"{user.Name}が入室");
         if(user.ConnectionId != myConnectionId)
         {
-            Instantiate(SyncPlayerPrefab).GetComponent<SyncPlayer>().connectionId = user.ConnectionId;
+            GameObject player = Instantiate(SyncPlayerPrefab);
+            playerList.Add(user.ConnectionId, player);
+
+            SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
+            PlayerData data = new PlayerData() { playerObj = player };
+            InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
         }
+    }
+
+    /// <summary>
+    /// 自身以外の同期
+    /// </summary>
+    private void OnSyncPlayer(Guid connectionId, PlayerTransformDTO data)
+    {
+        if (!playerList.ContainsKey(connectionId)) return;
+
+        SyncPlayer player = playerList[connectionId].GetComponent<SyncPlayer>();
+        player.ApplyTransform(data);
     }
 
     /// <summary>
@@ -96,5 +113,6 @@ public class TitleMana : MonoBehaviour
     private void OnLeavedUser(Guid connectionId, int joinOrder)
     {
         TextLogs($"ConnectionId：{connectionId} が退室");
+        InRoomPlayerData.I.RemovePlayer(connectionId);
     }
 }
