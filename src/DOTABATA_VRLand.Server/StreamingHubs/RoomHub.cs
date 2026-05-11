@@ -99,7 +99,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
 
             // ルーム参加者全員に、ユーザーの入室通知を送信
-            this._roomContext.Group.All.OnJoinRoom(joinedUser);
+            this._roomContext.Group.Except([this.ConnectionId]).OnJoinRoom(joinedUser);
 
             // 入室リクエストをしたユーザーに、参加者の情報をリストで返す
             return this._roomContext.RoomUserDataList.Select(f => f.Value.joinedUser).ToArray();

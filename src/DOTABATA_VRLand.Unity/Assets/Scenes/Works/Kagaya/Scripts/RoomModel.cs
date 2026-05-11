@@ -8,6 +8,7 @@ using UnityEngine;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     protected const string ServerURL = "http://10.70.41.152:5244";
+    //protected const string ServerURL = "http://localhost:5244";
 
     private GrpcChannelx channelx;
     private IRoomHub roomHub;
@@ -87,12 +88,15 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (roomHub != null) {
             try {
                 JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync("Test", "1");
-
                 if (joinedUsers != null)
                 {
                     foreach (var user in joinedUsers)
                     {
-                        OnJoinedUser(user);
+                        // 自分自身はスキップ
+                        if (user.ConnectionId != ConnectionId)
+                        {
+                            OnJoinedUser(user);
+                        }
                     }
                 }
             }

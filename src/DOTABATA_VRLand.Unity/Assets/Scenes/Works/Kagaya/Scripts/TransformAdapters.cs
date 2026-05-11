@@ -8,31 +8,24 @@ public static class TransformAdapters
     /// Transform -> DTO
     /// </summary>
     public static SimpleTransform ToSimpleTransform(this Transform t) =>
-        new SimpleTransform
-        {
-            localPosition = t.localPosition,
-            localRotation = t.localRotation,
-            localScale = t.localScale,
-        };
+    new SimpleTransform
+    {
+        localPosition = t.position,    // ✅ world座標
+        localRotation = t.rotation,    // ✅ world回転
+        localScale = t.localScale,     // scaleはそのままでOK
+    };
 
     /// <summary>
     /// DTO -> Transform
     /// </summary>
-    public static void ApplyTransform(
-        this Transform t,
-        in SimpleTransform st,
-        float duration)
+    public static void ApplyTransform(this Transform t, in SimpleTransform st, float duration)
     {
-        duration *= 2f;
+        t.DOKill();  // 前フレームのTweenをキャンセル
 
-        // 既存Tween停止
-        t.DOKill();
-
-        // local基準で同期
-        t.DOLocalMove(st.localPosition, duration)
+        t.DOMove(st.localPosition, duration)
             .SetEase(Ease.Linear);
 
-        t.DOLocalRotateQuaternion(st.localRotation, duration)
+        t.DORotateQuaternion(st.localRotation, duration)
             .SetEase(Ease.Linear);
 
         t.DOScale(st.localScale, duration)

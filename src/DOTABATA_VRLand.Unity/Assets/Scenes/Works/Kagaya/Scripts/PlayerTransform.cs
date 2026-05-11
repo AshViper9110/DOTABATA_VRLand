@@ -2,10 +2,10 @@
 using UnityEngine;
 
 public class PlayerTransform : MonoBehaviour {
-    [SerializeField] private Transform Head;
-    [SerializeField] private Transform LeftHand;
-    [SerializeField] private Transform RightHand;
-    [SerializeField] private Transform Body;
+    [SerializeField] public Transform Head;
+    [SerializeField] public Transform LeftHand;
+    [SerializeField] public Transform RightHand;
+    [SerializeField] public Transform Body;
 
 
     [SerializeField] private float duration = 0.2f;

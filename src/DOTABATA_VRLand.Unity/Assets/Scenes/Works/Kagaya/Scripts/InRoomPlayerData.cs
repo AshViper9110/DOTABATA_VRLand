@@ -30,6 +30,7 @@ public class InRoomPlayerData : Singleton<InRoomPlayerData> {
     /// プレイヤーリストから削除
     /// </summary>
     public void RemovePlayer(Guid connectionId) {
+        Destroy(playerList[connectionId].playerObj);
         playerList.Remove(connectionId);
     }
 }
