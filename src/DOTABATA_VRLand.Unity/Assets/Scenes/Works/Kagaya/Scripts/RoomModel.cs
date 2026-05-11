@@ -1,12 +1,14 @@
 ﻿using Cysharp.Threading.Tasks;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion;
 using MagicOnion.Client;
 using System;
 using UnityEngine;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
-    protected const string ServerURL = "http://localhost:5244";
+    protected const string ServerURL = "http://10.70.41.152:5244";
+    //protected const string ServerURL = "http://localhost:5244";
 
     private GrpcChannelx channelx;
     private IRoomHub roomHub;
@@ -28,6 +30,17 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// ユーザー退出通知
     /// </summary>
     public Action<Guid, int> OnLeavedUser { get; set; }
+
+
+    /// <summary>
+    /// ユーザーのTransfrom通知
+    /// </summary>
+    public Action<Guid, PlayerTransformDTO> OnUpdatedUserTransfrom { get; set; }
+
+    /// <summary>
+    /// ミニゲーム選択通知
+    /// </summary>
+    public Action<int> OnSelectedMiniGame { get; set; }
 
     /*
      * 処理
@@ -75,12 +88,17 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (roomHub != null) {
             try {
                 JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync("Test", "1");
-
-                //if (joinedUsers != null) {
-                //    foreach (var user in joinedUsers) {
-                //        OnJoinedUser(user);
-                //    }
-                //}
+                if (joinedUsers != null)
+                {
+                    foreach (var user in joinedUsers)
+                    {
+                        // 自分自身はスキップ
+                        if (user.ConnectionId != ConnectionId)
+                        {
+                            OnJoinedUser(user);
+                        }
+                    }
+                }
             }
             catch(Exception e) {
                 Debug.LogException(e);
@@ -116,5 +134,52 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (OnLeavedUser != null) {
             OnLeavedUser(connectionId, joinOrder);
         }
+    }
+
+
+    /// <summary>
+    /// ユーザーのTransform同期
+    /// </summary>
+    public async UniTask UpdateUserTransformAsync(PlayerTransformDTO playerTransform) {
+        if(roomHub != null) {
+            await roomHub.UpdateUserTransformAsync(playerTransform);
+        }
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ユーザーのTransfrom通知
+    /// </summary>
+    public void OnUpdateUserTransform(Guid connectionId, PlayerTransformDTO playerTransform) {
+        if (OnUpdatedUserTransfrom != null) {
+            OnUpdatedUserTransfrom(connectionId, playerTransform);
+        }
+    }
+
+    /// <summary>
+    /// ミニゲームの選択
+    /// </summary>
+    public async UniTask SelectMiniGameAsync(int miniGameId){
+        if (roomHub != null) {
+            await roomHub.SelectMiniGameAsync(miniGameId);
+        }
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ミニゲーム選択通知
+    /// </summary>
+    public void OnSelectMiniGame(int miniGameId) {
+        if (OnSelectedMiniGame != null) {
+            OnSelectedMiniGame(miniGameId);
+        }
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ゲームスタート通知
+    /// </summary>
+    public void OnGameStart() {
+
     }
 }

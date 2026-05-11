@@ -285,6 +285,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 394539592d732d84586a053cb6aa95b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ServerConfig: {fileID: 11400000, guid: 0961dc9f79c97e9448fe5b42062d7e44, type: 2}
 --- !u!4 &801639534
 Transform:
   m_ObjectHideFlags: 0
@@ -312,6 +313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8c75b493538cf641b81c54f68631d00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ServerConfig: {fileID: 11400000, guid: 0961dc9f79c97e9448fe5b42062d7e44, type: 2}
 --- !u!1 &804036104
 GameObject:
   m_ObjectHideFlags: 0

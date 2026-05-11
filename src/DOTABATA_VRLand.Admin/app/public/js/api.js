@@ -8,11 +8,8 @@ async function loadUsers() {
   if (users != null) {
     users.forEach((user) => {
       const li = document.createElement("li");
-      li.textContent = user.name;
+      li.textContent = `ID:${user.id} ) Name:${user.name} (time:${user.created_at})`;
       list.appendChild(li);
-      const li2 = document.createElement("li");
-      li2.textContent = user.level;
-      list.appendChild(li2);
     });
   }
 }
@@ -22,14 +19,13 @@ document.getElementById("form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const name = document.getElementById("name").value;
-  const level = document.getElementById("level").value;
 
   await fetch("/api/user/add", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ name, level }),
+    body: JSON.stringify({ name }),
   });
 
   loadUsers();
@@ -50,7 +46,9 @@ document.getElementById("search").addEventListener("submit", async (e) => {
   if (user && user.length > 0) {
     user.forEach((user) => {
       const li = document.createElement("li");
-      li.textContent = user.name;
+
+      li.textContent = `ID:${user.id} ) Name:${user.name} (time:${user.created_at})`;
+
       list.appendChild(li);
       const li2 = document.createElement("li");
       li2.textContent = user.level;

@@ -482,3 +482,16 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# asmdef backup files
+*_BACKUP_*.asmdef
+*_BACKUP_*.asmdef.meta
+
+*_REMOTE_*.asmdef
+*_REMOTE_*.asmdef.meta
+
+*_LOCAL_*.asmdef
+*_LOCAL_*.asmdef.meta
+
+*_BASE_*.asmdef
+*_BASE_*.asmdef.meta
