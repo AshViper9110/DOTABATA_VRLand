@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 
 public class GameManager : MonoBehaviour
@@ -15,6 +16,8 @@ public class GameManager : MonoBehaviour
 
     static public bool rally = true;
     static public bool freePlay = false;
+
+    public List<Transform> playerPos = new List<Transform>();
 
     /// <summary>
     /// 進行UI関係
@@ -98,16 +101,18 @@ public class GameManager : MonoBehaviour
 
     public int winPlayerId;
 
-
+    TitleMana mana;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+       // mana = GameObject.Find("TitleManager").GetComponent<TitleMana>();
         if (rally)
         {
             InitRally();
         }
 
+     
 
     }
 
@@ -136,7 +141,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0)||int.TryParse(Input.GetJoystickNames().ToString(), out int result) )
         {
             textIndex++;
             MainText.text = "";
@@ -219,6 +224,7 @@ public class GameManager : MonoBehaviour
         onResult = false;
         onEnd = false;
 
+        //mana.player.transform.position = playerPos[1].position;
 
 
         //ここで順位が決定されている状態だったらランキング処理のフラグを建てる
