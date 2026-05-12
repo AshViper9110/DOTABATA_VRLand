@@ -1,5 +1,7 @@
 ﻿using Cysharp.Runtime.Multicast;
+using DOTABATA_VRLand.Server.Models.Entities;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using DOTABATA_VRLand.Shared.Models.Entities;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -20,11 +22,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         // その他、ルームのデータとして保存したいものをフィールドに追加していく
         // コンストラクタ
-        public RoomContext(IMulticastGroupProvider groupProvider, string roomName, string roomPassword) {
+        public RoomContext(IMulticastGroupProvider groupProvider, RoomConfig roomConfig) {
             Id = Guid.NewGuid(); // ルーム毎のデータにIDを付けておく
-            Name = roomName; // ルーム名をフィールドに保存
-            Group = groupProvider.GetOrAddSynchronousGroup<Guid, IRoomHubReceiver>(roomName); // グループを作成
-            Password = roomPassword;
+            Name = roomConfig.Name; // ルーム名をフィールドに保存
+            Group = groupProvider.GetOrAddSynchronousGroup<Guid, IRoomHubReceiver>(roomConfig.Name); // グループを作成
+            Password = roomConfig.Password;
+            GameModeId = roomConfig.GameModeId;
         }
 
         public void Dispose() {
@@ -87,6 +90,36 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public bool ComparePassword(string roomPassword) {
             return Password == roomPassword;
         }
+
+        /// <summary>
+        /// ミニゲームの結果を反映
+        /// </summary>
+        public void ApplyMiniGameResult(Dictionary<Guid, int> userRanks) {
+            foreach (var user in userRanks) {
+                MiniGameResultData miniGameResultData = RoomUserDataList[user.Key].miniGameResultData;
+
+                miniGameResultData.rankings.Add(user.Value);
+                miniGameResultData.point += user.Value;
+                if (user.Value == 1) {
+                    miniGameResultData.winCount++;
+                }
+            }
+
+            SortAllRoundRanking();
+        }
+
+        /// <summary>
+        /// 全体の順位更新
+        /// </summary>
+        public void SortAllRoundRanking() {
+            int ranking = 1;
+            foreach (var user in RoomUserDataList.OrderBy(_=>_.Value.miniGameResultData.winCount)) {
+                user.Value.miniGameResultData.allRoundRanking = ranking;
+                ranking++;
+            }
+        }
+
+
 
         //準備完了状態の変更
         public void UpdateReadyState(Guid connectionId, bool isReady)

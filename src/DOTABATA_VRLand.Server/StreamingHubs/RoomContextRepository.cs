@@ -1,4 +1,5 @@
 ﻿using Cysharp.Runtime.Multicast;
+using DOTABATA_VRLand.Shared.Models.Entities;
 using System.Collections.Concurrent;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
@@ -7,8 +8,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             new ConcurrentDictionary<Guid, RoomContext>();
 
         // ルームコンテキストの作成
-        public RoomContext CreateContext(string roomName, string roomPassword) {
-            var context = new RoomContext(groupProvider, roomName, roomPassword);
+        public RoomContext CreateContext(RoomConfig roomConfig) {
+            var context = new RoomContext(groupProvider, roomConfig);
             contexts[context.Id] = context;
 
             Console.ForegroundColor = ConsoleColor.Green;
