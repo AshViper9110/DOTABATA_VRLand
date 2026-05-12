@@ -83,30 +83,17 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ゲーム終了時
     /// </summary>
-    protected override void OnApplicationQuit() {
+    protected override void OnApplicationQuit()
+    {
         base.OnApplicationQuit();
         DisconnectAsync().Forget();
-    }
-
-    /// <summary>
-    /// 現在あるルーム名を全取得
-    /// </summary>
-    public async UniTask<List<string>> GetAllRoomNamesAsync() {
-        if (roomHub == null) {
-            throw new Exception("RoomHubがnullです。");
-        }
-
-        return await roomHub.GetAllRoomNamesAsync();
     }
     /// <summary>
     /// ゲームモードを指定してルーム名を全取得
     /// </summary>
-    public async UniTask<List<string>> GetRoomNamesFromGameModeIdAsync(int gameModeId) {
-        if (roomHub == null) {
-            throw new Exception("RoomHubがnullです。");
-        }
-
-        return await roomHub.GetRoomNamesFromGameModeIdAsync(gameModeId);
+    public async UniTask<List<string>> GetAllRoomNamesAsync(int gameModeId) 
+    {
+        return await roomHub.GetAllRoomNamesAsync(gameModeId);
     }
 
 
@@ -114,17 +101,12 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ルームに入室
     /// </summary>
-    public async UniTask JoinRoomAsync() {
+    public async UniTask JoinRoomAsync(RoomConfig roomConfig) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
 
         try {
-                RoomConfig roomConfig = new RoomConfig() {
-                    Name = "TestRoom",
-                    Password = "",
-                    GameModeId = 0,
-                };
                 JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync("TestUser", roomConfig);
                 if (joinedUsers != null)
                 {

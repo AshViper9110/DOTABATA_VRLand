@@ -14,6 +14,13 @@ public class TitleMana : MonoBehaviour
     static public bool isJoin = false;
     public Dictionary<Guid, GameObject> playerList = new Dictionary<Guid, GameObject>();
 
+    public InputField nameText;
+    public InputField passText;
+
+    public string name;
+    public string password;
+    public int gameModeId = 1;
+
     /// <summary>
     /// TextにLogを表示
     /// </summary>
@@ -21,6 +28,17 @@ public class TitleMana : MonoBehaviour
     {
         //textLogs.text = $"{text}\n{textLogs.text}";
         Debug.Log(text);
+    }
+
+    public RoomConfig SetNames()
+    {
+        RoomConfig roomConfig = new RoomConfig()
+        {
+            Name = nameText.text,
+            Password = passText.text,
+            GameModeId = gameModeId,
+        };
+        return roomConfig;
     }
 
     /// <summary>
@@ -63,25 +81,21 @@ public class TitleMana : MonoBehaviour
     }
 
     /// <summary>
-    /// ルーム参加ボタン
+    /// Gameシーンに移動ボタン
     /// </summary>
-    public async void JoinRoom()
-    {
-        await RoomModel.I.JoinRoomAsync();
-        isJoin = true;
-
-        string text = "";
-        foreach (var user in await UserModel.I.GetAllUsersAsync())
-        {
-            text += $"Id：{user.Id}, Name：{user.Name}\n";
-        }
-        TextLogs(text);
-    }
-
-    public async void NextScene(string name)
+    public async void JointoNextScene(string name)
     {
         SceneManager.LoadScene(name);
-        await RoomModel.I.JoinRoomAsync();
+        await RoomModel.I.JoinRoomAsync(SetNames());
+    }
+
+    /// <summary>
+    /// ルーム全取得
+    /// </summary>
+    public async void GetAllRoom(int gameModeid)
+    {
+        List<string> roomNames = await RoomModel.I.GetAllRoomNamesAsync(gameModeid);
+        Debug.Log(roomNames);
     }
 
     /// <summary>

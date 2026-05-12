@@ -32,23 +32,24 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
-        /// 現在あるルーム名を全取得
+        /// ルーム名を全取得
         /// </summary>
-        public Task<List<string>> GetAllRoomNamesAsync() {
+        public Task<List<string>> GetAllRoomNamesAsync(int gameModeId = -1) {
             List<string> roomNames = new List<string>();
-            foreach (var context in _roomContextRepository.GetAllContext()) {
-                roomNames.Add(context.Value.Name);
-            }        
-
-            return Task.FromResult<List<string>>(roomNames);
-        }
-        /// <summary>
-        /// ゲームモードを指定してルーム名を全取得
-        /// </summary>
-        public Task<List<string>> GetRoomNamesFromGameModeIdAsync(int gameModeId) {
-            List<string> roomNames = new List<string>();
-            foreach (var context in _roomContextRepository.GetAllContext()) {
-                if (context.Value.GameModeId == gameModeId) {
+            if (gameModeId != -1)
+            {
+                foreach (var context in _roomContextRepository.GetAllContext())
+                {
+                    if (context.Value.GameModeId == gameModeId)
+                    {
+                        roomNames.Add(context.Value.Name);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var context in _roomContextRepository.GetAllContext())
+                {
                     roomNames.Add(context.Value.Name);
                 }
             }
@@ -90,7 +91,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             // パスワード判定
             if (_roomContext.Password != "" &&
-                !_roomContext.ComparePassword("")) {
+                !_roomContext.ComparePassword(roomConfig.Password)) {
                 throw new Exception("パスワードがちがいます。");
             }
 
