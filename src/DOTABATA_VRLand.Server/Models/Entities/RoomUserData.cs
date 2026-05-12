@@ -1,7 +1,7 @@
 ﻿using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 
-namespace DOTABATA_VRLand.Server.StreamingHubs {
+namespace DOTABATA_VRLand.Server.Models.Entities {
     public class RoomUserData {
         /// <summary>
         /// 接続済みユーザー情報
@@ -16,7 +16,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ユーザーのTransform情報
         /// </summary>
-        public SimpleTransform transform = new SimpleTransform();
+        public PlayerTransformDTO transform = new PlayerTransformDTO();
+
+        /// <summary>
+        /// ミニゲームの結果データ
+        /// </summary>
+        public MiniGameResultData miniGameResultData = new MiniGameResultData();
 
     }
 }

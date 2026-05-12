@@ -7,7 +7,7 @@ using System;
 using UnityEngine;
 
 public class UserModel : Singleton<UserModel> {
-    protected const string ServerURL = "http://localhost:5244";
+    [SerializeField] private ServerConfigSO serverConfig;
 
     private GrpcChannelx channelx;
     private IUserService client;
@@ -16,7 +16,13 @@ public class UserModel : Singleton<UserModel> {
     /// MagicOnion接続処理
     /// </summary>
     public UniTask CreateUserModel() {
-        channelx = GrpcChannelx.ForAddress(ServerURL);
+        channelx = GrpcChannelx.ForAddress(
+#if DEBUG
+            serverConfig.DEBUG.url
+#else
+            serverConfig.PRODUCTION.url
+#endif
+            );
         client = MagicOnionClient.Create<IUserService>(channelx);
 
         return UniTask.CompletedTask;

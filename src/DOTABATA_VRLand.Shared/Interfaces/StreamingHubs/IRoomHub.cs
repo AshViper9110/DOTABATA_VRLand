@@ -10,10 +10,16 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
     /// クライアントから呼び出す処理を実装するクラス用インターフェース
     /// </summary>
     public interface IRoomHub : IStreamingHub<IRoomHub, IRoomHubReceiver> {
+
+        /// <summary>
+        /// ゲームモードを指定してルーム名を全取得
+        /// </summary>
+        Task<List<string>> GetAllRoomNamesAsync(int gameModeId);
+
         /// <summary>
         /// ルームに接続
         /// </summary>
-        Task<JoinedUser[]> JoinRoomAsync(string roomName, string userName);
+        Task<JoinedUser[]> JoinRoomAsync(string userName, RoomConfig roomConfig);
 
         /// <summary>
         /// 退出処理
@@ -29,12 +35,17 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// ユーザーのTransfrom同期
         /// </summary>
-        Task UpdateUserTransformAsync(SimpleTransform simpleTransform);
+        Task UpdateUserTransformAsync(PlayerTransformDTO playerTransform);
 
 
         /// <summary>
         /// ミニゲームの選択
         /// </summary>
         Task SelectMiniGameAsync(int miniGameId);
+
+        /// <summary>
+        /// ゲームスタート
+        /// </summary>
+        Task GameStartAsync();
     }
 }
