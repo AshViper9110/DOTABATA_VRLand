@@ -34,7 +34,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ルーム名を全取得
         /// </summary>
-        public Task<List<string>> GetAllRoomNamesAsync(int gameModeId = -1) {
+        public Task<List<string>> GetAllRoomNamesAsync(int gameModeId) {
             List<string> roomNames = new List<string>();
             if (gameModeId != -1)
             {

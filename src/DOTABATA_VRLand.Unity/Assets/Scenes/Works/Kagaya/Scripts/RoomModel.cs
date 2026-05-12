@@ -91,7 +91,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ゲームモードを指定してルーム名を全取得
     /// </summary>
-    public async UniTask<List<string>> GetAllRoomNamesAsync(int gameModeId) 
+    public async UniTask<List<string>> GetAllRoomNamesAsync(int gameModeId = -1) 
     {
         return await roomHub.GetAllRoomNamesAsync(gameModeId);
     }
