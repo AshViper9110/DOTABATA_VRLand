@@ -35,7 +35,7 @@ public class SyncPlayer : MonoBehaviour
 
     private async UniTaskVoid SendTransform()
     {
-        if (!TitleMana.isJoin) return;
+        if (!NetworkManager.I.isJoin) return;
 
         PlayerTransformDTO data = playerTransform.ToPlayerTransformDTO();
         await RoomModel.I.UpdateUserTransformAsync(data);
