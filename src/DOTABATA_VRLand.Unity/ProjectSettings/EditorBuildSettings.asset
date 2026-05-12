@@ -8,6 +8,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Works/hirao/TitleScene.unity
     guid: 9aa53287dc33ed740bb4d19eb0d28e0b
+  - enabled: 1
+    path: Assets/Scenes/Works/hirao/Game2Scene.unity
+    guid: 5cc964b506594cf49a0baa73a579d831
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: f01f9b75aeba85b4393cc23ab54769ff, type: 2}

@@ -16,6 +16,7 @@ public class SyncPlayer : MonoBehaviour
 
     private void Awake()
     {
+        DontDestroyOnLoad(this.gameObject);
         if (playerTransform == null)
             playerTransform = GetComponent<PlayerTransform>();
     }
