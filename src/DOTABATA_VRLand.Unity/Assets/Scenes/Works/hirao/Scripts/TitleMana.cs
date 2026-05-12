@@ -3,11 +3,11 @@ using DOTABATA_VRLand.Shared.Models.Entities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class TitleMana : MonoBehaviour
 {
-    public Text textLogs;
     public GameObject SyncPlayerPrefab;
     public GameObject player;
     private Guid myConnectionId;
@@ -19,7 +19,7 @@ public class TitleMana : MonoBehaviour
     /// </summary>
     public void TextLogs(string text)
     {
-        textLogs.text = $"{text}\n{textLogs.text}";
+        //textLogs.text = $"{text}\n{textLogs.text}";
         Debug.Log(text);
     }
 
@@ -30,6 +30,7 @@ public class TitleMana : MonoBehaviour
 
     private void Awake()
     {
+        DontDestroyOnLoad(this.gameObject);
         RoomModel.I.OnJoinedUser += OnJoinedUser;
         RoomModel.I.OnLeavedUser += OnLeavedUser;
         RoomModel.I.OnUpdatedUserTransfrom += OnSyncPlayer;
@@ -75,6 +76,12 @@ public class TitleMana : MonoBehaviour
             text += $"IdÅF{user.Id}, NameÅF{user.Name}\n";
         }
         TextLogs(text);
+    }
+
+    public async void NextScene(string name)
+    {
+        SceneManager.LoadScene(name);
+        await RoomModel.I.JoinRoomAsync();
     }
 
     /// <summary>

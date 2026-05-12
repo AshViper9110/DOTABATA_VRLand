@@ -10,15 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ae8200f6c874634428868019a3c912aa, type: 3}
-  m_Name: ServerConfig
+  m_Name: New Server Config SO
   m_EditorClassIdentifier: 
   debug:
-  - use: 0
-    url: http://localhost:5244
   - use: 1
     url: http://10.70.41.152:5244
   production:
-  - use: 0
-    url: http://localhost:5244
-  - use: 0
+  - use: 1
     url: http://10.70.41.152:5244
