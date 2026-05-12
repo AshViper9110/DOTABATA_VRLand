@@ -10,6 +10,7 @@ namespace DOTABATA_VRLand.Shared.Models.Entities {
     /// ルームの設定
     /// </summary>
     [MessagePackObject]
+    [System.Serializable]
     public class RoomConfig {
         [Key(0)]
         public string Name { get; set; } = "";
