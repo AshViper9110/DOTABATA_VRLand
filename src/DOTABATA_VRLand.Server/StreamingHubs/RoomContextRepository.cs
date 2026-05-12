@@ -3,33 +3,53 @@ using System.Collections.Concurrent;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomContextRepository(IMulticastGroupProvider groupProvider) {
-        private readonly ConcurrentDictionary<string, RoomContext> contexts =
-            new ConcurrentDictionary<string, RoomContext>();
+        private readonly ConcurrentDictionary<Guid, RoomContext> contexts =
+            new ConcurrentDictionary<Guid, RoomContext>();
 
         // ルームコンテキストの作成
-        public RoomContext CreateContext(string roomName) {
-            var context = new RoomContext(groupProvider, roomName);
-            contexts[roomName] = context;
+        public RoomContext CreateContext(string roomName, string roomPassword) {
+            var context = new RoomContext(groupProvider, roomName, roomPassword);
+            contexts[context.Id] = context;
             return context;
         }
 
-        // ルームコンテキストの取得
-        public RoomContext GetContext(string roomName) {
-            if (!contexts.ContainsKey(roomName)) {
+        // ルームコンテキストの取得（roomId）
+        public RoomContext GetContext(Guid roomId) {
+            if (!contexts.ContainsKey(roomId)) {
                 return null;
             }
-            return contexts[roomName];
+            return contexts[roomId];
         }
 
-        // ルームコンテキストの削除
-        public void RemoveContext(string roomName) {
-            if (contexts.Remove(roomName, out var RoomContext)) {
+        // ルームコンテキストの取得（roomName）
+        public RoomContext GetContext(string roomName) {
+            if (!contexts.Any(_=>_.Value.Name == roomName)) {
+                return null;
+            }
+            return contexts.FirstOrDefault(_=>_.Value.Name == roomName).Value;
+        }
+
+        // ルームコンテキストの削除（roomId）
+        public void RemoveContext(Guid roomId) {
+            if (contexts.Remove(roomId, out var RoomContext)) {
                 RoomContext?.Dispose();
             }
         }
 
+        // ルームコンテキストの削除（roomName）
+        public void RemoveContext(string roomName) {
+            if (!contexts.Any(_ => _.Value.Name == roomName)) {
+                return;
+            }
+
+            RoomContext context  = contexts.FirstOrDefault(_ => _.Value.Name == roomName).Value;
+            if (contexts.Remove(context.Id, out var RoomContext)) {
+                RoomContext.Dispose();
+            }
+        }
+
         // 全ルームコンテキストの取得
-        public ConcurrentDictionary<string, RoomContext> GetAllContext() {
+        public ConcurrentDictionary<Guid, RoomContext> GetAllContext() {
             return contexts;
         }
     }

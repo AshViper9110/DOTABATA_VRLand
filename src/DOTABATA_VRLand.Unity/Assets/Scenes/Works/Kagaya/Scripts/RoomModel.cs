@@ -92,7 +92,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public async UniTask JoinRoomAsync() {
         if (roomHub != null) {
             try {
-                JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync("Test", "1");
+                JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync("TestUser", "TestRoom", "");
                 if (joinedUsers != null)
                 {
                     foreach (var user in joinedUsers)
