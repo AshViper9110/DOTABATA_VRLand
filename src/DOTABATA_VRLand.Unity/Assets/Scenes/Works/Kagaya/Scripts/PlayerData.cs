@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using UnityEngine;
 
 public class PlayerData {
     /*
@@ -7,5 +8,6 @@ public class PlayerData {
     
     // オブジェクト
     public GameObject playerObj;
+    public JoinedUser joinedUser;
 
 }
