@@ -14,6 +14,6 @@ public class MiniGameObjManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       this.gameObject.transform.rotation = Camera.main.transform.rotation;
+       this.gameObject.transform.rotation = new Quaternion(0,-Camera.main.transform.rotation.y,0,0);
     }
 }
