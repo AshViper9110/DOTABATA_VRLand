@@ -8,16 +8,19 @@ using UnityEngine.UI;
 using UnityEngine.Rendering;
 using System.Collections;
 using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 
 
 public class GameManager : MonoBehaviour
 {
-    public List<SceneAsset> miniGames = new List<SceneAsset>();
+    public List<string> miniGames = new List<string>();
 
     static public bool rally = true;
     static public bool freePlay = false;
 
     public List<Transform> playerPos = new List<Transform>();
+
+    public InputActionReference rightHandPrimaryAction;
 
     /// <summary>
     /// êiçsUIä÷åW
@@ -141,7 +144,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(0)||int.TryParse(Input.GetJoystickNames().ToString(), out int result) )
+        if (Input.GetMouseButtonDown(0)|| rightHandPrimaryAction.action.)
         {
             textIndex++;
             MainText.text = "";
@@ -260,10 +263,10 @@ public class GameManager : MonoBehaviour
         CenterObjRb.angularVelocity = new Vector3(0, spinPower, 0);
     }
 
-    public void MoveScene(SceneAsset scene)
+    public void MoveScene(string scene)
     {
 
-        Initiate.Fade(scene.name, Color.black, 1.0f);
+        Initiate.Fade(scene, Color.black, 1.0f);
     }
 
     public void SetMiniGame()
