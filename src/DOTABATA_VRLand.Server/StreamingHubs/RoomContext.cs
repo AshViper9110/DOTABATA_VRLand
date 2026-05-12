@@ -1,6 +1,7 @@
 ﻿using Cysharp.Runtime.Multicast;
 using DOTABATA_VRLand.Server.Models.Entities;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using DOTABATA_VRLand.Shared.Models.Entities;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -21,11 +22,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         // その他、ルームのデータとして保存したいものをフィールドに追加していく
         // コンストラクタ
-        public RoomContext(IMulticastGroupProvider groupProvider, string roomName, string roomPassword) {
+        public RoomContext(IMulticastGroupProvider groupProvider, RoomConfig roomConfig) {
             Id = Guid.NewGuid(); // ルーム毎のデータにIDを付けておく
-            Name = roomName; // ルーム名をフィールドに保存
-            Group = groupProvider.GetOrAddSynchronousGroup<Guid, IRoomHubReceiver>(roomName); // グループを作成
-            Password = roomPassword;
+            Name = roomConfig.Name; // ルーム名をフィールドに保存
+            Group = groupProvider.GetOrAddSynchronousGroup<Guid, IRoomHubReceiver>(roomConfig.Name); // グループを作成
+            Password = roomConfig.Password;
+            GameModeId = roomConfig.GameModeId;
         }
 
         public void Dispose() {

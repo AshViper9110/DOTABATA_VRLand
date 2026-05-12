@@ -32,16 +32,41 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
+        /// 現在あるルーム名を全取得
+        /// </summary>
+        public Task<List<string>> GetAllRoomNamesAsync() {
+            List<string> roomNames = new List<string>();
+            foreach (var context in _roomContextRepository.GetAllContext()) {
+                roomNames.Add(context.Value.Name);
+            }        
+
+            return Task.FromResult<List<string>>(roomNames);
+        }
+        /// <summary>
+        /// ゲームモードを指定してルーム名を全取得
+        /// </summary>
+        public Task<List<string>> GetRoomNamesFromGameModeIdAsync(int gameModeId) {
+            List<string> roomNames = new List<string>();
+            foreach (var context in _roomContextRepository.GetAllContext()) {
+                if (context.Value.GameModeId == gameModeId) {
+                    roomNames.Add(context.Value.Name);
+                }
+            }
+
+            return Task.FromResult<List<string>>(roomNames);
+        }
+
+        /// <summary>
         /// ルーム作成
         /// </summary>
-        public Task CreateRoomAsync(string roomName, string roomPassword) {
+        public Task CreateRoomAsync(RoomConfig roomConfig) {
             // 同時に生成しない用に排他制御
             lock (_roomContextRepository) {
                 // 指定の名前のルームがあるかどうかを確認
-                this._roomContext = _roomContextRepository.GetContext(roomName);
+                this._roomContext = _roomContextRepository.GetContext(roomConfig.Name);
                 if (this._roomContext == null) {
                     // なかったら生成
-                    this._roomContext = _roomContextRepository.CreateContext(roomName, roomPassword);
+                    this._roomContext = _roomContextRepository.CreateContext(roomConfig);
                 }
             }
 
@@ -60,8 +85,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ルームに接続
         /// </summary>
-        public async Task<JoinedUser[]> JoinRoomAsync(string userName, string roomName, string roomPassword) {
-            await CreateRoomAsync(roomName, "");
+        public async Task<JoinedUser[]> JoinRoomAsync(string userName, RoomConfig roomConfig) {
+            await CreateRoomAsync(roomConfig);
 
             // パスワード判定
             if (_roomContext.Password != "" &&
