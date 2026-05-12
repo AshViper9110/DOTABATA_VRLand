@@ -1,4 +1,5 @@
 ﻿using Cysharp.Runtime.Multicast;
+using DOTABATA_VRLand.Server.Models.Entities;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -87,6 +88,36 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public bool ComparePassword(string roomPassword) {
             return Password == roomPassword;
         }
+
+        /// <summary>
+        /// ミニゲームの結果を反映
+        /// </summary>
+        public void ApplyMiniGameResult(Dictionary<Guid, int> userRanks) {
+            foreach (var user in userRanks) {
+                MiniGameResultData miniGameResultData = RoomUserDataList[user.Key].miniGameResultData;
+
+                miniGameResultData.rankings.Add(user.Value);
+                miniGameResultData.point += user.Value;
+                if (user.Value == 1) {
+                    miniGameResultData.winCount++;
+                }
+            }
+
+            SortAllRoundRanking();
+        }
+
+        /// <summary>
+        /// 全体の順位更新
+        /// </summary>
+        public void SortAllRoundRanking() {
+            int ranking = 1;
+            foreach (var user in RoomUserDataList.OrderBy(_=>_.Value.miniGameResultData.winCount)) {
+                user.Value.miniGameResultData.allRoundRanking = ranking;
+                ranking++;
+            }
+        }
+
+
 
         //準備完了状態の変更
         public void UpdateReadyState(Guid connectionId, bool isReady)

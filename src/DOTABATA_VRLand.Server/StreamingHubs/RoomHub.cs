@@ -1,4 +1,5 @@
 ﻿using DOTABATA_VRLand.Server.Models.Contexts;
+using DOTABATA_VRLand.Server.Models.Entities;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion.Server.Hubs;
