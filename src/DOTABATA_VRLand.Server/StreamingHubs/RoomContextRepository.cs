@@ -10,6 +10,18 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public RoomContext CreateContext(string roomName, string roomPassword) {
             var context = new RoomContext(groupProvider, roomName, roomPassword);
             contexts[context.Id] = context;
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("{CreateRoom}");
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("<Room>");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(
+                $"Id：{context.Id}\n" +
+                $"Name : {context.Name}\n"
+                );
+
             return context;
         }
 
@@ -31,6 +43,17 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         // ルームコンテキストの削除（roomId）
         public void RemoveContext(Guid roomId) {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("{DeleteRoom}");
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("<Room>");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(
+                $"Id：{contexts[roomId].Id}\n" +
+                $"Name : {contexts[roomId].Name}\n"
+                );
+
             if (contexts.Remove(roomId, out var RoomContext)) {
                 RoomContext?.Dispose();
             }

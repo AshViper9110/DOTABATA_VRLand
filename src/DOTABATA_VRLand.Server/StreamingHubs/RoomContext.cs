@@ -32,6 +32,56 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
+        /// コンソールに入室ログを表示
+        /// </summary>
+        public void WriteConsoleJoinInfo(JoinedUser joinedUser) {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("{JoinRoom}");
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("<Room>");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(
+                $"Id：{Id}\n" +
+                $"Name : {Name}"
+                );
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("<User>");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(
+                $"Name : {joinedUser.Name}\n" +
+                $"ConnectionID : {joinedUser.ConnectionId}\n" +
+                $"JoinOrder : {joinedUser.JoinOrder}\n"
+                );
+        }
+
+        /// <summary>
+        /// コンソールに退室ログを表示
+        /// </summary>
+        public void WriteConsoleLeaveInfo(Guid connectionId) {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("{LeaveRoom}");
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("<Room>");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(
+                $"Id：{Id}\n" +
+                $"Name : {Name}"
+                );
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("<User>");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(
+                $"Name : {RoomUserDataList[connectionId].joinedUser.Name}\n" +
+                $"ConnectionID : {connectionId}\n" +
+                $"JoinOrder : {RoomUserDataList[connectionId].joinedUser.JoinOrder}\n"
+                );
+        }
+
+        /// <summary>
         /// パスワードがあっているか
         /// </summary>
         public bool ComparePassword(string roomPassword) {
