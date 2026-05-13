@@ -9,6 +9,7 @@ using UnityEngine.Rendering;
 using System.Collections;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
+using Unity.Android.Gradle.Manifest;
 
 
 public class GameManager : MonoBehaviour
@@ -21,6 +22,7 @@ public class GameManager : MonoBehaviour
     public List<Transform> playerPos = new List<Transform>();
 
     public InputActionReference rightHandPrimaryAction;
+    InputAction action;
 
     /// <summary>
     /// 進行UI関係
@@ -106,6 +108,12 @@ public class GameManager : MonoBehaviour
 
     TitleMana mana;
 
+    private void Awake()
+    {
+        action = rightHandPrimaryAction.action;
+        action.performed += MoveText;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -114,6 +122,8 @@ public class GameManager : MonoBehaviour
         {
             InitRally();
         }
+
+
 
      
 
@@ -144,72 +154,10 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(0)|| rightHandPrimaryAction.action.)
+        if (Input.GetMouseButtonDown(0))
         {
-            textIndex++;
-            MainText.text = "";
-            if (onResult)
-            {
-                if (textIndex >= AfterText.Count && !isSpin)
-                {
-                    SelectMiniGame();
-                    return;
-                }
-
-                if (AfterText[textIndex] == "!!! おめでとう！")
-                {
-
-                    MainText.DOText($"プレイヤー{winPlayerId}" + AfterText[textIndex], 1.0f);
-                    playerWinlist[RankingList[winPlayerId - 1].Id]++;
-
-                    SetRanking();
-
-                    if (playerWinlist[RankingList[winPlayerId - 1].Id] >= 3)
-                    {
-                        onEnd = true;
-                        onResult = false;
-                        textIndex = -1;
-                    }
-                }
-                else
-                {
-                    MainText.DOText(AfterText[textIndex], 1.0f);
-                }
-            }
-            else if (onEnd)
-            {
-                if (textIndex >= FinishText.Count)
-                {
-                    //タイトルに戻る
-                    Initiate.Fade("GameScene", Color.black, 1.0f);
-                    return;
-                }
-
-                if (FinishText[textIndex] == "!!! おめでとう！")
-                {
-
-                    MainText.DOText($"プレイヤー{winPlayerId}" + FinishText[textIndex], 1.0f);
-
-                }
-                else
-                {
-                    MainText.DOText(FinishText[textIndex], 1.0f);
-                }
-            }
-            else if (onSelect)
-            {
-                MoveScene(miniGames[selPointManager.SelectId]);
-            }
-            else
-            {
-                if (textIndex >= StartText.Count && !isSpin)
-                {
-                    SelectMiniGame();
-                    return;
-                }
-                MainText.DOText(StartText[textIndex], 1.0f);
-            }
-
+            
+    
 
         }
 
@@ -339,5 +287,72 @@ public class GameManager : MonoBehaviour
 
     }
 
-   
+    private void MoveText(InputAction.CallbackContext context)
+    {
+        textIndex++;
+        MainText.text = "";
+        if (onResult)
+        {
+            if (textIndex >= AfterText.Count && !isSpin)
+            {
+                SelectMiniGame();
+                return;
+            }
+
+            if (AfterText[textIndex] == "!!! おめでとう！")
+            {
+
+                MainText.DOText($"プレイヤー{winPlayerId}" + AfterText[textIndex], 1.0f);
+                playerWinlist[RankingList[winPlayerId - 1].Id]++;
+
+                SetRanking();
+
+                if (playerWinlist[RankingList[winPlayerId - 1].Id] >= 3)
+                {
+                    onEnd = true;
+                    onResult = false;
+                    textIndex = -1;
+                }
+            }
+            else
+            {
+                MainText.DOText(AfterText[textIndex], 1.0f);
+            }
+        }
+        else if (onEnd)
+        {
+            if (textIndex >= FinishText.Count)
+            {
+                //タイトルに戻る
+                Initiate.Fade("GameScene", Color.black, 1.0f);
+                return;
+            }
+
+            if (FinishText[textIndex] == "!!! おめでとう！")
+            {
+
+                MainText.DOText($"プレイヤー{winPlayerId}" + FinishText[textIndex], 1.0f);
+
+            }
+            else
+            {
+                MainText.DOText(FinishText[textIndex], 1.0f);
+            }
+        }
+        else if (onSelect)
+        {
+            MoveScene(miniGames[selPointManager.SelectId]);
+        }
+        else
+        {
+            if (textIndex >= StartText.Count && !isSpin)
+            {
+                SelectMiniGame();
+                return;
+            }
+            MainText.DOText(StartText[textIndex], 1.0f);
+        }
+
+    }
+
 }
