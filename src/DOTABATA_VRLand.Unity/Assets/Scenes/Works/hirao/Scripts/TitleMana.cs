@@ -1,19 +1,22 @@
 using DOTABATA_VRLand.Shared.Models.Entities;
 using UnityEngine;
-using UnityEngine.UI;
+using Steamworks;
 
 public class TitleMana : MonoBehaviour
 {
-    public InputField nameText;
-    public InputField passText;
+    private string playerName;
     public int gameModeId = 1;
 
+    private void Start()
+    {
+        playerName = SteamFriends.GetPersonaName();
+    }
     public RoomConfig SetNames()
     {
         RoomConfig roomConfig = new RoomConfig()
         {
-            Name = nameText.text,
-            Password = passText.text,
+            Name = playerName,
+            Password = "0000",
             GameModeId = gameModeId,
         };
         return roomConfig;
