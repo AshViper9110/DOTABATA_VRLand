@@ -51,7 +51,12 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// オブジェクト生成
         /// </summary>
-        Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, string objecName);
+        Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, string objectName);
+
+        /// <summary>
+        /// オブジェクトリストに追加
+        /// </summary>
+        Task AddObjectListAsync(Guid objectId, string objectName, SimpleTransform simpleTransform);
 
         /// <summary>
         /// オブジェクトのTransform同期
@@ -61,6 +66,6 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// オブジェクトの削除
         /// </summary>
-        public Task DestroyObjectAsync(Guid objectId);
+        Task DestroyObjectAsync(Guid objectId);
     }
 }

@@ -1,32 +1,64 @@
-﻿using DG.Tweening.Core.Easing;
+﻿using Cysharp.Threading.Tasks;
+using DG.Tweening.Core.Easing;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using System;
+using System.Linq;
 using UnityEngine;
 
 public class SyncObject : MonoBehaviour {
-    [SerializeField, Header("作成通知を送信")] private bool SendCreate = false;
+    [SerializeField, Header("作成通知を送信")] private bool SendCreate;
 
 
-    [SerializeField, Header("Transform情報を送信")] private bool SendTransform = false;
+    [SerializeField, Header("Transform情報を送信")] private bool SendTransform;
 
     // 送る間隔
     [SerializeField] private float SendSpan = 0.2f;
     private float sendTimer = 0f;
 
-    [SerializeField, Header("削除通知を送信")] private bool SendDestroy = false;
+    [SerializeField, Header("削除通知を送信")] private bool SendDestroy;
 
     // オブジェクトId
-    private Guid objectId = Guid.Empty;
+    private Guid objectId;
     public Guid ObjectId {
         get { return objectId; }
         set { objectId = value; }
     }
+
+    [ReadOnly] public string stringObjectId;
 
     // 作成者のコネクションId
     private Guid createrId = Guid.Empty;
     public Guid CreaterId {
         get { return createrId; }
         set { createrId = value; }
+    }
+
+    /// <summary>
+    /// オブジェクトIdを生成
+    /// </summary>
+    public void GenerateObjectId() {
+        objectId = Guid.NewGuid();
+        ApplyGuidToInspector();
+    }
+
+    /// <summary>
+    /// オブジェクトIdをリセット
+    /// </summary>
+    public void ResetObjectId() {
+        objectId= Guid.Empty;
+        ApplyGuidToInspector();
+    }
+
+    /// <summary>
+    /// オブジェクトIdをインスペクターに反映
+    /// </summary>
+    public void ApplyGuidToInspector() {
+        if (objectId == Guid.Empty) {
+            stringObjectId = string.Empty;
+        }
+        else {
+            stringObjectId = objectId.ToString();
+        }
     }
 
     private void Awake() {
@@ -59,15 +91,24 @@ public class SyncObject : MonoBehaviour {
     /// オブジェクトリスト作成同期
     /// </summary>
     private async void SendCreateObjectAsync() {
-        if (RoomModel.I == null ||
-            !RoomModel.I.IsJoinRoom ||
-            !SendCreate ||
-            objectId != Guid.Empty) {
-            return;
-        }
+        await UniTask.WaitUntil(()=> RoomModel.I != null && RoomModel.I.IsJoinRoom);
 
-        createrId = RoomModel.I.ConnectionId;
-        objectId = await RoomModel.I.CreateObjectAsync(this.transform.ToSimpleTransform(), this.gameObject.name);
+        if (!SendCreate &&
+            stringObjectId != string.Empty) {
+            Debug.Log(stringObjectId);
+            objectId = Guid.Parse(stringObjectId);
+
+            if (InRoomPlayerData.I.MySelf.JoinOrder == 1) {
+                CreaterId = RoomModel.I.ConnectionId;
+                await RoomModel.I.AddObjectListAsync(objectId, this.gameObject.name, this.transform.ToSimpleTransform());
+            }
+        }
+        else if (SendCreate &&
+            objectId == Guid.Empty) {
+            createrId = RoomModel.I.ConnectionId;
+            objectId = await RoomModel.I.CreateObjectAsync(this.transform.ToSimpleTransform(), this.gameObject.name);
+            ApplyGuidToInspector();
+        }
     }
 
     /// <summary>

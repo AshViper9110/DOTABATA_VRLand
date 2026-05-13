@@ -47,5 +47,6 @@ public class SyncObjectManager : MonoBehaviour {
         SyncObject syncObject = createdObj.GetComponent<SyncObject>();
         syncObject.ObjectId = objectId;
         syncObject.CreaterId = createrConnectionId;
+        syncObject.ApplyGuidToInspector();
     }
 }

@@ -21,17 +21,17 @@ public class ConnectionTest : MonoBehaviour {
     }
 
     private async void Start() {
-        await UserModel.I.CreateUserModel();
+        //await UserModel.I.CreateUserModel();
         await RoomModel.I.ConnectAsync();
 
         await RoomModel.I.JoinRoomAsync("TestUser", new RoomConfig() { GameModeId = 0, Name = "TestRoom"});
-        await UserModel.I.RegistUserAsync("YamagamiSecond");
+        //await UserModel.I.RegistUserAsync("YamagamiSecond");
 
-        string text = "";
-        foreach (var user in await UserModel.I.GetAllUsersAsync()) {
-            text += $"Id：{user.Id}, Name：{user.Name}\n";
-        }
-        Debug.Log(text);
+        //string text = "";
+        //foreach (var user in await UserModel.I.GetAllUsersAsync()) {
+        //    text += $"Id：{user.Id}, Name：{user.Name}\n";
+        //}
+        //Debug.Log(text);
 
     }
 

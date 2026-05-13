@@ -5,6 +5,7 @@ using MagicOnion;
 using MagicOnion.Client;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
@@ -131,6 +132,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         try {
             JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync(userName, roomConfig);
             isJoinRoom = true;
+            InRoomPlayerData.I.SetMySelf(joinedUsers.First(_=>_.ConnectionId == ConnectionId));
             if (joinedUsers != null) {
                 foreach (var user in joinedUsers) {
                     // 自分自身はスキップ
@@ -252,6 +254,17 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (OnCreatedObject != null) {
             OnCreatedObject(objectId, createrConnectionId, createdTransform, objecName);
         }
+    }
+
+    /// <summary>
+    /// オブジェクトリストに追加
+    /// </summary>
+    public async UniTask AddObjectListAsync(Guid objectId, string objectName, SimpleTransform simpleTransform) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.AddObjectListAsync(objectId, objectName, simpleTransform);
     }
 
     /// <summary>
