@@ -14,6 +14,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public Dictionary<Guid, RoomUserData> RoomUserDataList { get; } =
             new Dictionary<Guid, RoomUserData>(); // ユーザーデータ一覧
 
+        public List<JoinedUser> GoalOrder = new List<JoinedUser>();
+
         // その他、ルームのデータとして保存したいものをフィールドに追加していく
         // コンストラクタ
         public RoomContext(IMulticastGroupProvider groupProvider, string roomName) {
@@ -83,6 +85,49 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             }
             // 全員 Ready
             return true;
+        }
+        public List<JoinedUser> RegisterGoal(Guid connectionId)//ConnectionIDでRoomUserDataから対象を探し、JoinedUser型のリストで返している
+        {
+            // 既にクリア済みの場合は無視
+            if (GoalOrder.Any(u => u.ConnectionId == connectionId)) //GoalOrder.joinedUser.ConnectionIdを参照
+            {
+                Console.WriteLine($"[RoomContext] クリアしているプレイヤーのクリア判定が行われました");
+                return null;
+            }
+            //connectionIDを基にjoinedUser.ConnectionIDでクリアユーザーの情報を取得
+            RoomUserData userData = RoomUserDataList.Values.FirstOrDefault(u => u.joinedUser.ConnectionId == connectionId);
+            if (userData == null)//nullチェック
+            {
+                Console.WriteLine($"[RoomContext] クリアユーザーの情報の取得に失敗しました ID:{connectionId}");
+                return null;
+            }
+            //クリアした順番にidを追加
+            GoalOrder.Add(userData.joinedUser);
+            //クリアしていないプレイヤーが一人になった
+            if (GoalOrder.Count == RoomUserDataList.Count - 1)
+            {
+                // GoalOrderに含まれていない最後の1人を探して追加 
+                var lastPlayer = RoomUserDataList.Values
+                    .FirstOrDefault(u => !GoalOrder.Contains(u.joinedUser)); //JoinedUser同士で比較
+                                                                             //最後の一人のプレイヤーの情報を持っているか
+                if (lastPlayer != null)
+                {
+                    GoalOrder.Add(lastPlayer.joinedUser);
+                    Console.WriteLine($"[RoomContext] 最下位プレイヤー追加: {lastPlayer}");
+                }
+
+                int i = 1;//コンソール表記用カウント
+
+                //コンソール順位表記
+                foreach (var user in GoalOrder)
+                {            
+                    Console.WriteLine($"[RoomContext]　{i}位:{user.Name} ID:{user.ConnectionId}");
+                    i++;
+                }
+                // 順位確定したリストを返す(joinedUser型)
+                return GoalOrder;
+            }
+            return null;
         }
     }
 }
