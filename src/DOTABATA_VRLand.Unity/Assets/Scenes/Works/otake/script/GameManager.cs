@@ -9,7 +9,6 @@ using UnityEngine.Rendering;
 using System.Collections;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
-using Unity.Android.Gradle.Manifest;
 
 
 public class GameManager : MonoBehaviour
