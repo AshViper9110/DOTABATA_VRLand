@@ -6,6 +6,7 @@ using MagicOnion.Client;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
@@ -18,6 +19,12 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// 　接続ID
     /// </summary>
     public Guid ConnectionId { get; private set; }
+
+    /// <summary>
+    /// ロームに入っているか
+    /// </summary>
+    private bool isJoinRoom = false;
+    public bool IsJoinRoom { get  { return isJoinRoom; } }
 
     /*
      * サーバー通知
@@ -42,6 +49,21 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// ミニゲーム選択通知
     /// </summary>
     public Action<int> OnSelectedMiniGame { get; set; }
+
+    /// <summary>
+    /// オブジェクト作成通知
+    /// </summary>
+    public Action<Guid, Guid, SimpleTransform, string> OnCreatedObject { get; set; }
+
+    /// <summary>
+    /// オブジェクトのTransform通知
+    /// </summary>
+    public Action<Guid, SimpleTransform> OnUpdatedObjectTransform { get; set; }
+
+    /// <summary>
+    /// オブジェクトの削除通知
+    /// </summary>
+    public Action<Guid> OnDestroyedObject { get; set; }
 
     /*
      * 処理
@@ -101,29 +123,27 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ルームに入室
     /// </summary>
-    public async UniTask JoinRoomAsync(RoomConfig roomConfig) {
+    public async UniTask JoinRoomAsync(string userName, RoomConfig roomConfig) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
 
         try {
-                JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync("TestUser", roomConfig);
-                if (joinedUsers != null)
-                {
-                    foreach (var user in joinedUsers)
-                    {
-                        // 自分自身はスキップ
-                        if (user.ConnectionId != ConnectionId)
-                        {
-                            OnJoinedUser(user);
-                        }
+            JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync(userName, roomConfig);
+            isJoinRoom = true;
+            if (joinedUsers != null) {
+                foreach (var user in joinedUsers) {
+                    // 自分自身はスキップ
+                    if (user.ConnectionId != ConnectionId) {
+                        OnJoinedUser(user);
                     }
                 }
             }
-            catch(Exception e) {
-                Debug.LogException(e);
-            }
-        
+        }
+        catch (Exception e) {
+            Debug.LogException(e);
+        }
+
     }
 
 
@@ -144,6 +164,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
+
+        isJoinRoom = false;
 
         await roomHub.LeaveRoomAsync();
     }
@@ -205,5 +227,72 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public void OnGameStart() {
 
+    }
+
+    /*
+     * オブジェクト
+     */
+
+    /// <summary>
+    /// オブジェクト生成
+    /// </summary>
+    public async UniTask<Guid> CreateObjectAsync(SimpleTransform createdTransform, string objecName) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        return await roomHub.CreateObjectAsync(createdTransform, objecName);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// オブジェクト作成通知
+    /// </summary>
+    public void OnCreateObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, string objecName) {
+        if (OnCreatedObject != null) {
+            OnCreatedObject(objectId, createrConnectionId, createdTransform, objecName);
+        }
+    }
+
+    /// <summary>
+    /// オブジェクトのTransform同期
+    /// </summary>
+    public async UniTask UpdateObjectTransformAsync(Guid objectId, SimpleTransform sTransform) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.UpdateObjectTransformAsync(objectId, sTransform);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// オブジェクトのTransform通知
+    /// </summary>
+    public void OnUpdateObjectTransform(Guid objectId, SimpleTransform sTransform) {
+        if (OnUpdatedObjectTransform != null) {
+            OnUpdatedObjectTransform(objectId, sTransform);
+        }
+    }
+
+    /// <summary>
+    /// オブジェクトの削除
+    /// </summary>
+    public async UniTask DestroyObjectAsync(Guid objectId) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.DestroyObjectAsync(objectId);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// オブジェクトの削除通知
+    /// </summary>
+    public void OnDestroyObject(Guid objectId) {
+        if (OnDestroyedObject != null) {
+            OnDestroyedObject(objectId);
+        }
     }
 }

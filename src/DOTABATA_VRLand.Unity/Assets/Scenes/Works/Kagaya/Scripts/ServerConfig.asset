@@ -13,10 +13,16 @@ MonoBehaviour:
   m_Name: ServerConfig
   m_EditorClassIdentifier: 
   debugs:
-  - use: 1
-    saveUse: 1
-    url: http://10.70.41.152:5244
-  productions:
-  - use: 1
+  - use: 0
     saveUse: 0
     url: http://10.70.41.152:5244
+  - use: 1
+    saveUse: 1
+    url: http://localhost:5244
+  productions:
+  - use: 0
+    saveUse: 0
+    url: http://10.70.41.152:5244
+  - use: 1
+    saveUse: 1
+    url: http://localhost:5244

@@ -17,6 +17,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public Dictionary<Guid, RoomUserData> RoomUserDataList { get; } =
             new Dictionary<Guid, RoomUserData>(); // ユーザーデータ一覧
 
+        public Dictionary<Guid, RoomObjectData> RoomObjectDataList { get; } =
+            new Dictionary<Guid, RoomObjectData>(); // オブジェクトデータリスト
+
+
         public List<JoinedUser> GoalOrder = new List<JoinedUser>();
 
         public string Password { get; set; } // ルームパスワード

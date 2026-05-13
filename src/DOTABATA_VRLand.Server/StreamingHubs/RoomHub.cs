@@ -200,5 +200,68 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// オブジェクト作成
+        /// </summary>
+        public Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, string objecName) {
+            // id作成
+            Guid objId = Guid.NewGuid();
+
+            Console.WriteLine(objId.ToString());
+
+            // 情報作成
+            RoomObjectData roomObjectData = new RoomObjectData() {
+                objectName = objecName,
+                simpleTransform = createdTransform,
+                ownerConnectionId = this.ConnectionId,
+            };
+
+            // サーバーに保持
+            this._roomContext.RoomObjectDataList[objId] = roomObjectData;
+
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnCreateObject(objId, this.ConnectionId, createdTransform, objecName);
+
+            return Task.FromResult<Guid>(objId);
+        }
+
+        /// <summary>
+        /// オブジェクトのTransform同期
+        /// </summary>
+        public Task UpdateObjectTransformAsync(Guid objectId, SimpleTransform sTransform) {
+            // そのオブジェクトIdがあるか所有者のIdが一致しているか
+            if (!this._roomContext.RoomObjectDataList.ContainsKey(objectId) ||
+                this._roomContext.RoomObjectDataList[objectId].ownerConnectionId != this.ConnectionId) {
+                return Task.CompletedTask;
+            }
+
+            // サーバーに保持
+            this._roomContext.RoomObjectDataList[objectId].simpleTransform = sTransform;
+
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnUpdateObjectTransform(objectId, sTransform);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// オブジェクトの削除
+        /// </summary>
+        public Task DestroyObjectAsync(Guid objectId) {
+            // そのオブジェクトIdがあるか所有者のIdが一致しているか
+            if (!this._roomContext.RoomObjectDataList.ContainsKey(objectId) ||
+                this._roomContext.RoomObjectDataList[objectId].ownerConnectionId != this.ConnectionId) {
+                return Task.CompletedTask;
+            }
+
+            // サーバーから削除
+            this._roomContext.RoomObjectDataList.Remove(objectId);
+
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnDestroyObject(objectId);
+
+            return Task.CompletedTask;
+        }
     }
 }

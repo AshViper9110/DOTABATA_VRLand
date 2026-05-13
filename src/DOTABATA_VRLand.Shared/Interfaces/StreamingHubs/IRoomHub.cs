@@ -47,5 +47,20 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ゲームスタート
         /// </summary>
         Task GameStartAsync();
+
+        /// <summary>
+        /// オブジェクト生成
+        /// </summary>
+        Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, string objecName);
+
+        /// <summary>
+        /// オブジェクトのTransform同期
+        /// </summary>
+        Task UpdateObjectTransformAsync(Guid objectId, SimpleTransform sTransform);
+
+        /// <summary>
+        /// オブジェクトの削除
+        /// </summary>
+        public Task DestroyObjectAsync(Guid objectId);
     }
 }
