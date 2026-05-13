@@ -4,6 +4,8 @@ using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion.Server.Hubs;
 using Microsoft.EntityFrameworkCore;
+using System.Security.AccessControl;
+using System.Security.Cryptography;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub :StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub {
@@ -258,15 +260,13 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// オブジェクト作成
         /// </summary>
-        public Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, string objecName) {
+        public Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, string objectName) {
             // id作成
             Guid objId = Guid.NewGuid();
 
-            Console.WriteLine(objId.ToString());
-
             // 情報作成
             RoomObjectData roomObjectData = new RoomObjectData() {
-                objectName = objecName,
+                objectName = objectName,
                 simpleTransform = createdTransform,
                 ownerConnectionId = this.ConnectionId,
             };
@@ -275,9 +275,26 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             this._roomContext.RoomObjectDataList[objId] = roomObjectData;
 
             // 自分以外に通知
-            this._roomContext.Group.Except([this.ConnectionId]).OnCreateObject(objId, this.ConnectionId, createdTransform, objecName);
+            this._roomContext.Group.Except([this.ConnectionId]).OnCreateObject(objId, this.ConnectionId, createdTransform, objectName);
 
             return Task.FromResult<Guid>(objId);
+        }
+
+        /// <summary>
+        /// オブジェクトリストに追加
+        /// </summary>
+        public Task AddObjectListAsync(Guid objectId, string objectName, SimpleTransform simpleTransform) {
+            // 情報作成
+            RoomObjectData roomObjectData = new RoomObjectData() {
+                objectName = objectName,
+                simpleTransform = simpleTransform,
+                ownerConnectionId = this.ConnectionId,
+            };
+
+            // サーバーに保持
+            this._roomContext.RoomObjectDataList[objectId] = roomObjectData;
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
