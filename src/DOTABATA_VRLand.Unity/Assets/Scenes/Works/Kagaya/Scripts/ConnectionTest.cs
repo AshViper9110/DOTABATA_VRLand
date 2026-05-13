@@ -23,7 +23,7 @@ public class ConnectionTest : MonoBehaviour {
         await UserModel.I.CreateUserModel();
         await RoomModel.I.ConnectAsync();
 
-        await RoomModel.I.JoinRoomAsync();
+        //await RoomModel.I.JoinRoomAsync();
         await UserModel.I.RegistUserAsync("YamagamiSecond");
 
         string text = "";
@@ -32,7 +32,6 @@ public class ConnectionTest : MonoBehaviour {
         }
         Debug.Log(text);
 
-        
     }
 
     /// <summary>

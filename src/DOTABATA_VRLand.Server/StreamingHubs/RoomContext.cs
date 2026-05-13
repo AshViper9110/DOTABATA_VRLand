@@ -1,5 +1,7 @@
 ﻿using Cysharp.Runtime.Multicast;
+using DOTABATA_VRLand.Server.Models.Entities;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using DOTABATA_VRLand.Shared.Models.Entities;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -9,6 +11,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public string Name { get; } // ルーム名
         public IMulticastSyncGroup<Guid, IRoomHubReceiver> Group { get; } // グループ
 
+        public int GameModeId { get; set; } // ゲームモードid
         public int MiniGameId { get; set; } // ミニゲームid
 
         public Dictionary<Guid, RoomUserData> RoomUserDataList { get; } =
@@ -16,17 +19,108 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         public List<JoinedUser> GoalOrder = new List<JoinedUser>();
 
+        public string Password { get; set; } // ルームパスワード
+
         // その他、ルームのデータとして保存したいものをフィールドに追加していく
         // コンストラクタ
-        public RoomContext(IMulticastGroupProvider groupProvider, string roomName) {
+        public RoomContext(IMulticastGroupProvider groupProvider, RoomConfig roomConfig) {
             Id = Guid.NewGuid(); // ルーム毎のデータにIDを付けておく
-            Name = roomName; // ルーム名をフィールドに保存
-            Group = groupProvider.GetOrAddSynchronousGroup<Guid, IRoomHubReceiver>(roomName); // グループを作成
+            Name = roomConfig.Name; // ルーム名をフィールドに保存
+            Group = groupProvider.GetOrAddSynchronousGroup<Guid, IRoomHubReceiver>(roomConfig.Name); // グループを作成
+            Password = roomConfig.Password;
+            GameModeId = roomConfig.GameModeId;
         }
 
         public void Dispose() {
             Group.Dispose();
         }
+
+        /// <summary>
+        /// コンソールに入室ログを表示
+        /// </summary>
+        public void WriteConsoleJoinInfo(JoinedUser joinedUser) {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("{JoinRoom}");
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("<Room>");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(
+                $"Id：{Id}\n" +
+                $"Name : {Name}"
+                );
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("<User>");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(
+                $"Name : {joinedUser.Name}\n" +
+                $"ConnectionID : {joinedUser.ConnectionId}\n" +
+                $"JoinOrder : {joinedUser.JoinOrder}\n"
+                );
+        }
+
+        /// <summary>
+        /// コンソールに退室ログを表示
+        /// </summary>
+        public void WriteConsoleLeaveInfo(Guid connectionId) {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("{LeaveRoom}");
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("<Room>");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(
+                $"Id：{Id}\n" +
+                $"Name : {Name}"
+                );
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("<User>");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(
+                $"Name : {RoomUserDataList[connectionId].joinedUser.Name}\n" +
+                $"ConnectionID : {connectionId}\n" +
+                $"JoinOrder : {RoomUserDataList[connectionId].joinedUser.JoinOrder}\n"
+                );
+        }
+
+        /// <summary>
+        /// パスワードがあっているか
+        /// </summary>
+        public bool ComparePassword(string roomPassword) {
+            return Password == roomPassword;
+        }
+
+        /// <summary>
+        /// ミニゲームの結果を反映
+        /// </summary>
+        public void ApplyMiniGameResult(Dictionary<Guid, int> userRanks) {
+            foreach (var user in userRanks) {
+                MiniGameResultData miniGameResultData = RoomUserDataList[user.Key].miniGameResultData;
+
+                miniGameResultData.rankings.Add(user.Value);
+                miniGameResultData.point += user.Value;
+                if (user.Value == 1) {
+                    miniGameResultData.winCount++;
+                }
+            }
+
+            SortAllRoundRanking();
+        }
+
+        /// <summary>
+        /// 全体の順位更新
+        /// </summary>
+        public void SortAllRoundRanking() {
+            int ranking = 1;
+            foreach (var user in RoomUserDataList.OrderBy(_=>_.Value.miniGameResultData.winCount)) {
+                user.Value.miniGameResultData.allRoundRanking = ranking;
+                ranking++;
+            }
+        }
+
+
 
         //準備完了状態の変更
         public void UpdateReadyState(Guid connectionId, bool isReady)
