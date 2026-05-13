@@ -162,8 +162,6 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
 
-
-
         /// <summary>
         /// ユーザーのTransfrom同期
         /// </summary>
@@ -192,6 +190,49 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
+        /// 準備完了状態の変更
+        /// </summary>
+        public async Task UpdateReadyState(bool isReady)
+        {
+            var (updatedUser, isReadyResult) = _roomContext.UpdateReadyState(ConnectionId, isReady);
+
+            if (updatedUser == null) return; // 対象ユーザーが存在しない場合
+
+            //全員に更新されたプレイヤーと準備状態を通知
+            // Group.All.OnUpdateReadyState(updatedUser, isReadyResult); Interface追加後に解除
+
+            if (_roomContext.IsAllUserReady() == true)
+            {
+                Console.WriteLine("[RoomHub]すべてのプレイヤーの準備完了");
+            }
+            else
+            {
+                Console.WriteLine("[RoomHub]すべてのプレイヤーの準備が完了していません");
+            }
+        }
+
+        /// <summary>
+        /// カウントダウン
+        /// </summary>
+        public async Task StartCountdown()
+        {
+            _roomContext.ResetCountdown(3);//カウントのリセット
+
+            //最初だけ3秒待機
+            await Task.Delay(3000);
+
+            while (true)
+            {
+                int count = _roomContext.TickCountdown();
+                //_roomContext.Group.All.OnCountdown(count);//現在のカウントを通知、nterface追加後に解除
+
+                if (count == 0) break;
+
+                await Task.Delay(1000); // 1秒おく
+            }
+        }
+
+        /// <summary>
         /// ゲームスタート
         /// </summary>
         public Task GameStartAsync() {
@@ -199,6 +240,19 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             _roomContext.Group.All.OnGameStart();
 
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 速度系順位確定
+        /// </summary>
+        public void RegisterGoal()
+        {
+            var goalOrder = _roomContext.RegisterGoal(ConnectionId);
+
+            if (goalOrder == null) return; // まだ全員ゴールしていない
+
+            // 全員ゴール完了、順位確定
+            // Group.All.OnRegisterGoal(goalOrder); Interface追加後に解除
         }
 
         /// <summary>

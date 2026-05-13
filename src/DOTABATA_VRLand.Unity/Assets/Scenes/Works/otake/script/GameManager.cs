@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 
 
 public class GameManager : MonoBehaviour
@@ -20,7 +21,7 @@ public class GameManager : MonoBehaviour
     InputAction action;
 
     /// <summary>
-    /// 進行UI関係
+    /// �i�sUI�֌W
     /// </summary>
 
     public Text MainText;
@@ -30,34 +31,34 @@ public class GameManager : MonoBehaviour
     public bool onResult;
     public bool onEnd;
 
-    //進行テキスト(最初)
+    //�i�s�e�L�X�g(�ŏ�)
     List<string> StartText = new List<string>()
     {
-        "ミニゲーム大会を始めるよ！",
-        "先に三勝したプレイヤーが勝ちだよ！",
-        "それじゃあ早速ミニゲームを決めていくよ！"
+        "�~�j�Q�[������n�߂��I",
+        "��ɎO�������v���C���[����������I",
+        "���ꂶ�Ⴀ�����~�j�Q�[������߂Ă�����I"
     };
 
-    //進行テキスト(ミニゲーム後)
+    //�i�s�e�L�X�g(�~�j�Q�[����)
     List<string> AfterText = new List<string>()
     {
-        "ミニゲームお疲れ様!",
-        "今回勝ったひとは...",
-        "!!! おめでとう！",//あとから勝ったプレイヤー名を挿入,
-        "それじゃあ次のミニゲームを決めていくよ!",
+        "�~�j�Q�[�������l!",
+        "���񏟂����ЂƂ�...",
+        "!!! ���߂łƂ��I",//���Ƃ��珟�����v���C���[����}��,
+        "���ꂶ�Ⴀ���̃~�j�Q�[������߂Ă�����!",
     };
 
-    //進行テキスト(メインゲーム終了時)
+    //�i�s�e�L�X�g(���C���Q�[���I����)
     List<string> FinishText = new List<string>()
     {
-        "ここでゲーム大会の勝者が決まったみたいだね",
-        "今回優勝した人は...",
-        "!!! おめでとう！",//あとから勝ったプレイヤー名を挿入,
-        "他のみんなも遊んでくれてありがとう！",
-        "また遊んでね！バイバーイ！"
+        "�����ŃQ�[�����̏��҂����܂����݂�������",
+        "����D�������l��...",
+        "!!! ���߂łƂ��I",//���Ƃ��珟�����v���C���[����}��,
+        "���݂̂�Ȃ�V��ł���Ă��肪�Ƃ��I",
+        "�܂��V��łˁI�o�C�o�[�C�I"
     };
 
-    //ミニゲームのUI配置関係
+    //�~�j�Q�[����UI�z�u�֌W
     public float radius;
     [SerializeField] GameObject MinigamePrefab;
 
@@ -71,7 +72,7 @@ public class GameManager : MonoBehaviour
 
     bool isSpin;
 
-    //ランキングUI
+    //�����L���OUI
     public List<RectTransform> rankingPosList;
     public List<RectTransform> rankingUis;
 
@@ -80,7 +81,7 @@ public class GameManager : MonoBehaviour
     public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
         { 1,1 },{2,0 },{3,1},{4,0}
-    };//勝利数
+    };//������
 
     public List<Rank> RankingList = new List<Rank>()
     {
@@ -139,8 +140,8 @@ public class GameManager : MonoBehaviour
             if (CenterObjRb.angularVelocity.y < 0.01f)
             {
                 MainText.text = "";
-                Debug.Log(selPointManager.SelectId + "にゲームが決まりました");
-                MainText.DOText(selPointManager.SelectId + "にゲームが決まりました", 1.0f);
+                Debug.Log(selPointManager.SelectId + "�ɃQ�[�������܂�܂���");
+                MainText.DOText(selPointManager.SelectId + "�ɃQ�[�������܂�܂���", 1.0f);
 
                 onSelect = true;
                 onResult = false;
@@ -158,7 +159,7 @@ public class GameManager : MonoBehaviour
         }
 
 
-        //TODO：自身がホストの場合はミニゲーム一覧の回転同期
+        //TODO�F���g���z�X�g�̏ꍇ�̓~�j�Q�[���ꗗ�̉�]����
     }
 
     public void InitRally()
@@ -172,7 +173,7 @@ public class GameManager : MonoBehaviour
         onEnd = false;
 
         
-        //シーン移行後の位置配置
+        //�V�[���ڍs��̈ʒu�z�u
         var myId = NetworkManager.I.myConnectionId;
 
         int index =
@@ -184,7 +185,7 @@ public class GameManager : MonoBehaviour
         
 
 
-        //ここで順位が決定されている状態だったらランキング処理のフラグを建てる
+        //�����ŏ��ʂ����肳��Ă����Ԃ������烉���L���O�����̃t���O����Ă�
         if (miniRankingList[0].rank != 0)
         {
             onResult = true;
@@ -206,11 +207,11 @@ public class GameManager : MonoBehaviour
         SetRanking();
     }
 
-    //ミニゲーム抽選開始(ホストのみ実行)
+    //�~�j�Q�[�����I�J�n(�z�X�g�̂ݎ��s)
     public void SelectMiniGame()
     {
         isSpin = true;
-        //TODO：抽選開始通知
+        //TODO�F���I�J�n�ʒm
 
         float spinPower = Random.Range(3, 6);
 
@@ -225,23 +226,23 @@ public class GameManager : MonoBehaviour
 
     public void SetMiniGame()
     {
-        // 角度を計算
+        // �p�x��v�Z
         float angle = 3 * Mathf.PI * 2 / 4;
 
-        // 位置を計算 (X, Z平面)
+        // �ʒu��v�Z (X, Z����)
         Vector3 pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
         selectPoint.transform.position = CenterObj.transform.position + pos;
 
         int count = miniGames.Count;
         for (int i = 0; i < count; i++)
         {
-            // 角度を計算
+            // �p�x��v�Z
             angle = i * Mathf.PI * 2 / count;
 
-            // 位置を計算 (X, Z平面)
+            // �ʒu��v�Z (X, Z����)
             pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
 
-            // 生成して回転を適用
+            // �������ĉ�]��K�p
             GameObject obj = Instantiate(MinigamePrefab,
                 CenterObj.transform.position + pos,
                 Quaternion.identity,
@@ -271,7 +272,7 @@ public class GameManager : MonoBehaviour
 
     public void SetRanking()
     {
-        //勝利数でソート→ID参照でランキング付け→テキスト入れ替え
+        //�������Ń\�[�g��ID�Q�ƂŃ����L���O�t�����e�L�X�g����ւ�
 
         playerWinlist = playerWinlist.OrderByDescending(x => x.Value)
                        .ToDictionary(x => x.Key, x => x.Value); ;
@@ -305,10 +306,10 @@ public class GameManager : MonoBehaviour
                 return;
             }
 
-            if (AfterText[textIndex] == "!!! おめでとう！")
+            if (AfterText[textIndex] == "!!! ���߂łƂ��I")
             {
 
-                MainText.DOText($"プレイヤー{winPlayerId}" + AfterText[textIndex], 1.0f);
+                MainText.DOText($"�v���C���[{winPlayerId}" + AfterText[textIndex], 1.0f);
                 playerWinlist[RankingList[winPlayerId - 1].Id]++;
 
                 SetRanking();
@@ -329,15 +330,15 @@ public class GameManager : MonoBehaviour
         {
             if (textIndex >= FinishText.Count)
             {
-                //タイトルに戻る
+                //�^�C�g���ɖ߂�
                 Initiate.Fade("GameScene", Color.black, 1.0f);
                 return;
             }
 
-            if (FinishText[textIndex] == "!!! おめでとう！")
+            if (FinishText[textIndex] == "!!! ���߂łƂ��I")
             {
 
-                MainText.DOText($"プレイヤー{winPlayerId}" + FinishText[textIndex], 1.0f);
+                MainText.DOText($"�v���C���[{winPlayerId}" + FinishText[textIndex], 1.0f);
 
             }
             else

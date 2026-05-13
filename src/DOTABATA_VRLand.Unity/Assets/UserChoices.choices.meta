@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:src/DOTABATA_VRLand.Unity/Assets/UserChoices.choices.meta
 guid: 01b7c0bdd2916234ba727b5bac121242
+========
+guid: 23f587995a3e02a408eaedfdd9858c4e
+>>>>>>>> main:src/DOTABATA_VRLand.Unity/Assets/Scenes/Works/hirao/TestGameScene.unity.meta
 DefaultImporter:
   externalObjects: {}
   userData: 
