@@ -10,11 +10,15 @@ using System.Collections;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
 using Unity.Android.Gradle.Manifest;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
+using Unity.XR.CoreUtils;
+using System;
 
 
 public class GameManager : MonoBehaviour
 {
     public List<string> miniGames = new List<string>();
+    public List<string> miniGameNames = new List<string>();
 
     static public bool rally = true;
     static public bool freePlay = false;
@@ -24,6 +28,14 @@ public class GameManager : MonoBehaviour
     public InputActionReference rightHandPrimaryAction;
     InputAction action;
 
+    [SerializeField] GameObject CrownPrefab;
+    public float crownDistance;
+
+    ///あとで消す
+    [SerializeField]Transform crowntrans;
+     
+     
+    
     /// <summary>
     /// 進行UI関係
     /// </summary>
@@ -84,7 +96,7 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
-        { 1,1 },{2,0 },{3,1},{4,0}
+        { 1,8},{2,0 },{3,1},{4,0}
     };//勝利数
 
     public List<Rank> RankingList = new List<Rank>()
@@ -117,7 +129,29 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-       // mana = GameObject.Find("TitleManager").GetComponent<TitleMana>();
+        //List<GameObject> crowns = new List<GameObject>();
+
+        ////Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
+
+        //for (int i = 0; i < playerWinlist[1]; i++)
+        //{
+        //    //GameObject crown = Instantiate(CrownPrefab,
+        //    //    transform);
+        //    //crowns.Add(crown);
+
+        //    GameObject crown = Instantiate(CrownPrefab,
+        //      crowntrans);
+        //    crowns.Add(crown);
+        //}
+        //int index = 0;
+
+        //foreach (GameObject crown in crowns)
+        //{
+        //    crown.transform.position = new Vector3(crown.transform.position.x, crownDistance * index, crown.transform.position.z);
+        //    index++;
+        //}
+
+        // mana = GameObject.Find("TitleManager").GetComponent<TitleMana>();
         if (rally)
         {
             InitRally();
@@ -144,8 +178,8 @@ public class GameManager : MonoBehaviour
             if (CenterObjRb.angularVelocity.y < 0.01f)
             {
                 MainText.text = "";
-                Debug.Log(selPointManager.SelectId + "にゲームが決まりました");
-                MainText.DOText(selPointManager.SelectId + "にゲームが決まりました", 1.0f);
+                Debug.Log(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました");
+                MainText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
 
                 onSelect = true;
                 onResult = false;
@@ -176,7 +210,9 @@ public class GameManager : MonoBehaviour
         onResult = false;
         onEnd = false;
 
-        
+       
+
+
         //シーン移行後の位置配置
         var myId = NetworkManager.I.myConnectionId;
 
@@ -186,7 +222,13 @@ public class GameManager : MonoBehaviour
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position =
             playerPos[index].position;
 
-        
+        var rayInteractor = InRoomPlayerData.I.PlayerList[myId].playerObj.GetComponent<XRRayInteractor>();
+        rayInteractor.attachTransform = InRoomPlayerData.I.PlayerList[myId].playerObj.transform;
+
+        foreach(Guid guid in InRoomPlayerData.I.PlayerList.Keys)
+        {
+            SetCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+        }
 
 
         //ここで順位が決定されている状態だったらランキング処理のフラグを建てる
@@ -208,6 +250,8 @@ public class GameManager : MonoBehaviour
             textIndex = 0;
             MainText.DOText(StartText[textIndex], 1.0f);
         }
+
+       
         SetRanking();
     }
 
@@ -217,7 +261,7 @@ public class GameManager : MonoBehaviour
         isSpin = true;
         //TODO：抽選開始通知
 
-        float spinPower = Random.Range(3, 6);
+        float spinPower = UnityEngine.Random.Range(3, 6);
 
         CenterObjRb.angularVelocity = new Vector3(0, spinPower, 0);
     }
@@ -259,6 +303,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void SetCrown(Guid guid,int ID)
+    {
+        List<GameObject> crowns = new List<GameObject>();
+        
+        Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
+
+        for (int i = 0; i < playerWinlist[ID]; i++)
+        {
+            GameObject crown = Instantiate(CrownPrefab,
+                transform);
+            crowns.Add(crown);
+
+
+        }
+        int index = 0;
+
+        foreach (GameObject crown in crowns)
+        {
+            crown.transform.position = new Vector3(crown.transform.position.x,crownDistance*index,crown.transform.position.z);
+            index++;
+        }
+    }
     public void SetResult()
     {
         for (int i = 0; i < miniRankingList.Count; i++)
