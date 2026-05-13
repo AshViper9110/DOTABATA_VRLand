@@ -61,9 +61,9 @@ public class NetworkManager : Singleton<NetworkManager>
     /// <summary>
     /// Gameシーンに移動ボタン
     /// </summary>
-    public async Task JointoNextScene(string name, RoomConfig roomConfig)
+    public async Task JointoNextScene(string scene, string name, RoomConfig roomConfig)
     {
-        //await RoomModel.I.JoinRoomAsync(roomConfig);
+        await RoomModel.I.JoinRoomAsync(name, roomConfig);
 
         await Cysharp.Threading.Tasks.UniTask.WaitUntil(() =>
             InRoomPlayerData.I.PlayerList.ContainsKey(myConnectionId)
@@ -73,7 +73,7 @@ public class NetworkManager : Singleton<NetworkManager>
         SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
         syncPlayer.isLocalPlayer = true;
 
-        SceneManager.LoadScene(name);
+        SceneManager.LoadScene(scene);
     }
     /// <summary>
     /// ルーム全取得
