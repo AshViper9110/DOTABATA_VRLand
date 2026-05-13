@@ -5,14 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-<<<<<<< HEAD
-  - enabled: 1
-    path: Assets/Scenes/Works/Kagaya/TestScene.unity
-    guid: 49cec44694504a143ab09361adc8c9e8
-  - enabled: 1
-=======
   - enabled: 0
->>>>>>> main
     path: Assets/Scenes/Works/hirao/TitleScene.unity
     guid: 9aa53287dc33ed740bb4d19eb0d28e0b
   - enabled: 0

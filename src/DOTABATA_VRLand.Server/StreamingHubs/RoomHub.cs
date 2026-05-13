@@ -317,5 +317,18 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// 速度系順位確定
+        /// </summary>
+        public void RegisterGoal()
+        {
+            var goalOrder = _roomContext.RegisterGoal(ConnectionId);
+
+            if (goalOrder == null) return; // まだ全員ゴールしていない
+
+            // 全員ゴール完了、順位確定
+            // Group.All.OnRegisterGoal(goalOrder); Interface追加後に解除
+        }
     }
 }
