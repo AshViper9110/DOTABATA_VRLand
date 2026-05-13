@@ -15,7 +15,7 @@ public class TestManager : MonoBehaviour
     {
         RoomConfig roomConfig = new RoomConfig()
         {
-            Name = playerName,
+            Name = playerName+"Name",
             Password = "0000",
             GameModeId = gameModeId,
         };
@@ -27,6 +27,6 @@ public class TestManager : MonoBehaviour
     /// </summary>
     public async void JointoNextScene(string name)
     {
-        await NetworkManager.I.JointoNextScene(name, SetNames());
+        await NetworkManager.I.JointoNextScene(name, playerName, SetNames());
     }
 }
