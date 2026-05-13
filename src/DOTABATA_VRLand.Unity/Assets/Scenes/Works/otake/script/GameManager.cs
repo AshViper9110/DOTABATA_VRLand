@@ -154,6 +154,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
+
         if (Input.GetMouseButtonDown(0))
         {
             
@@ -175,7 +176,17 @@ public class GameManager : MonoBehaviour
         onResult = false;
         onEnd = false;
 
-        //mana.player.transform.position = playerPos[1].position;
+        
+        //シーン移行後の位置配置
+        var myId = NetworkManager.I.myConnectionId;
+
+        int index =
+            InRoomPlayerData.I.PlayerList[myId].joinedUser.JoinOrder - 1;
+
+        InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position =
+            playerPos[index].position;
+
+        
 
 
         //ここで順位が決定されている状態だったらランキング処理のフラグを建てる
