@@ -321,7 +321,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 速度系順位確定
         /// </summary>
-        public void RegisterGoal()
+        public void RegisterGoalAsync()
         {
             var goalOrder = _roomContext.RegisterGoal(ConnectionId);
 
