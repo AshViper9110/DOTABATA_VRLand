@@ -16,6 +16,7 @@ public class SyncPlayer : MonoBehaviour
 
     private void Awake()
     {
+        DontDestroyOnLoad(this.gameObject);
         if (playerTransform == null)
             playerTransform = GetComponent<PlayerTransform>();
     }
@@ -34,7 +35,7 @@ public class SyncPlayer : MonoBehaviour
 
     private async UniTaskVoid SendTransform()
     {
-        if (!TitleMana.isJoin) return;
+        if (!NetworkManager.I.isJoin) return;
 
         PlayerTransformDTO data = playerTransform.ToPlayerTransformDTO();
         await RoomModel.I.UpdateUserTransformAsync(data);

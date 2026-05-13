@@ -18,6 +18,6 @@ public class SelPointManager : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         SelectId = other.GetComponent<MiniGameObjManager>().ID;
-        Debug.Log(SelectId);
+     
     }
 }

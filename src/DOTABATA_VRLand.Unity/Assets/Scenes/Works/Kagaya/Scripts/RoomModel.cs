@@ -4,11 +4,12 @@ using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion;
 using MagicOnion.Client;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
-    protected const string ServerURL = "http://10.70.41.152:5244";
-    //protected const string ServerURL = "http://localhost:5244";
+    [SerializeField] private ServerConfigSO serverConfig;
 
     private GrpcChannelx channelx;
     private IRoomHub roomHub;
@@ -50,7 +51,13 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// 　MagicOnion接続処理
     /// </summary>
     public async UniTask ConnectAsync() {
-        channelx = GrpcChannelx.ForAddress(ServerURL);
+        channelx = GrpcChannelx.ForAddress(
+#if DEBUG
+            serverConfig.DEBUG.url
+#else
+            serverConfig.PRODUCTION.url
+#endif
+            );
         roomHub = await StreamingHubClient.
              ConnectAsync<IRoomHub, IRoomHubReceiver>(channelx, this);
         this.ConnectionId = await roomHub.GetConnectionId();
@@ -76,18 +83,31 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ゲーム終了時
     /// </summary>
-    protected override void OnApplicationQuit() {
+    protected override void OnApplicationQuit()
+    {
         base.OnApplicationQuit();
         DisconnectAsync().Forget();
     }
+    /// <summary>
+    /// ゲームモードを指定してルーム名を全取得
+    /// </summary>
+    public async UniTask<List<string>> GetAllRoomNamesAsync(int gameModeId = -1) 
+    {
+        return await roomHub.GetAllRoomNamesAsync(gameModeId);
+    }
+
+
 
     /// <summary>
     /// ルームに入室
     /// </summary>
-    public async UniTask JoinRoomAsync() {
-        if (roomHub != null) {
-            try {
-                JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync("Test", "1");
+    public async UniTask JoinRoomAsync(RoomConfig roomConfig) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        try {
+                JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync("TestUser", roomConfig);
                 if (joinedUsers != null)
                 {
                     foreach (var user in joinedUsers)
@@ -103,7 +123,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             catch(Exception e) {
                 Debug.LogException(e);
             }
-        }
+        
     }
 
 
@@ -121,9 +141,11 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// ルームから退室
     /// </summary>
     public async UniTask LeaveRoomAsync() {
-        if (roomHub != null) {
-            await roomHub.LeaveRoomAsync();
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
         }
+
+        await roomHub.LeaveRoomAsync();
     }
 
     /// <summary>
@@ -141,9 +163,10 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// ユーザーのTransform同期
     /// </summary>
     public async UniTask UpdateUserTransformAsync(PlayerTransformDTO playerTransform) {
-        if(roomHub != null) {
-            await roomHub.UpdateUserTransformAsync(playerTransform);
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
         }
+        await roomHub.UpdateUserTransformAsync(playerTransform);
     }
 
     /// <summary>
@@ -160,9 +183,10 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// ミニゲームの選択
     /// </summary>
     public async UniTask SelectMiniGameAsync(int miniGameId){
-        if (roomHub != null) {
-            await roomHub.SelectMiniGameAsync(miniGameId);
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
         }
+        await roomHub.SelectMiniGameAsync(miniGameId);
     }
 
     /// <summary>
