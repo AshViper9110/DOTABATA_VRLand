@@ -18,6 +18,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             new Dictionary<Guid, RoomUserData>(); // ユーザーデータ一覧
 
         public List<JoinedUser> GoalOrder = new List<JoinedUser>();
+        private int _currentCount = 3;//カウントダウン用
 
         public string Password { get; set; } // ルームパスワード
 
@@ -120,16 +121,16 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             }
         }
 
-
-
-        //準備完了状態の変更
-        public void UpdateReadyState(Guid connectionId, bool isReady)
+        /// <summary>
+        /// 準備完了状態の変更
+        /// </summary>
+        public (JoinedUser user, bool isReady) UpdateReadyState(Guid connectionId, bool isReady)
         {
             // 対象ユーザーが存在しない場合は何もしない
             if (!RoomUserDataList.TryGetValue(connectionId, out var user))
             {
                 Console.WriteLine($"[RoomContext]対象プレイヤーはルームに存在しません");
-                return;
+                return (null,false);
             }
 
             // Ready状態を更新
@@ -138,25 +139,30 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             //コンソールに出力
             if(user.IsReady == true)
             {
-                Console.WriteLine($"{user.joinedUser.Name}の準備が完了しました");
+                Console.WriteLine($"[RoomContext]{user.joinedUser.Name}の準備が完了しました");
             }else
             {
-                Console.WriteLine($"{user.joinedUser.Name}の準備完了が取り消されました");
+                Console.WriteLine($"[RoomContext]{user.joinedUser.Name}の準備完了が取り消されました");
             }
                
            
             if (IsAllUserReady() == true )
             {
-                Console.WriteLine("すべてのプレイヤーの準備完了");
+                Console.WriteLine("[RoomContext]すべてのプレイヤーの準備完了");
             }else
             {
-                Console.WriteLine("すべてのプレイヤーの準備が完了していません");
+                Console.WriteLine("[RoomContext]すべてのプレイヤーの準備が完了していません");
             }
 
+            return (user.joinedUser, user.IsReady);
+
         }
-    
-        // 全員準備完了かどうかの判定処理
-       public bool IsAllUserReady()
+
+       
+        /// <summary>
+        /// 全員準備完了かどうかの判定処理
+        /// </summary>
+        public bool IsAllUserReady()
         {
             // 誰もいない場合は false
             if (RoomUserDataList.Count == 0)
@@ -180,7 +186,31 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             // 全員 Ready
             return true;
         }
-        public List<JoinedUser> RegisterGoal(Guid connectionId)//ConnectionIDでRoomUserDataから対象を探し、JoinedUser型のリストで返している
+
+        /// <summary>
+        /// カウントダウン
+        /// </summary>
+        public int TickCountdown()
+        {
+            if (_currentCount > 0)
+            {
+                _currentCount--;
+            }
+            return _currentCount;
+        }
+
+        /// <summary>
+        /// カウントのリセット(未設定なら3で固定)
+        /// </summary>
+        public void ResetCountdown(int count = 3)
+        {
+            _currentCount = count;
+        }
+
+        /// <summary>
+        /// 速度系順位確定
+        /// </summary>
+        public List<JoinedUser> RegisterGoal(Guid connectionId)
         {
             // 既にクリア済みの場合は無視
             if (GoalOrder.Any(u => u.ConnectionId == connectionId)) //GoalOrder.joinedUser.ConnectionIdを参照
