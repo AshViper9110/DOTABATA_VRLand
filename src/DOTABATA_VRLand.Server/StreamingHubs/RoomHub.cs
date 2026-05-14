@@ -4,6 +4,8 @@ using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion.Server.Hubs;
 using Microsoft.EntityFrameworkCore;
+using System.Security.AccessControl;
+using System.Security.Cryptography;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub :StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub {
@@ -289,6 +291,97 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             // Group.All.OnGetLastMiniGameRanking(lastRank); Interface追加後に解除
 
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// オブジェクト作成
+        /// </summary>
+        public Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, int objectListId) {
+            // id作成
+            Guid objId = Guid.NewGuid();
+
+            // 情報作成
+            RoomObjectData roomObjectData = new RoomObjectData() {
+                objectListId = objectListId,
+                simpleTransform = createdTransform,
+                ownerConnectionId = this.ConnectionId,
+            };
+
+            // サーバーに保持
+            this._roomContext.RoomObjectDataList[objId] = roomObjectData;
+
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnCreateObject(objId, this.ConnectionId, createdTransform, objectListId);
+
+            return Task.FromResult<Guid>(objId);
+        }
+
+        /// <summary>
+        /// オブジェクトリストに追加
+        /// </summary>
+        public Task AddObjectListAsync(Guid objectId, int objectListId, SimpleTransform simpleTransform) {
+            // 情報作成
+            RoomObjectData roomObjectData = new RoomObjectData() {
+                objectListId = objectListId,
+                simpleTransform = simpleTransform,
+                ownerConnectionId = this.ConnectionId,
+            };
+
+            // サーバーに保持
+            this._roomContext.RoomObjectDataList[objectId] = roomObjectData;
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// オブジェクトのTransform同期
+        /// </summary>
+        public Task UpdateObjectTransformAsync(Guid objectId, SimpleTransform sTransform) {
+            // そのオブジェクトIdがあるか所有者のIdが一致しているか
+            if (!this._roomContext.RoomObjectDataList.ContainsKey(objectId) ||
+                this._roomContext.RoomObjectDataList[objectId].ownerConnectionId != this.ConnectionId) {
+                return Task.CompletedTask;
+            }
+
+            // サーバーに保持
+            this._roomContext.RoomObjectDataList[objectId].simpleTransform = sTransform;
+
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnUpdateObjectTransform(objectId, sTransform);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// オブジェクトの削除
+        /// </summary>
+        public Task DestroyObjectAsync(Guid objectId) {
+            // そのオブジェクトIdがあるか所有者のIdが一致しているか
+            if (!this._roomContext.RoomObjectDataList.ContainsKey(objectId) ||
+                this._roomContext.RoomObjectDataList[objectId].ownerConnectionId != this.ConnectionId) {
+                return Task.CompletedTask;
+            }
+
+            // サーバーから削除
+            this._roomContext.RoomObjectDataList.Remove(objectId);
+
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnDestroyObject(objectId);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 速度系順位確定
+        /// </summary>
+        public void RegisterGoalAsync()
+        {
+            var goalOrder = _roomContext.RegisterGoal(ConnectionId);
+
+            if (goalOrder == null) return; // まだ全員ゴールしていない
+
+            // 全員ゴール完了、順位確定
+            // Group.All.OnRegisterGoal(goalOrder); Interface追加後に解除
         }
     }
 }

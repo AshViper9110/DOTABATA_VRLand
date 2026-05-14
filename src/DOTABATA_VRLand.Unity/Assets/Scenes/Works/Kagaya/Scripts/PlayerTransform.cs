@@ -10,6 +10,8 @@ public class PlayerTransform : MonoBehaviour {
 
     [SerializeField] private float duration = 0.2f;
 
+    [SerializeField] public Transform crownParent;
+
     /// <summary>
     /// PlayerTransform ==> DTO 
     /// </summary>

@@ -1,5 +1,10 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:src/DOTABATA_VRLand.Unity/Assets/com.rlabrecque.steamworks.net/Editor.meta
+guid: 495c7db3158516742a906228c9d47b91
+folderAsset: yes
+========
 guid: 23f587995a3e02a408eaedfdd9858c4e
+>>>>>>>> main:src/DOTABATA_VRLand.Unity/Assets/Scenes/Works/hirao/TestGameScene.unity.meta
 DefaultImporter:
   externalObjects: {}
   userData: 
