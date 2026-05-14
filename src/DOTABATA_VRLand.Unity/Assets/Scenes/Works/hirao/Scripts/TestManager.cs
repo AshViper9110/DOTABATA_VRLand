@@ -15,7 +15,7 @@ public class TestManager : MonoBehaviour
     {
         RoomConfig roomConfig = new RoomConfig()
         {
-            Name = playerName+"Name",
+            Name = "Name",
             Password = "0000",
             GameModeId = gameModeId,
         };
