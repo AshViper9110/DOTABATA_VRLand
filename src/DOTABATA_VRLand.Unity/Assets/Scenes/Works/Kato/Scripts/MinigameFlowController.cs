@@ -31,7 +31,7 @@ public class MinigameFlowController : MonoBehaviour
 
     private bool[] ready = new bool[4];
 
-    private bool isReadyPhase = false;
+    //private bool isReadyPhase = false;
     private bool isGameStarted = false;
     private bool isResultShown = false;
 
@@ -50,6 +50,8 @@ public class MinigameFlowController : MonoBehaviour
             StartCoroutine(ShowResult());
         }
 
+
+        // 仮実装　サーバーから受信するので最終的に消す
         if (waitingText.gameObject.activeSelf)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1)) ready[1] = true;
@@ -108,10 +110,25 @@ public class MinigameFlowController : MonoBehaviour
         return true;
     }
 
+    // =========================
+    // Ready送信
+    // =========================
+
+    public void UpdateReadyState(bool readyState)
+    {
+        Debug.Log($"Ready送信 : {readyState}");
+
+    //TODO:
+    //サーバーへ送信
+    }
+
     public void OnReadyButton()
     {
         // Ready切り替え
         ready[0] = !ready[0];
+
+        //サーバー送信
+        UpdateReadyState(ready[0]);
 
         UpdateReadyUI();
 
@@ -129,6 +146,7 @@ public class MinigameFlowController : MonoBehaviour
         }
 
         // 全員Readyなら開始
+        // ここも最終的に不要になる
         if (AllReady() && !isGameStarted)
         {
             StartCoroutine(StartGameFlow());
@@ -148,32 +166,66 @@ public class MinigameFlowController : MonoBehaviour
         descriptionPanel.SetActive(false);
         readyPanel.SetActive(false);
 
-        yield return StartCoroutine(Countdown());
+        // Cowntdown待ち
+
+        // 仮実装↓
+        //yield return StartCoroutine(Countdown());
+
+        //introUI.SetActive(false);
+        //gameUI.SetActive(true);
+    }
+
+
+    IEnumerator BeginGameAfterStart()
+    {
+        yield return new WaitForSecondsRealtime(1f);
+
+        countdownText.gameObject.SetActive(false);
 
         introUI.SetActive(false);
         gameUI.SetActive(true);
     }
 
     // =========================
-    // カウントダウン
+    // カウントダウン　クライアントのみの処理
     // =========================
-    IEnumerator Countdown()
+    //IEnumerator Countdown()
+    //{
+    //    countdownText.gameObject.SetActive(true);
+
+    //    countdownText.text = "3";
+    //    yield return new WaitForSecondsRealtime(1f);
+
+    //    countdownText.text = "2";
+    //    yield return new WaitForSecondsRealtime(1f);
+
+    //    countdownText.text = "1";
+    //    yield return new WaitForSecondsRealtime(1f);
+
+    //    countdownText.text = "START!";
+    //    yield return new WaitForSecondsRealtime(1f);
+
+    //    countdownText.gameObject.SetActive(false);
+    //}
+
+     //=========================
+     //カウントダウン送信用
+     //=========================
+
+    public void StartCountdown(int remain)
     {
         countdownText.gameObject.SetActive(true);
 
-        countdownText.text = "3";
-        yield return new WaitForSecondsRealtime(1f);
+        if (remain > 0)
+        {
+            countdownText.text = remain.ToString();
+        }
+        else
+        {
+            countdownText.text = "START!";
 
-        countdownText.text = "2";
-        yield return new WaitForSecondsRealtime(1f);
-
-        countdownText.text = "1";
-        yield return new WaitForSecondsRealtime(1f);
-
-        countdownText.text = "START!";
-        yield return new WaitForSecondsRealtime(1f);
-
-        countdownText.gameObject.SetActive(false);
+            StartCoroutine(BeginGameAfterStart());
+        }
     }
 
     // =========================
