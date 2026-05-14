@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Works/otake/GameScene.unity
     guid: 41a2d0a112918f140a5741db1c92c93b
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Works/Kagaya/TestScene.unity
     guid: 49cec44694504a143ab09361adc8c9e8
   - enabled: 1
