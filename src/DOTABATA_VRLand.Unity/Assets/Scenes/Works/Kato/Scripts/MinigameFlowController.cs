@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class MinigameFlowController : MonoBehaviour
 {
@@ -183,7 +184,9 @@ public class MinigameFlowController : MonoBehaviour
         countdownText.gameObject.SetActive(false);
 
         introUI.SetActive(false);
-        gameUI.SetActive(true);
+
+        // ▼ シーン移動
+        SceneManager.LoadScene("GameScene");
     }
 
     // =========================
@@ -208,9 +211,9 @@ public class MinigameFlowController : MonoBehaviour
     //    countdownText.gameObject.SetActive(false);
     //}
 
-     //=========================
-     //カウントダウン送信用
-     //=========================
+    //=========================
+    //カウントダウン送信用
+    //=========================
 
     public void StartCountdown(int remain)
     {
