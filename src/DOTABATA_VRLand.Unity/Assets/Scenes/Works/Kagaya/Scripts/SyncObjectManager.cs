@@ -35,8 +35,8 @@ public class SyncObjectManager : MonoBehaviour {
     /// [サーバー通知]
     /// オブジェクト作成通知
     /// </summary>
-    public void OnCreatedObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, string objecName) {
-        GameObject createSyncObject = syncObjectData.syncObjectDataList.First(_=> objecName.StartsWith(_.syncObject.name)).syncObject;
+    public void OnCreatedObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, int objectListId) {
+        GameObject createSyncObject = syncObjectData.syncObjectDataList.First(_=> _.objectListId == objectListId).syncObject;
         GameObject createdObj = Instantiate(
             createSyncObject,
             createdTransform.localPosition,

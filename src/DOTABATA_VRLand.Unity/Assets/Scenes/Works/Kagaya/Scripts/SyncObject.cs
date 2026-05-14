@@ -6,6 +6,8 @@ using System.Linq;
 using UnityEngine;
 
 public class SyncObject : MonoBehaviour {
+    [SerializeField] private int objectListId = 0;
+
     [SerializeField, Header("作成通知を送信")] private bool SendCreate;
 
 
@@ -62,6 +64,10 @@ public class SyncObject : MonoBehaviour {
     }
 
     private void Awake() {
+        if (objectListId == 0) {
+            Debug.LogError($"{this.gameObject.name}：objectListIdが指定されていません");
+        }
+
         RoomModel.I.OnUpdatedObjectTransform += OnUpdatedObjectTransform;
         RoomModel.I.OnDestroyedObject += OnDestroyedObject;
     }
@@ -100,13 +106,13 @@ public class SyncObject : MonoBehaviour {
 
             if (InRoomPlayerData.I.MySelf.JoinOrder == 1) {
                 CreaterId = RoomModel.I.ConnectionId;
-                await RoomModel.I.AddObjectListAsync(objectId, this.gameObject.name, this.transform.ToSimpleTransform());
+                await RoomModel.I.AddObjectListAsync(objectId, objectListId, this.transform.ToSimpleTransform());
             }
         }
         else if (SendCreate &&
             objectId == Guid.Empty) {
             createrId = RoomModel.I.ConnectionId;
-            objectId = await RoomModel.I.CreateObjectAsync(this.transform.ToSimpleTransform(), this.gameObject.name);
+            objectId = await RoomModel.I.CreateObjectAsync(this.transform.ToSimpleTransform(), objectListId);
             ApplyGuidToInspector();
         }
     }
