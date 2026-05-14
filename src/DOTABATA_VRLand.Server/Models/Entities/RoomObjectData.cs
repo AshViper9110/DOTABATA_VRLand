@@ -3,9 +3,9 @@
 namespace DOTABATA_VRLand.Server.Models.Entities {
     public class RoomObjectData {
         /// <summary>
-        /// オブジェクト名
+        /// オブジェクトリストId
         /// </summary>
-        public string objectName = "";
+        public int objectListId;
 
         /// <summary>
         /// Transform

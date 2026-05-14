@@ -54,7 +54,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// オブジェクト作成通知
     /// </summary>
-    public Action<Guid, Guid, SimpleTransform, string> OnCreatedObject { get; set; }
+    public Action<Guid, Guid, SimpleTransform, int> OnCreatedObject { get; set; }
 
     /// <summary>
     /// オブジェクトのTransform通知
@@ -238,33 +238,33 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// オブジェクト生成
     /// </summary>
-    public async UniTask<Guid> CreateObjectAsync(SimpleTransform createdTransform, string objecName) {
+    public async UniTask<Guid> CreateObjectAsync(SimpleTransform createdTransform, int objectListId) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
 
-        return await roomHub.CreateObjectAsync(createdTransform, objecName);
+        return await roomHub.CreateObjectAsync(createdTransform, objectListId);
     }
 
     /// <summary>
     /// [サーバー通知]
     /// オブジェクト作成通知
     /// </summary>
-    public void OnCreateObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, string objecName) {
+    public void OnCreateObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, int objectListId) {
         if (OnCreatedObject != null) {
-            OnCreatedObject(objectId, createrConnectionId, createdTransform, objecName);
+            OnCreatedObject(objectId, createrConnectionId, createdTransform, objectListId);
         }
     }
 
     /// <summary>
     /// オブジェクトリストに追加
     /// </summary>
-    public async UniTask AddObjectListAsync(Guid objectId, string objectName, SimpleTransform simpleTransform) {
+    public async UniTask AddObjectListAsync(Guid objectId, int objectListId, SimpleTransform simpleTransform) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
 
-        await roomHub.AddObjectListAsync(objectId, objectName, simpleTransform);
+        await roomHub.AddObjectListAsync(objectId, objectListId, simpleTransform);
     }
 
     /// <summary>
