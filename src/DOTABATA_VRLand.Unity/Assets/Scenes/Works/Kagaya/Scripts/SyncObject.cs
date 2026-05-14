@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 
 public class SyncObject : MonoBehaviour {
-    [SerializeField] private int objectListId = 0;
+    [ReadOnly] public int objectListId = 0;
 
     [SerializeField, Header("作成通知を送信")] private bool SendCreate;
 
@@ -61,6 +61,13 @@ public class SyncObject : MonoBehaviour {
         else {
             stringObjectId = objectId.ToString();
         }
+    }
+
+    /// <summary>
+    /// オブジェクトリストIdセット
+    /// </summary>
+    public void SetSyncObjectListId(int indexNum) {
+        objectListId = indexNum;
     }
 
     private void Awake() {

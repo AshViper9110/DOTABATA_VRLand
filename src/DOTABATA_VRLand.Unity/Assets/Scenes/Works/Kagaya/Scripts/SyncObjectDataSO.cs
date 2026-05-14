@@ -8,6 +8,7 @@ public class SyncObjectDataSO : ScriptableObject {
     private void OnValidate() {
         for (int i = 0; i < syncObjectDataList.Count; i++) {
             syncObjectDataList[i].objectListId = i + 1;
+            syncObjectDataList[i].syncObject.GetComponent<SyncObject>().SetSyncObjectListId(i + 1);
         }
     }
 }
