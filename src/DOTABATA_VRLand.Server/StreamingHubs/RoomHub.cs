@@ -4,6 +4,8 @@ using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion.Server.Hubs;
 using Microsoft.EntityFrameworkCore;
+using System.Security.AccessControl;
+using System.Security.Cryptography;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub :StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub {
@@ -192,7 +194,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 準備完了状態の変更
         /// </summary>
-        public async Task UpdateReadyState(bool isReady)
+        public async Task UpdateReadyStateAsync(bool isReady)
         {
             var (updatedUser, isReadyResult) = _roomContext.UpdateReadyState(ConnectionId, isReady);
 
@@ -201,20 +203,23 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             //全員に更新されたプレイヤーと準備状態を通知
             // Group.All.OnUpdateReadyState(updatedUser, isReadyResult); Interface追加後に解除
 
+            //すべてのプレイヤーの準備が完了してるのかどうか
             if (_roomContext.IsAllUserReady() == true)
             {
                 Console.WriteLine("[RoomHub]すべてのプレイヤーの準備完了");
+                // Group.All.OnUpdateAllReadyState(true); Interface追加後に解除
             }
             else
             {
                 Console.WriteLine("[RoomHub]すべてのプレイヤーの準備が完了していません");
+                // Group.All.OnUpdateAllReadyState(false); Interface追加後に解除
             }
         }
 
         /// <summary>
         /// カウントダウン
         /// </summary>
-        public async Task StartCountdown()
+        public async Task StartCountdownAsync()
         {
             _roomContext.ResetCountdown(3);//カウントのリセット
 
@@ -236,6 +241,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// ゲームスタート
         /// </summary>
         public Task GameStartAsync() {
+            
+            //ミニゲーム順位リストの初期化
+            _roomContext.InitializeScoreOrder();
             // 全員に通知
             _roomContext.Group.All.OnGameStart();
 
@@ -243,9 +251,130 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
+        /// ミニゲームの結果を反映
+        /// </summary>       
+        public Task RegisterScoreAsync(int result)
+        {//制限時間の場合、unity側でfloatをintに変換してから実行してください
+         //int remainingMs = (int)(remainingTime * 1000); これでミリ秒に変換し、判定処理を行っています
+
+            var rankOrder = _roomContext.ApplyMiniGameResultScore(ConnectionId, result);
+
+            if (rankOrder == null) return Task.CompletedTask;  // まだ全員ゴールしていない
+
+            // 全員ゴール完了、順位確定
+            // Group.All.OnRegisterscore(score); Interface追加後に解除
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 全体の順位更新、送信
+        /// </summary>
+         public Task GetAllRoundRankingAsync()
+        {
+            var rank = _roomContext.SortAllRoundRanking();
+
+            if (rank == null) return Task.CompletedTask;  
+
+            // 順位送信
+            // Group.All.OnGetAllRoundRanking(); Interface追加後に解除
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// プレイヤーの最終プレイ順位の取得
+        /// </summary>
+        public Task GetLastRankingAsync(Guid connectionId)
+        {
+            int lastRank = _roomContext.GetLastMiniGameRanking(connectionId);
+            // Group.All.OnGetLastMiniGameRanking(lastRank); Interface追加後に解除
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// オブジェクト作成
+        /// </summary>
+        public Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, int objectListId) {
+            // id作成
+            Guid objId = Guid.NewGuid();
+
+            // 情報作成
+            RoomObjectData roomObjectData = new RoomObjectData() {
+                objectListId = objectListId,
+                simpleTransform = createdTransform,
+                ownerConnectionId = this.ConnectionId,
+            };
+
+            // サーバーに保持
+            this._roomContext.RoomObjectDataList[objId] = roomObjectData;
+
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnCreateObject(objId, this.ConnectionId, createdTransform, objectListId);
+
+            return Task.FromResult<Guid>(objId);
+        }
+
+        /// <summary>
+        /// オブジェクトリストに追加
+        /// </summary>
+        public Task AddObjectListAsync(Guid objectId, int objectListId, SimpleTransform simpleTransform) {
+            // 情報作成
+            RoomObjectData roomObjectData = new RoomObjectData() {
+                objectListId = objectListId,
+                simpleTransform = simpleTransform,
+                ownerConnectionId = this.ConnectionId,
+            };
+
+            // サーバーに保持
+            this._roomContext.RoomObjectDataList[objectId] = roomObjectData;
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// オブジェクトのTransform同期
+        /// </summary>
+        public Task UpdateObjectTransformAsync(Guid objectId, SimpleTransform sTransform) {
+            // そのオブジェクトIdがあるか所有者のIdが一致しているか
+            if (!this._roomContext.RoomObjectDataList.ContainsKey(objectId) ||
+                this._roomContext.RoomObjectDataList[objectId].ownerConnectionId != this.ConnectionId) {
+                return Task.CompletedTask;
+            }
+
+            // サーバーに保持
+            this._roomContext.RoomObjectDataList[objectId].simpleTransform = sTransform;
+
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnUpdateObjectTransform(objectId, sTransform);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// オブジェクトの削除
+        /// </summary>
+        public Task DestroyObjectAsync(Guid objectId) {
+            // そのオブジェクトIdがあるか所有者のIdが一致しているか
+            if (!this._roomContext.RoomObjectDataList.ContainsKey(objectId) ||
+                this._roomContext.RoomObjectDataList[objectId].ownerConnectionId != this.ConnectionId) {
+                return Task.CompletedTask;
+            }
+
+            // サーバーから削除
+            this._roomContext.RoomObjectDataList.Remove(objectId);
+
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnDestroyObject(objectId);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
         /// 速度系順位確定
         /// </summary>
-        public void RegisterGoal()
+        public void RegisterGoalAsync()
         {
             var goalOrder = _roomContext.RegisterGoal(ConnectionId);
 

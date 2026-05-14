@@ -1,8 +1,12 @@
-﻿using System;
+﻿using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class InRoomPlayerData : Singleton<InRoomPlayerData> {
+    // 自分
+    private JoinedUser mySelf;
+    public JoinedUser MySelf { get { return mySelf; } }
     // プレイヤーリスト
     private Dictionary<Guid, PlayerData> playerList;
     public Dictionary<Guid, PlayerData> PlayerList { get { return playerList; } }
@@ -13,10 +17,18 @@ public class InRoomPlayerData : Singleton<InRoomPlayerData> {
     }
 
     /// <summary>
-    /// プレイヤーリストの初期化
+    /// 初期化
     /// </summary>
-    public void InitPlayerList() {
+    public void Init() {
+        mySelf = null;
         playerList.Clear();
+    }
+
+    /// <summary>
+    /// 自分の情報を追加
+    /// </summary>
+    public void SetMySelf(JoinedUser joinedUser) {
+        mySelf = joinedUser;
     }
 
     /// <summary>

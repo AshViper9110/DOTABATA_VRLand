@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:src/DOTABATA_VRLand.Unity/Assets/com.rlabrecque.steamworks.net/Plugins.meta
+guid: 43c6c29ff0fd78a45a2a72ccd7b1ffc9
+========
 guid: 5e649a97977e267488a3ae1b055ebbf5
+>>>>>>>> main:src/DOTABATA_VRLand.Unity/Assets/Scenes/Works/otake/prefabs.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
