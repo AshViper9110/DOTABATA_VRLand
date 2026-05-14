@@ -2,24 +2,23 @@ using Assets.Scenes.Works.otake.script;
 using DG.Tweening;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
+
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Rendering;
-using System.Collections;
+
 using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
-<<<<<<< HEAD
-using Unity.Android.Gradle.Manifest;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
-using Unity.XR.CoreUtils;
+
 using System;
-=======
->>>>>>> main
+using Valve.VR;
+
 
 
 public class GameManager : MonoBehaviour
 {
+    // Inspectorから設定
+    public SteamVR_Action_Boolean grabAction;
+    public SteamVR_Input_Sources handType;
+
     public List<string> miniGames = new List<string>();
     public List<string> miniGameNames = new List<string>();
 
@@ -99,7 +98,7 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
-        { 1,8},{2,0 },{3,1},{4,0}
+        { 1,5},{2,9 },{3,1},{4,0}
     };//勝利数
 
     public List<Rank> RankingList = new List<Rank>()
@@ -113,7 +112,7 @@ public class GameManager : MonoBehaviour
 
     public List<Rank> miniRankingList = new List<Rank>()
     {
-        new Rank(1,0),
+        new Rank(1,1),
         new Rank(2,0),
         new Rank(3,0),
         new Rank(4,0),
@@ -126,35 +125,37 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         action = rightHandPrimaryAction.action;
-        action.performed += MoveText;
+       // action.performed += MoveText;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        //List<GameObject> crowns = new List<GameObject>();
+        List<GameObject> crowns = new List<GameObject>();
 
-        ////Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
+        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
 
-        //for (int i = 0; i < playerWinlist[1]; i++)
-        //{
-        //    //GameObject crown = Instantiate(CrownPrefab,
-        //    //    transform);
-        //    //crowns.Add(crown);
+        for (int i = 0; i < playerWinlist[1]; i++)
+        {
+            //GameObject crown = Instantiate(CrownPrefab,
+            //    transform);
+            //crowns.Add(crown);
 
-        //    GameObject crown = Instantiate(CrownPrefab,
-        //      crowntrans);
-        //    crowns.Add(crown);
-        //}
-        //int index = 0;
+            GameObject crown = Instantiate(CrownPrefab,
+              crowntrans);
+            crowns.Add(crown);
+        }
+        int index = 0;
 
-        //foreach (GameObject crown in crowns)
-        //{
-        //    crown.transform.position = new Vector3(crown.transform.position.x, crownDistance * index, crown.transform.position.z);
-        //    index++;
-        //}
+        foreach (GameObject crown in crowns)
+        {
+            crown.transform.position = new Vector3(crown.transform.position.x, crown.transform.position.y+(crownDistance * index), crown.transform.position.z);
+            index++;
+        }
 
         // mana = GameObject.Find("TitleManager").GetComponent<TitleMana>();
+
+
         if (rally)
         {
             InitRally();
@@ -191,11 +192,11 @@ public class GameManager : MonoBehaviour
             }
         }
 
-
-        if (Input.GetMouseButtonDown(0))
+  
+        if (Input.GetMouseButtonDown(0)|| grabAction.GetStateDown(handType))
         {
-            
-    
+
+            MoveText();
 
         }
 
@@ -213,7 +214,14 @@ public class GameManager : MonoBehaviour
         onResult = false;
         onEnd = false;
 
-       
+
+        onResult = true;
+        MainText.text = "";
+        textIndex = 0;
+
+
+        MainText.DOText(AfterText[textIndex], 1.0f);
+        SetResult();
 
 
         //シーン移行後の位置配置
@@ -225,8 +233,8 @@ public class GameManager : MonoBehaviour
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position =
             playerPos[index].position;
 
-        var rayInteractor = InRoomPlayerData.I.PlayerList[myId].playerObj.GetComponent<XRRayInteractor>();
-        rayInteractor.attachTransform = InRoomPlayerData.I.PlayerList[myId].playerObj.transform;
+        //var rayInteractor = InRoomPlayerData.I.PlayerList[myId].playerObj.GetComponent<XRRayInteractor>();
+        //rayInteractor.attachTransform = InRoomPlayerData.I.PlayerList[myId].playerObj.transform;
 
         foreach(Guid guid in InRoomPlayerData.I.PlayerList.Keys)
         {
@@ -310,9 +318,9 @@ public class GameManager : MonoBehaviour
     {
         List<GameObject> crowns = new List<GameObject>();
         
-        Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
-
-        for (int i = 0; i < playerWinlist[ID]; i++)
+        Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
+  
+        for (int i = 0; i < playerWinlist[1]; i++)
         {
             GameObject crown = Instantiate(CrownPrefab,
                 transform);
@@ -324,9 +332,27 @@ public class GameManager : MonoBehaviour
 
         foreach (GameObject crown in crowns)
         {
-            crown.transform.position = new Vector3(crown.transform.position.x,crownDistance*index,crown.transform.position.z);
+            crown.transform.position = new Vector3(crown.transform.position.x,transform.position.y+(crownDistance*index),crown.transform.position.z);
             index++;
         }
+    }
+
+    public void AddCrown(Guid guid, int ID)
+    {
+        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
+        //GameObject crown = Instantiate(CrownPrefab,
+        //       transform);
+
+        GameObject crown = Instantiate(CrownPrefab,
+              crowntrans);
+
+
+        crown.transform.position = new Vector3(crown.transform.position.x, transform.position.y + (crownDistance * playerWinlist[ID])+3f, crown.transform.position.z);
+
+        CrownManager manager = crown.GetComponent<CrownManager>();
+        manager.isNew = true;
+
+
     }
     public void SetResult()
     {
@@ -367,9 +393,12 @@ public class GameManager : MonoBehaviour
 
     }
 
-    private void MoveText(InputAction.CallbackContext context)
+    private void MoveText()
     {
-        textIndex++;
+        if (!isSpin)
+        {
+            textIndex++;
+        }
         MainText.text = "";
         if (onResult)
         {
@@ -386,6 +415,8 @@ public class GameManager : MonoBehaviour
                 playerWinlist[RankingList[winPlayerId - 1].Id]++;
 
                 SetRanking();
+                //一旦仮で入れてます。本実装は優勝者のGuidいれてください。
+                AddCrown(Guid.NewGuid(),1);
 
                 if (playerWinlist[RankingList[winPlayerId - 1].Id] >= 3)
                 {
@@ -430,7 +461,10 @@ public class GameManager : MonoBehaviour
                 SelectMiniGame();
                 return;
             }
-            MainText.DOText(StartText[textIndex], 1.0f);
+            else if(textIndex < StartText.Count) 
+            {
+                MainText.DOText(StartText[textIndex], 1.0f);
+            }
         }
 
     }
