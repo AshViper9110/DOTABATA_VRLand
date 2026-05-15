@@ -34,7 +34,7 @@ public class RoomInfoCanvas : MonoBehaviour {
         }
 
         // 要素を再生成
-        List<RoomInfo> roomInfoList = await RoomModel.I.GetAllRoomNamesAsync();
+        List<RoomInfo> roomInfoList = await RoomModel.I.GetAllRoomAsync();
         foreach (RoomInfo roomInfo in roomInfoList) {
             GameObject createdUI = Instantiate(roomInfoElement, parent: roomInfoParent);
             TextMeshProUGUI[] roomInfoTexts = createdUI.GetComponentsInChildren<TextMeshProUGUI>();
