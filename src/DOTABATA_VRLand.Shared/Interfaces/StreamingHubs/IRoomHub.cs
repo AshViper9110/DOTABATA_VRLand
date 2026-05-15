@@ -12,9 +12,9 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
     public interface IRoomHub : IStreamingHub<IRoomHub, IRoomHubReceiver> {
 
         /// <summary>
-        /// ゲームモードを指定してルーム名を全取得
+        /// ルームを全取得
         /// </summary>
-        Task<List<string>> GetAllRoomNamesAsync(int gameModeId);
+        Task<List<RoomInfo>> GetAllRoomAsync();
 
         /// <summary>
         /// ルームに接続
