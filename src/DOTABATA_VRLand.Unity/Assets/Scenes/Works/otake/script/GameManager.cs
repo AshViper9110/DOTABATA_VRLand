@@ -2,23 +2,11 @@ using Assets.Scenes.Works.otake.script;
 using DG.Tweening;
 using System.Collections.Generic;
 using System.Linq;
-<<<<<<< HEAD
-
 using UnityEngine;
 using UnityEngine.UI;
-
 using UnityEngine.InputSystem;
-
 using System;
 using Valve.VR;
-
-=======
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
-using System;
->>>>>>> main
 
 
 public class GameManager : MonoBehaviour
@@ -287,7 +275,8 @@ public class GameManager : MonoBehaviour
 
     public void MoveScene(string scene)
     {
-
+        DeleteCrown(Guid.NewGuid(), 0);
+        SteamVR_Fade.Start(Color.black, 1);
         Initiate.Fade(scene, Color.black, 1.0f);
     }
 
@@ -361,6 +350,18 @@ public class GameManager : MonoBehaviour
         manager.isNew = true;
 
 
+    }
+
+    public void DeleteCrown(Guid guid, int ID)
+    {
+        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
+
+        Transform transform = crowntrans;
+        foreach(Transform crown in transform)
+        {
+            Destroy(crown.gameObject);
+        }
+     
     }
     public void SetResult()
     {
