@@ -9,7 +9,15 @@ public class TestManager : MonoBehaviour
 
     private void Start()
     {
-        playerName = SteamFriends.GetPersonaName();
+        if (SteamManager.Initialized)
+        {
+            playerName = SteamFriends.GetPersonaName();
+            Debug.Log(playerName);
+        }
+        else
+        {
+            Debug.LogError("Steam is not initialized.");
+        }
     }
     public RoomConfig SetNames()
     {
