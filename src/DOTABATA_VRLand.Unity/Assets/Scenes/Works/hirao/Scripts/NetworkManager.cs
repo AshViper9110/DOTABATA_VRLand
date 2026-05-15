@@ -80,7 +80,7 @@ public class NetworkManager : Singleton<NetworkManager>
     /// </summary>
     public async void GetAllRoom(int gameModeid)
     {
-        List<string> roomNames = await RoomModel.I.GetAllRoomNamesAsync(gameModeid);
+        List<RoomInfo> roomNames = await RoomModel.I.GetAllRoomNamesAsync();
         Debug.Log(roomNames);
     }
 
