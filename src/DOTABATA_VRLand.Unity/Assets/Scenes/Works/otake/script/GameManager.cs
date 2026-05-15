@@ -2,23 +2,11 @@ using Assets.Scenes.Works.otake.script;
 using DG.Tweening;
 using System.Collections.Generic;
 using System.Linq;
-<<<<<<< HEAD
-
 using UnityEngine;
 using UnityEngine.UI;
-
 using UnityEngine.InputSystem;
-
 using System;
 using Valve.VR;
-
-=======
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
-using System;
->>>>>>> main
 
 
 public class GameManager : MonoBehaviour
