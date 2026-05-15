@@ -139,8 +139,13 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 退出処理
         /// </summary>
-        public Task LeaveRoomAsync()
-        {
+        public Task LeaveRoomAsync() {
+            // ルームにいなかったら無視
+            if (!this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId)) {
+                return Task.CompletedTask;
+            }
+
+
             // コンソールにログを表示
             _roomContext.WriteConsoleLeaveInfo(this.ConnectionId);
 
