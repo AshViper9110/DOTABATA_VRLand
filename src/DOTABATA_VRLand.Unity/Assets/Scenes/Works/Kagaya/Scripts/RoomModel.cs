@@ -22,6 +22,17 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public Guid ConnectionId { get; private set; }
 
     /// <summary>
+    /// ユーザー名
+    /// </summary>
+    public string UserName { get; private set; }
+
+    /// <summary>
+    /// MagicOnionに接続しているか
+    /// </summary>
+    private bool isConnected = false;
+    public bool IsConnected { get { return isConnected; } }
+
+    /// <summary>
     /// ロームに入っているか
     /// </summary>
     private bool isJoinRoom = false;
@@ -84,12 +95,14 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         roomHub = await StreamingHubClient.
              ConnectAsync<IRoomHub, IRoomHubReceiver>(channelx, this);
         this.ConnectionId = await roomHub.GetConnectionId();
+        isConnected = true;
     }
 
     /// <summary>
     /// MagicOnion切断処理
     /// </summary>
     public async UniTask DisconnectAsync() {
+        isConnected = false;
         if (roomHub != null) await roomHub.DisposeAsync();
         if (channelx != null) await channelx.ShutdownAsync();
         roomHub = null;
@@ -111,14 +124,13 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         base.OnApplicationQuit();
         DisconnectAsync().Forget();
     }
-    /// <summary>
-    /// ゲームモードを指定してルーム名を全取得
-    /// </summary>
-    public async UniTask<List<string>> GetAllRoomNamesAsync(int gameModeId = -1) 
-    {
-        return await roomHub.GetAllRoomNamesAsync(gameModeId);
-    }
 
+    /// <summary>
+    /// ルームを全取得
+    /// </summary>
+    public async UniTask<List<RoomInfo>> GetAllRoomAsync() {
+        return await roomHub.GetAllRoomAsync();
+    }
 
 
     /// <summary>

@@ -37,30 +37,22 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
-        /// ルーム名を全取得
+        /// ルームを全取得
         /// </summary>
-        public Task<List<string>> GetAllRoomNamesAsync(int gameModeId)
-        {
-            List<string> roomNames = new List<string>();
-            if (gameModeId != -1)
-            {
-                foreach (var context in _roomContextRepository.GetAllContext())
-                {
-                    if (context.Value.GameModeId == gameModeId)
-                    {
-                        roomNames.Add(context.Value.Name);
-                    }
-                }
-            }
-            else
-            {
-                foreach (var context in _roomContextRepository.GetAllContext())
-                {
-                    roomNames.Add(context.Value.Name);
-                }
+        public Task<List<RoomInfo>> GetAllRoomAsync() {
+            List<RoomInfo> roomInfoList = new List<RoomInfo>();
+            foreach (var context in _roomContextRepository.GetAllContext()) {
+                RoomInfo roomInfo = new RoomInfo() {
+                    Name = context.Value.Name,
+                    UsePassword = context.Value.Password != "",
+                    GameModeId = context.Value.GameModeId,
+                    PlayerAmount = context.Value.RoomUserDataList.Count,
+                };
+
+                roomInfoList.Add(roomInfo);
             }
 
-            return Task.FromResult<List<string>>(roomNames);
+            return Task.FromResult<List<RoomInfo>>(roomInfoList);
         }
 
         /// <summary>
@@ -100,11 +92,21 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         {
             await CreateRoomAsync(roomConfig);
 
+            // 4人以上いたら入室させない
+            if (_roomContext.RoomUserDataList.Count >= 4) {
+                throw new Exception("満室です。");
+            }
+
             // パスワード判定
             if (_roomContext.Password != "" &&
                 !_roomContext.ComparePassword(roomConfig.Password))
             {
                 throw new Exception("パスワードがちがいます。");
+            }
+
+            // すでにいるか
+            if (this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId)) {
+                throw new Exception("すでに入室済みです。");
             }
 
             // ルームに参加 ＆ ルームを保持
