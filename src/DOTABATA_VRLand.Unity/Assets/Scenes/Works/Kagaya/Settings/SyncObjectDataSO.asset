@@ -14,12 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncObjectDataList:
   - objectListId: 1
-    syncObject: {fileID: 120784978463938242, guid: a55b2e8b884290e4abc739906fc4eda4, type: 3}
+    syncObject: {fileID: 2236606099346283477, guid: 3ea295a6128cfbd48bcb4e8d33acd6ee, type: 3}
   - objectListId: 2
-    syncObject: {fileID: 196770, guid: a5b684916cfe6804985d74652a2af09f, type: 3}
+    syncObject: {fileID: 170850, guid: 8e13c6e5a21aeea4db3c25ef0e529308, type: 3}
   - objectListId: 3
     syncObject: {fileID: 103010, guid: b9d299b8c6aa86242bec9a060f7e2d81, type: 3}
   - objectListId: 4
-    syncObject: {fileID: 173346, guid: f1f5f898fbfdb80478825ce9b01fe8ae, type: 3}
+    syncObject: {fileID: 196770, guid: a5b684916cfe6804985d74652a2af09f, type: 3}
   - objectListId: 5
+    syncObject: {fileID: 173346, guid: f1f5f898fbfdb80478825ce9b01fe8ae, type: 3}
+  - objectListId: 6
     syncObject: {fileID: 173732, guid: 81fc1450441aca64e8cc1a0e14b1aa77, type: 3}

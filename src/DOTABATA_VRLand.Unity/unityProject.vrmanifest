@@ -5,7 +5,7 @@
       "app_key": "application.generated.unity.__appname__.unity.exe",
       "launch_type": "url",
       "url": "steam://launch/",
-      "action_manifest_path": "C:\\Users\\student\\Documents\\Git\\DOTABATA_VRLand\\src\\DOTABATA_VRLand.Unity\\Assets\\StreamingAssets\\SteamVR\\actions.json",
+      "action_manifest_path": "C:\\Users\\student\\Documents\\git\\DOTABATA_VRLand\\src\\DOTABATA_VRLand.Unity\\Assets\\StreamingAssets\\SteamVR\\actions.json",
       "strings": {
         "en_us": {
           "name": "__AppName__.Unity [Testing]"
