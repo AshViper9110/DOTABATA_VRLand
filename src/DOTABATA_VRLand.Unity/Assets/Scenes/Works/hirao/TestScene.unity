@@ -1508,7 +1508,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: TestGameScene
+          m_StringArgument: GameScene
           m_BoolArgument: 0
         m_CallState: 2
   onButtonUp:
@@ -1628,6 +1628,14 @@ PrefabInstance:
     - target: {fileID: 7072114806391354250, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 8580782544160415177, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
+      propertyPath: headsetOnHead.actionPath
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8580782544160415177, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
+      propertyPath: headsetOnHead.needsReinit
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

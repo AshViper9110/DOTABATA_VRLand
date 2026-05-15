@@ -22,6 +22,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
 
         public List<JoinedUser> GoalOrder = new List<JoinedUser>();
+        private List<(JoinedUser user, int result)> rankOrder = new();
+
         private int _currentCount = 3;//カウントダウン用
 
         public string Password { get; set; } // ルームパスワード
@@ -98,37 +100,91 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
-        /// ミニゲームの結果を反映
+        /// ミニゲーム大会用リスト生成
         /// </summary>
-        public void ApplyMiniGameResult(Dictionary<Guid, int> userRanks) {
-            foreach (var user in userRanks) {
-                MiniGameResultData miniGameResultData = RoomUserDataList[user.Key].miniGameResultData;
-
-                miniGameResultData.rankings.Add(user.Value);
-                miniGameResultData.point += user.Value;
-                if (user.Value == 1) {
-                    miniGameResultData.winCount++;
-                }
+        public void InitializeMiniGameResultData()
+        {
+            foreach (var user in RoomUserDataList.Values)
+            {
+                // 既存のMiniGameResultDataをリセットする
+                user.miniGameResultData = new MiniGameResultData();
+               
             }
-
-            SortAllRoundRanking();
         }
 
         /// <summary>
-        /// 全体の順位更新
+        /// ミニゲーム順位リスト初期化
         /// </summary>
-        public void SortAllRoundRanking() {
-            int ranking = 1;
-            foreach (var user in RoomUserDataList.OrderBy(_=>_.Value.miniGameResultData.winCount)) {
-                user.Value.miniGameResultData.allRoundRanking = ranking;
-                ranking++;
+        public void InitializeScoreOrder()
+        {
+            rankOrder.Clear();//ミニゲーム開始時に毎回呼ぶ
+        }
+
+        /// <summary>
+        /// ミニゲームの結果を反映
+        /// </summary>
+        public List<JoinedUser> ApplyMiniGameResultScore(Guid connectionId ,int result) {
+
+            // 既にクリア済みの場合は無視
+            if (rankOrder.Any(u => u.user.ConnectionId == connectionId))
+            {
+                Console.WriteLine($"[RoomContext] クリアしているプレイヤーのクリア判定が行われました");
+                return null;
             }
+
+            // connectionIDを基にクリアユーザーの情報を取得
+            if (!RoomUserDataList.TryGetValue(connectionId, out var userData))
+            {
+                Console.WriteLine($"[RoomContext] クリアユーザーの情報の取得に失敗しました ID:{connectionId}");
+                return null;
+            }
+
+            //クリアした順番に追加
+            rankOrder.Add((userData.joinedUser, result));
+
+            //全員のデータがそろったタイミング
+            if (rankOrder.Count == RoomUserDataList.Count)
+            {
+                // 残り時間の多い順にソートして順位確定
+                var ranked = rankOrder
+                    .OrderByDescending(u => u.result)
+                    .Select(u => u.user)
+                    .ToList();
+
+                //各プレイヤーの順位を保存
+                for (int i = 0; i < ranked.Count; i++)
+                {
+                    if (!RoomUserDataList.TryGetValue(ranked[i].ConnectionId, out var roomUserData)) continue;
+
+                    int rank = i + 1; // 0始まりなので+1
+                    roomUserData.miniGameResultData.rankings.Add(rank); // 1位なら1, 2位なら2
+                    if (rank == 1) roomUserData.miniGameResultData.winCount++;//一位のプレイヤーは勝利カウントを+
+             
+                }
+
+                return ranked;//joinedUser型の順位リストを返す
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 全体の順位更新、送信
+        /// </summary>
+        public List<JoinedUser> SortAllRoundRanking() {
+
+            // winCountの多い順にソートして順位確定
+            var ranked = RoomUserDataList
+                .OrderByDescending(u => u.Value.miniGameResultData.winCount)
+                .Select(u => u.Value.joinedUser) //joinedUserを取得
+                .ToList();
+
+            return ranked;
         }
 
         /// <summary>
         /// 準備完了状態の変更
         /// </summary>
-        public (JoinedUser user, bool isReady) UpdateReadyState(Guid connectionId, bool isReady)
+        public (JoinedUser user, bool readyState) UpdateReadyState(Guid connectionId, bool isReady)
         {
             // 対象ユーザーが存在しない場合は何もしない
             if (!RoomUserDataList.TryGetValue(connectionId, out var user))
@@ -149,20 +205,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 Console.WriteLine($"[RoomContext]{user.joinedUser.Name}の準備完了が取り消されました");
             }
                
-           
-            if (IsAllUserReady() == true )
-            {
-                Console.WriteLine("[RoomContext]すべてのプレイヤーの準備完了");
-            }else
-            {
-                Console.WriteLine("[RoomContext]すべてのプレイヤーの準備が完了していません");
-            }
-
             return (user.joinedUser, user.IsReady);
 
         }
-
-       
+     
         /// <summary>
         /// 全員準備完了かどうかの判定処理
         /// </summary>
@@ -212,50 +258,26 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
-        /// 速度系順位確定
+        /// プレイヤーの最終プレイ順位の取得
         /// </summary>
-        public List<JoinedUser> RegisterGoal(Guid connectionId)
+        public int GetLastMiniGameRanking(Guid connectionId)
         {
-            // 既にクリア済みの場合は無視
-            if (GoalOrder.Any(u => u.ConnectionId == connectionId)) //GoalOrder.joinedUser.ConnectionIdを参照
+            // 対象ユーザーが存在しない場合は何もしない
+            if (!RoomUserDataList.TryGetValue(connectionId, out var user))
             {
-                Console.WriteLine($"[RoomContext] クリアしているプレイヤーのクリア判定が行われました");
-                return null;
+                Console.WriteLine($"[RoomContext]対象プレイヤーはルームに存在しません");
+                return -99; //ユーザーデータなし
             }
-            //connectionIDを基にjoinedUser.ConnectionIDでクリアユーザーの情報を取得
-            RoomUserData userData = RoomUserDataList.Values.FirstOrDefault(u => u.joinedUser.ConnectionId == connectionId);
-            if (userData == null)//nullチェック
-            {
-                Console.WriteLine($"[RoomContext] クリアユーザーの情報の取得に失敗しました ID:{connectionId}");
-                return null;
-            }
-            //クリアした順番にidを追加
-            GoalOrder.Add(userData.joinedUser);
-            //クリアしていないプレイヤーが一人になった
-            if (GoalOrder.Count == RoomUserDataList.Count - 1)
-            {
-                // GoalOrderに含まれていない最後の1人を探して追加 
-                var lastPlayer = RoomUserDataList.Values
-                    .FirstOrDefault(u => !GoalOrder.Contains(u.joinedUser)); //JoinedUser同士で比較
-                                                                             //最後の一人のプレイヤーの情報を持っているか
-                if (lastPlayer != null)
-                {
-                    GoalOrder.Add(lastPlayer.joinedUser);
-                    Console.WriteLine($"[RoomContext] 最下位プレイヤー追加: {lastPlayer}");
-                }
 
-                int i = 1;//コンソール表記用カウント
-
-                //コンソール順位表記
-                foreach (var user in GoalOrder)
-                {            
-                    Console.WriteLine($"[RoomContext]　{i}位:{user.Name} ID:{user.ConnectionId}");
-                    i++;
-                }
-                // 順位確定したリストを返す(joinedUser型)
-                return GoalOrder;
+            //まだ何も登録されていない場合
+            if (user.miniGameResultData.rankings.Count == 0)
+            {
+                Console.WriteLine($"[RoomContext] ランキングデータが存在しません");
+                return -1;  //ランキングデータなし
             }
-            return null;
+
+            return user.miniGameResultData.rankings.Last();
+
         }
     }
 }
