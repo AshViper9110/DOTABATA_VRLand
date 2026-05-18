@@ -301,14 +301,17 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public Task GetAllRoundRankingAsync()
         {
-            var rank = _roomContext.SortAllRoundRanking();
 
+            var rank = _roomContext.SortAllRoundRanking();//順位リスト取得
             if (rank == null || rank.Count == 0) return Task.CompletedTask;
 
-            // 順位送信
-            _roomContext.Group.All.OnGetAllRoundRanking(rank);
+            var users = rank.Select(r => r.user).ToList();//ユーザーの順位順リストを取得
+            var winCounts = rank.Select(r => r.winCount).ToList();//勝利数を取得、//    users[i] と winCounts[i] は必ず同じプレイヤーに対応
 
+            _roomContext.Group.All.OnGetAllRoundRanking(users, winCounts);
             return Task.CompletedTask;
+            // 順位送信
+           
         }
 
         /// <summary>
@@ -316,9 +319,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public Task GetLastRankingAsync(Guid connectionId)
         {
-            int lastRank = _roomContext.GetLastMiniGameRanking(connectionId);
+            var (joinedUser, ranking) = _roomContext.GetLastMiniGameRanking(connectionId);
             // 呼び出した本人にだけ送信
-            Client.OnGetLastMiniGameRanking(connectionId,lastRank); 
+            Client.OnGetLastMiniGameRanking(joinedUser,ranking); 
             return Task.CompletedTask;
         }
 
