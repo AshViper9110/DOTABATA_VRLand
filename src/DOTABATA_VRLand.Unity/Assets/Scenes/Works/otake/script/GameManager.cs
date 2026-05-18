@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
-        { 1,5},{2,9 },{3,1},{4,0}
+        { 1,1},{2,0 },{3,2},{4,0}
     };//勝利数
 
     public List<Rank> RankingList = new List<Rank>()
@@ -233,12 +233,11 @@ public class GameManager : MonoBehaviour
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position =
             playerPos[index].position;
 
-        //var rayInteractor = InRoomPlayerData.I.PlayerList[myId].playerObj.GetComponent<XRRayInteractor>();
-        //rayInteractor.attachTransform = InRoomPlayerData.I.PlayerList[myId].playerObj.transform;
 
         foreach(Guid guid in InRoomPlayerData.I.PlayerList.Keys)
         {
             SetCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+
         }
 
 
@@ -425,7 +424,7 @@ public class GameManager : MonoBehaviour
             {
 
                 MainText.DOText($"プレイヤー{winPlayerId}" + AfterText[textIndex], 1.0f);
-                playerWinlist[RankingList[winPlayerId - 1].Id]++;
+                playerWinlist[winPlayerId]++;
 
                 SetRanking();
                 //一旦仮で入れてます。本実装は優勝者のGuidいれてください。
