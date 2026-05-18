@@ -337,11 +337,11 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// ゲーム大会順位取得
     /// </summary>
-    public void OnGetAllRoundRanking(List<JoinedUser> ranking)
+    public void OnGetAllRoundRanking(List<JoinedUser> ranking,List<int> winCount)
     {
         for (int i = 0; i < ranking.Count; i++)
         {
-            Debug.Log($"{i + 1}位: {ranking[i].Name}");
+            Debug.Log($"{i + 1}位: {ranking[i].Name} 勝利数: {winCount[i]}");
         }
         // 順位表示UIの更新など
     }
@@ -358,7 +358,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// プレイヤーの最終プレイ順位の取得
     /// </summary>
-    public void OnGetLastMiniGameRanking(int lastRank)
+    public void OnGetLastMiniGameRanking(JoinedUser user,int lastRank)
     {
         if (lastRank == -99)
         {
@@ -370,7 +370,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             Debug.Log("ランキングデータが存在しません");
             return;
         }
-        Debug.Log($"最終順位: {lastRank}位");
+        Debug.Log($"プレイヤー:{user.Name} 最終順位: {lastRank}位");
     }
     /*
      * オブジェクト
