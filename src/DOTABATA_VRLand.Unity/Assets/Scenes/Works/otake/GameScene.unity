@@ -559,7 +559,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seClips:
   - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 8300000, guid: 6d95938827cb8f04292ab548e010162e, type: 3}
   - {fileID: 8300000, guid: 831c23db56ae87c4db9b4e16806965e9, type: 3}
   bgmClips:
   - {fileID: 0}

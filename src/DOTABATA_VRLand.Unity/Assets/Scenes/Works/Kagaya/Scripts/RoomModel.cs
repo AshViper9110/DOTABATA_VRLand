@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.MemoryProfiler;
 using UnityEngine;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
@@ -320,4 +321,111 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             OnDestroyedObject(objectId);
         }
     }
+//    public async void SendReadyState(bool isReady)
+//    {
+//        await _hubClient.UpdateReadyStateAsync(isReady);
+//    }
+
+   
+//public void OnUpdateReadyState(JoinedUser updatedUser, bool isReady)
+//    {
+//        Debug.Log($"{updatedUser.Name}の準備状態: {isReady}");
+//    }
+
+//    public void OnUpdateAllReadyState(bool isAllReady)
+//    {
+//        if (isAllReady)
+//        {
+//            Debug.Log("全員準備完了 → ゲーム開始");
+//        }
+//        else
+//        {
+//            Debug.Log("準備中のプレイヤーがいます");
+//        }
+//    }
+
+
+
+//public async void GameStart()
+//    {
+//        await _hubClient.GameStartAsync();
+//    }
+
+  
+
+
+
+//public async void StartCountdown()
+//    {
+//        await _hubClient.StartCountdownAsync();
+//    }
+
+
+//public void OnCountdown(int count)
+//    {
+//        Debug.Log($"カウント: {count}");
+//        // カウントダウンUIの更新
+//        // count == 0 でゲーム開始演出など
+//        if (count == 0)
+//        {
+//            Debug.Log("ゲームスタート");
+//        }
+//    }
+
+
+
+//public async void SendScore(int result)
+//    {
+//        await _hubClient.RegisterScoreAsync(result);
+//    }
+
+
+//public void OnRegisterScore(List<JoinedUser> rankOrder)
+//    {
+//        // 順位表示UIの更新など
+//        for (int i = 0; i < rankOrder.Count; i++)
+//        {
+//            Debug.Log($"{i + 1}位: {rankOrder[i].Name}");
+//        }
+//    }
+    
+    
+
+//public async void RequestAllRoundRanking()
+//    {
+//        await _hubClient.GetAllRoundRankingAsync();
+//    }
+
+
+// public void OnGetAllRoundRanking(List<JoinedUser> ranking)
+//    {
+//        for (int i = 0; i < ranking.Count; i++)
+//        {
+//            Debug.Log($"{i + 1}位: {ranking[i].Name}");
+//        }
+//        // 順位表示UIの更新など
+//    }
+    
+    
+
+//public async void RequestLastRanking()
+//    {
+//        await _hubClient.GetLastRankingAsync(connectionId);
+//    }
+
+
+//public void OnGetLastMiniGameRanking(int lastRank)
+//    {
+//        if (lastRank == -99)
+//        {
+//            Debug.Log("対象プレイヤーが存在しません");
+//            return;
+//        }
+//        if (lastRank == -1)
+//        {
+//            Debug.Log("ランキングデータが存在しません");
+//            return;
+//        }
+//        Debug.Log($"最終順位: {lastRank}位");
+//    }
 }

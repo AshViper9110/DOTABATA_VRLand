@@ -50,35 +50,35 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
         public void OnDestroyObject(Guid objectId);
 
-        /// <summary>
-        /// 個人準備完了状態切り替え通知
-        /// </summary>
-        void OnUpdateReadyState(JoinedUser updatedUser, bool isReady);
+        ///// <summary>
+        ///// 個人準備完了状態切り替え通知
+        ///// </summary>
+        //void OnUpdateReadyState(JoinedUser updatedUser, bool isReady);
 
-        /// <summary>
-        /// 全員準備完了状態切り替え通知
-        /// </summary>
-        void OnUpdateAllReadyState(bool isAllReady);
+        ///// <summary>
+        ///// 全員準備完了状態切り替え通知
+        ///// </summary>
+        //void OnUpdateAllReadyState(bool isAllReady);
 
-        /// <summary>
-        /// カウントダウンカウント通知
-        /// </summary>
-        void OnCountdown(int count);
+        ///// <summary>
+        ///// カウントダウンカウント通知
+        ///// </summary>
+        //void OnCountdown(int count);
 
-        /// <summary>
-        /// ミニゲーム結果順位通知
-        /// </summary>
-        void OnRegisterScore(List<JoinedUser> rankOrder);
+        ///// <summary>
+        ///// ミニゲーム結果順位通知
+        ///// </summary>
+        //void OnRegisterScore(List<JoinedUser> rankOrder);
 
-        /// <summary>
-        /// ミニゲーム大会全体順位通知
-        /// </summary>
-        void OnGetAllRoundRanking(List<JoinedUser> ranking);
+        ///// <summary>
+        ///// ミニゲーム大会全体順位通知
+        ///// </summary>
+        //void OnGetAllRoundRanking(List<JoinedUser> ranking);
 
-        /// <summary>
-        /// プレイヤー最終プレイ順位通知
-        /// </summary>
-        void OnGetLastMiniGameRanking(int lastRank);
+        ///// <summary>
+        ///// プレイヤー最終プレイ順位通知
+        ///// </summary>
+        //void OnGetLastMiniGameRanking(int lastRank);
     }
 
 }
