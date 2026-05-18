@@ -226,12 +226,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             if (_roomContext.IsAllUserReady() == true)
             {
                 Console.WriteLine("[RoomHub]すべてのプレイヤーの準備完了");
-                // Group.All.OnUpdateAllReadyState(true); Interface追加後に解除
+                _roomContext.Group.All.OnUpdateAllReadyState(true);
             }
             else
             {
                 Console.WriteLine("[RoomHub]すべてのプレイヤーの準備が完了していません");
-                // Group.All.OnUpdateAllReadyState(false); Interface追加後に解除
+                _roomContext.Group.All.OnUpdateAllReadyState(false); 
             }
         }
 
@@ -240,19 +240,25 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public async Task StartCountdownAsync()
         {
-            _roomContext.ResetCountdown(3);//カウントのリセット
-
-            //最初だけ3秒待機
-            await Task.Delay(3000);
+            
+            int count = _roomContext.ResetCountdown(3); // 初期値設定
 
             while (true)
             {
-                int count = _roomContext.TickCountdown();
-                //_roomContext.Group.All.OnCountdown(count);//現在のカウントを通知、nterface追加後に解除
-
-                if (count == 0) break;
-
                 await Task.Delay(1000); // 1秒おく
+
+                _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
+
+                count = _roomContext.TickCountdown();//カウント-1
+
+                Console.WriteLine($"カウントダウン:{count}");
+
+                if (count == 0)
+                {
+                    _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
+                    break;
+                }
+
             }
         }
 
@@ -273,16 +279,19 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ミニゲームの結果を反映
         /// </summary>       
+        /// <remarks>
+        /// 制限時間の場合、Unity側でfloatをintに変換してから実行
+        /// int remainingMs = (int)(remainingTime * 1000) でミリ秒に変換
+        /// </remarks>
         public Task RegisterScoreAsync(int result)
-        {//制限時間の場合、unity側でfloatをintに変換してから実行してください
-         //int remainingMs = (int)(remainingTime * 1000); これでミリ秒に変換し、判定処理を行っています
+        {
 
             var rankOrder = _roomContext.ApplyMiniGameResultScore(ConnectionId, result);
 
             if (rankOrder == null) return Task.CompletedTask;  // まだ全員ゴールしていない
 
             // 全員ゴール完了、順位確定
-            // Group.All.OnRegisterscore(score); Interface追加後に解除
+            _roomContext.Group.All.OnRegisterScore(rankOrder);
 
             return Task.CompletedTask;
         }
@@ -294,10 +303,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         {
             var rank = _roomContext.SortAllRoundRanking();
 
-            if (rank == null) return Task.CompletedTask;
+            if (rank == null || rank.Count == 0) return Task.CompletedTask;
 
             // 順位送信
-            // Group.All.OnGetAllRoundRanking(); Interface追加後に解除
+            _roomContext.Group.All.OnGetAllRoundRanking(rank);
 
             return Task.CompletedTask;
         }
@@ -309,7 +318,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         {
             int lastRank = _roomContext.GetLastMiniGameRanking(connectionId);
             // 呼び出した本人にだけ送信
-            //Client.OnGetLastMiniGameRanking(lastRank); Interface追加後に解除
+            Client.OnGetLastMiniGameRanking(lastRank); 
             return Task.CompletedTask;
         }
 

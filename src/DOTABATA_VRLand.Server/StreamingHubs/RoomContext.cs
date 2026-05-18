@@ -145,11 +145,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             //全員のデータがそろったタイミング
             if (rankOrder.Count == RoomUserDataList.Count)
             {
-                // 残り時間の多い順にソートして順位確定
+                // ミニゲーム結果の順にソートして順位確定
                 var ranked = rankOrder
-                    .OrderByDescending(u => u.result)
-                    .Select(u => u.user)
-                    .ToList();
+                .OrderByDescending(u => u.result)
+                .ThenBy(u => rankOrder.IndexOf(u)) // ゴールした順番を優先
+                .Select(u => u.user)
+                .ToList();
 
                 //各プレイヤーの順位を保存
                 for (int i = 0; i < ranked.Count; i++)
@@ -174,9 +175,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             // winCountの多い順にソートして順位確定
             var ranked = RoomUserDataList
-                .OrderByDescending(u => u.Value.miniGameResultData.winCount)
-                .Select(u => u.Value.joinedUser) //joinedUserを取得
-                .ToList();
+            .OrderByDescending(u => u.Value.miniGameResultData.winCount)
+            .ThenBy(u => u.Key) // タイブレーク
+            .Select(u => u.Value.joinedUser)
+            .ToList();
 
             return ranked;
         }
@@ -252,9 +254,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// カウントのリセット(未設定なら3で固定)
         /// </summary>
-        public void ResetCountdown(int count = 3)
+        public int ResetCountdown(int count = 3)
         {
             _currentCount = count;
+            return _currentCount;
         }
 
         /// <summary>
@@ -269,14 +272,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 return -99; //ユーザーデータなし
             }
 
-            //まだ何も登録されていない場合
-            if (user.miniGameResultData.rankings.Count == 0)
-            {
-                Console.WriteLine($"[RoomContext] ランキングデータが存在しません");
-                return -1;  //ランキングデータなし
-            }
-
-            return user.miniGameResultData.rankings.Last();
+            return user.miniGameResultData.rankings.LastOrDefault(-1);//何も登録されていない場合は-1(エラーコードを返す)
 
         }
     }
