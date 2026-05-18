@@ -358,7 +358,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// プレイヤーの最終プレイ順位の取得
     /// </summary>
-    public void OnGetLastMiniGameRanking(int lastRank)
+    public void OnGetLastMiniGameRanking(Guid id,int lastRank)
     {
         if (lastRank == -99)
         {
