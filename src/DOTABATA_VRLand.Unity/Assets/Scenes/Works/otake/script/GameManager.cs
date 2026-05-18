@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject CrownPrefab;
     public float crownDistance;
 
+    AudioManager audioManager;
+
     ///あとで消す
     [SerializeField]Transform crowntrans;
      
@@ -127,6 +129,8 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        audioManager = GetComponent<AudioManager>();
+        SteamVR_Fade.Start(new Color(0,0,0,0),2);
         List<GameObject> crowns = new List<GameObject>();
 
         //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
@@ -276,8 +280,8 @@ public class GameManager : MonoBehaviour
     public void MoveScene(string scene)
     {
         DeleteCrown(Guid.NewGuid(), 0);
-        SteamVR_Fade.Start(Color.black, 1);
-        Initiate.Fade(scene, Color.black, 1.0f);
+        SteamVR_Fade.Start(new Color(0,0,0,1), 2);
+        Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
     }
 
     public void SetMiniGame()
@@ -444,13 +448,13 @@ public class GameManager : MonoBehaviour
             if (textIndex >= FinishText.Count)
             {
                 //タイトルに戻る
-                Initiate.Fade("GameScene", Color.black, 1.0f);
+                MoveScene("GameScene");
                 return;
             }
 
             if (FinishText[textIndex] == "!!! おめでとう！")
             {
-
+                AudioManager.ChangeBGM(AudioManager.BGM.Main_End);
                 MainText.DOText($"プレイヤー{winPlayerId}" + FinishText[textIndex], 1.0f);
 
             }
