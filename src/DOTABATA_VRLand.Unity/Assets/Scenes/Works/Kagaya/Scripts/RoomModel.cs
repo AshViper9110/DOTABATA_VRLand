@@ -244,6 +244,134 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     }
 
+    /// <summary>
+    /// 個人準備完了状態切り替え
+    /// </summary>
+    public async void SendReadyState(bool isReady)
+    {
+        await roomHub.UpdateReadyStateAsync(isReady);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 個人準備完了状態切り替え
+    /// </summary>
+    public void OnUpdateReadyState(JoinedUser updatedUser, bool isReady)
+    {
+        Debug.Log($"{updatedUser.Name}の準備状態: {isReady}");
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 全員準備完了状態切り替え
+    /// </summary>
+    public void OnUpdateAllReadyState(bool isAllReady)
+    {
+        if (isAllReady)
+        {
+            Debug.Log("全員準備完了 → ゲーム開始");
+        }
+        else
+        {
+            Debug.Log("準備中のプレイヤーがいます");
+        }
+    }
+
+    /// <summary>
+    /// カウントダウン開始
+    /// </summary>
+    public async void StartCountdown()
+    {
+        await roomHub.StartCountdownAsync();
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// カウントダウン受け取り
+    /// </summary>
+    public void OnCountdown(int count)
+    {
+        Debug.Log($"カウント: {count}");
+        // カウントダウンUIの更新
+        // count == 0 でゲーム開始演出など
+        if (count == 0)
+        {
+            Debug.Log("ゲームスタート");
+        }
+    }
+
+    /// <summary>
+    /// ミニゲーム結果送信
+    /// </summary>
+    /// <remarks>
+    /// 制限時間の場合、Unity側でfloatをintに変換してから実行
+    /// int result = (int)(remainingTime * 1000) でミリ秒に変換
+    /// </remarks>
+    public async void SendScore(int result)
+    {
+        await roomHub.RegisterScoreAsync(result);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ミニゲーム結果順位
+    /// </summary>
+    public void OnRegisterScore(List<JoinedUser> rankOrder)
+    {
+        // 順位表示UIの更新など
+        for (int i = 0; i < rankOrder.Count; i++)
+        {
+            Debug.Log($"{i + 1}位: {rankOrder[i].Name}");
+        }
+    }
+
+    /// <summary>
+    /// ゲーム大会順位取得
+    /// </summary>
+    public async void RequestAllRoundRanking()
+    {
+        await roomHub.GetAllRoundRankingAsync();
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ゲーム大会順位取得
+    /// </summary>
+    public void OnGetAllRoundRanking(List<JoinedUser> ranking)
+    {
+        for (int i = 0; i < ranking.Count; i++)
+        {
+            Debug.Log($"{i + 1}位: {ranking[i].Name}");
+        }
+        // 順位表示UIの更新など
+    }
+
+    /// <summary>
+    /// プレイヤーの最終プレイ順位の取得
+    /// </summary>
+    public async void RequestLastRanking(Guid connectionId)
+    {
+        await roomHub.GetLastRankingAsync(connectionId);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// プレイヤーの最終プレイ順位の取得
+    /// </summary>
+    public void OnGetLastMiniGameRanking(int lastRank)
+    {
+        if (lastRank == -99)
+        {
+            Debug.Log("対象プレイヤーが存在しません");
+            return;
+        }
+        if (lastRank == -1)
+        {
+            Debug.Log("ランキングデータが存在しません");
+            return;
+        }
+        Debug.Log($"最終順位: {lastRank}位");
+    }
     /*
      * オブジェクト
      */
