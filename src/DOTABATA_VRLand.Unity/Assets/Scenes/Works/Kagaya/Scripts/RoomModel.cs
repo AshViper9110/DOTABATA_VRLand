@@ -337,11 +337,11 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// ゲーム大会順位取得
     /// </summary>
-    public void OnGetAllRoundRanking(List<JoinedUser> ranking)
+    public void OnGetAllRoundRanking(List<JoinedUser> ranking,List<int> winCount)
     {
         for (int i = 0; i < ranking.Count; i++)
         {
-            Debug.Log($"{i + 1}位: {ranking[i].Name}");
+            Debug.Log($"{i + 1}位: {ranking[i].Name} 勝利数: {winCount[i]}");
         }
         // 順位表示UIの更新など
     }
@@ -358,7 +358,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// プレイヤーの最終プレイ順位の取得
     /// </summary>
-    public void OnGetLastMiniGameRanking(Guid id,int lastRank)
+    public void OnGetLastMiniGameRanking(JoinedUser user,int lastRank)
     {
         if (lastRank == -99)
         {
@@ -370,7 +370,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             Debug.Log("ランキングデータが存在しません");
             return;
         }
-        Debug.Log($"最終順位: {lastRank}位");
+        Debug.Log($"プレイヤー:{user.Name} 最終順位: {lastRank}位");
     }
     /*
      * オブジェクト
@@ -449,111 +449,4 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             OnDestroyedObject(objectId);
         }
     }
-//    public async void SendReadyState(bool isReady)
-//    {
-//        await _hubClient.UpdateReadyStateAsync(isReady);
-//    }
-
-   
-//public void OnUpdateReadyState(JoinedUser updatedUser, bool isReady)
-//    {
-//        Debug.Log($"{updatedUser.Name}の準備状態: {isReady}");
-//    }
-
-//    public void OnUpdateAllReadyState(bool isAllReady)
-//    {
-//        if (isAllReady)
-//        {
-//            Debug.Log("全員準備完了 → ゲーム開始");
-//        }
-//        else
-//        {
-//            Debug.Log("準備中のプレイヤーがいます");
-//        }
-//    }
-
-
-
-//public async void GameStart()
-//    {
-//        await _hubClient.GameStartAsync();
-//    }
-
-  
-
-
-
-//public async void StartCountdown()
-//    {
-//        await _hubClient.StartCountdownAsync();
-//    }
-
-
-//public void OnCountdown(int count)
-//    {
-//        Debug.Log($"カウント: {count}");
-//        // カウントダウンUIの更新
-//        // count == 0 でゲーム開始演出など
-//        if (count == 0)
-//        {
-//            Debug.Log("ゲームスタート");
-//        }
-//    }
-
-
-
-//public async void SendScore(int result)
-//    {
-//        await _hubClient.RegisterScoreAsync(result);
-//    }
-
-
-//public void OnRegisterScore(List<JoinedUser> rankOrder)
-//    {
-//        // 順位表示UIの更新など
-//        for (int i = 0; i < rankOrder.Count; i++)
-//        {
-//            Debug.Log($"{i + 1}位: {rankOrder[i].Name}");
-//        }
-//    }
-    
-    
-
-//public async void RequestAllRoundRanking()
-//    {
-//        await _hubClient.GetAllRoundRankingAsync();
-//    }
-
-
-// public void OnGetAllRoundRanking(List<JoinedUser> ranking)
-//    {
-//        for (int i = 0; i < ranking.Count; i++)
-//        {
-//            Debug.Log($"{i + 1}位: {ranking[i].Name}");
-//        }
-//        // 順位表示UIの更新など
-//    }
-    
-    
-
-//public async void RequestLastRanking()
-//    {
-//        await _hubClient.GetLastRankingAsync(connectionId);
-//    }
-
-
-//public void OnGetLastMiniGameRanking(int lastRank)
-//    {
-//        if (lastRank == -99)
-//        {
-//            Debug.Log("対象プレイヤーが存在しません");
-//            return;
-//        }
-//        if (lastRank == -1)
-//        {
-//            Debug.Log("ランキングデータが存在しません");
-//            return;
-//        }
-//        Debug.Log($"最終順位: {lastRank}位");
-//    }
 }

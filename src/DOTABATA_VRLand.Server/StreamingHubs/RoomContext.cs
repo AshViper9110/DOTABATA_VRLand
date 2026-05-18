@@ -145,7 +145,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             //全員のデータがそろったタイミング
             if (rankOrder.Count == RoomUserDataList.Count)
             {
-                // ミニゲーム結果の順にソートして順位確定
+                // 順にソートして順位確定
                 var ranked = rankOrder
                 .OrderByDescending(u => u.result)
                 .ThenBy(u => rankOrder.IndexOf(u)) // ゴールした順番を優先
@@ -159,7 +159,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
                     int rank = i + 1; // 0始まりなので+1
                     roomUserData.miniGameResultData.rankings.Add(rank); // 1位なら1, 2位なら2
-                    if (rank == 1) roomUserData.miniGameResultData.winCount++;//一位のプレイヤーは勝利カウントを+
+                    //if (rank == 1) roomUserData.miniGameResultData.winCount++;//一位のプレイヤーは勝利カウントを+
              
                 }
 
@@ -171,15 +171,13 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 全体の順位更新、送信
         /// </summary>
-        public List<JoinedUser> SortAllRoundRanking() {
-
-            // winCountの多い順にソートして順位確定
+        public List<(JoinedUser user, int winCount)> SortAllRoundRanking()
+        {
             var ranked = RoomUserDataList
-            .OrderByDescending(u => u.Value.miniGameResultData.winCount)
-            .ThenBy(u => u.Key) // タイブレーク
-            .Select(u => u.Value.joinedUser)
-            .ToList();
-
+                .OrderByDescending(u => u.Value.miniGameResultData.winCount)
+                .ThenBy(u => u.Key)
+                .Select(u => (u.Value.joinedUser, u.Value.miniGameResultData.winCount))
+                .ToList();
             return ranked;
         }
 
@@ -263,16 +261,17 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// プレイヤーの最終プレイ順位の取得
         /// </summary>
-        public int GetLastMiniGameRanking(Guid connectionId)
+        public (JoinedUser? user, int ranking) GetLastMiniGameRanking(Guid connectionId)
         {
             // 対象ユーザーが存在しない場合は何もしない
             if (!RoomUserDataList.TryGetValue(connectionId, out var user))
             {
                 Console.WriteLine($"[RoomContext]対象プレイヤーはルームに存在しません");
-                return -99; //ユーザーデータなし
+                return (null, -99); // ユーザーデータなし
             }
 
-            return user.miniGameResultData.rankings.LastOrDefault(-1);//何も登録されていない場合は-1(エラーコードを返す)
+            var ranking = user.miniGameResultData.rankings.LastOrDefault(-1);
+            return (user.joinedUser, ranking);
 
         }
     }

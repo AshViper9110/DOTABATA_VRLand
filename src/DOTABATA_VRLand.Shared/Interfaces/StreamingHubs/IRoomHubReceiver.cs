@@ -73,12 +73,13 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// ミニゲーム大会全体順位通知
         /// </summary>
-        void OnGetAllRoundRanking(List<JoinedUser> ranking);
+        void OnGetAllRoundRanking(List<JoinedUser> ranking, List<int> winCounts);
 
         /// <summary>
         /// プレイヤー最終プレイ順位通知
         /// </summary>
-        void OnGetLastMiniGameRanking(Guid connectionId, int lastRank);
+        void OnGetLastMiniGameRanking(JoinedUser joinedUser, int lastRank);
+       
     }
 
 }
