@@ -318,7 +318,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         {
             int lastRank = _roomContext.GetLastMiniGameRanking(connectionId);
             // 呼び出した本人にだけ送信
-            Client.OnGetLastMiniGameRanking(lastRank); 
+            Client.OnGetLastMiniGameRanking(connectionId,lastRank); 
             return Task.CompletedTask;
         }
 
