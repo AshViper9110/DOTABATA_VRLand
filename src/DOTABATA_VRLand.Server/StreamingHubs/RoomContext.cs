@@ -17,8 +17,16 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public Dictionary<Guid, RoomUserData> RoomUserDataList { get; } =
             new Dictionary<Guid, RoomUserData>(); // ユーザーデータ一覧
 
-        public string Password { get; set; } // ルームパスワード
+        public Dictionary<Guid, RoomObjectData> RoomObjectDataList { get; } =
+            new Dictionary<Guid, RoomObjectData>(); // オブジェクトデータリスト
 
+
+        public List<JoinedUser> GoalOrder = new List<JoinedUser>();
+        private List<(JoinedUser user, int result)> rankOrder = new();
+
+        private int _currentCount = 3;//カウントダウン用
+
+        public string Password { get; set; } // ルームパスワード
 
         // その他、ルームのデータとして保存したいものをフィールドに追加していく
         // コンストラクタ
@@ -92,43 +100,97 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
-        /// ミニゲームの結果を反映
+        /// ミニゲーム大会用リスト生成
         /// </summary>
-        public void ApplyMiniGameResult(Dictionary<Guid, int> userRanks) {
-            foreach (var user in userRanks) {
-                MiniGameResultData miniGameResultData = RoomUserDataList[user.Key].miniGameResultData;
-
-                miniGameResultData.rankings.Add(user.Value);
-                miniGameResultData.point += user.Value;
-                if (user.Value == 1) {
-                    miniGameResultData.winCount++;
-                }
+        public void InitializeMiniGameResultData()
+        {
+            foreach (var user in RoomUserDataList.Values)
+            {
+                // 既存のMiniGameResultDataをリセットする
+                user.miniGameResultData = new MiniGameResultData();
+               
             }
-
-            SortAllRoundRanking();
         }
 
         /// <summary>
-        /// 全体の順位更新
+        /// ミニゲーム順位リスト初期化
         /// </summary>
-        public void SortAllRoundRanking() {
-            int ranking = 1;
-            foreach (var user in RoomUserDataList.OrderBy(_=>_.Value.miniGameResultData.winCount)) {
-                user.Value.miniGameResultData.allRoundRanking = ranking;
-                ranking++;
-            }
+        public void InitializeScoreOrder()
+        {
+            rankOrder.Clear();//ミニゲーム開始時に毎回呼ぶ
         }
 
+        /// <summary>
+        /// ミニゲームの結果を反映
+        /// </summary>
+        public List<JoinedUser> ApplyMiniGameResultScore(Guid connectionId ,int result) {
 
+            // 既にクリア済みの場合は無視
+            if (rankOrder.Any(u => u.user.ConnectionId == connectionId))
+            {
+                Console.WriteLine($"[RoomContext] クリアしているプレイヤーのクリア判定が行われました");
+                return null;
+            }
 
-        //準備完了状態の変更
-        public void UpdateReadyState(Guid connectionId, bool isReady)
+            // connectionIDを基にクリアユーザーの情報を取得
+            if (!RoomUserDataList.TryGetValue(connectionId, out var userData))
+            {
+                Console.WriteLine($"[RoomContext] クリアユーザーの情報の取得に失敗しました ID:{connectionId}");
+                return null;
+            }
+
+            //クリアした順番に追加
+            rankOrder.Add((userData.joinedUser, result));
+
+            //全員のデータがそろったタイミング
+            if (rankOrder.Count == RoomUserDataList.Count)
+            {
+                // 順にソートして順位確定
+                var ranked = rankOrder
+                .OrderByDescending(u => u.result)
+                .ThenBy(u => rankOrder.IndexOf(u)) // ゴールした順番を優先
+                .Select(u => u.user)
+                .ToList();
+
+                //各プレイヤーの順位を保存
+                for (int i = 0; i < ranked.Count; i++)
+                {
+                    if (!RoomUserDataList.TryGetValue(ranked[i].ConnectionId, out var roomUserData)) continue;
+
+                    int rank = i + 1; // 0始まりなので+1
+                    roomUserData.miniGameResultData.rankings.Add(rank); // 1位なら1, 2位なら2
+                    //if (rank == 1) roomUserData.miniGameResultData.winCount++;//一位のプレイヤーは勝利カウントを+
+             
+                }
+
+                return ranked;//joinedUser型の順位リストを返す
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 全体の順位更新、送信
+        /// </summary>
+        public List<(JoinedUser user, int winCount)> SortAllRoundRanking()
+        {
+            var ranked = RoomUserDataList
+                .OrderByDescending(u => u.Value.miniGameResultData.winCount)
+                .ThenBy(u => u.Key)
+                .Select(u => (u.Value.joinedUser, u.Value.miniGameResultData.winCount))
+                .ToList();
+            return ranked;
+        }
+
+        /// <summary>
+        /// 準備完了状態の変更
+        /// </summary>
+        public (JoinedUser user, bool readyState) UpdateReadyState(Guid connectionId, bool isReady)
         {
             // 対象ユーザーが存在しない場合は何もしない
             if (!RoomUserDataList.TryGetValue(connectionId, out var user))
             {
                 Console.WriteLine($"[RoomContext]対象プレイヤーはルームに存在しません");
-                return;
+                return (null,false);
             }
 
             // Ready状態を更新
@@ -137,25 +199,20 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             //コンソールに出力
             if(user.IsReady == true)
             {
-                Console.WriteLine($"{user.joinedUser.Name}の準備が完了しました");
+                Console.WriteLine($"[RoomContext]{user.joinedUser.Name}の準備が完了しました");
             }else
             {
-                Console.WriteLine($"{user.joinedUser.Name}の準備完了が取り消されました");
+                Console.WriteLine($"[RoomContext]{user.joinedUser.Name}の準備完了が取り消されました");
             }
                
-           
-            if (IsAllUserReady() == true )
-            {
-                Console.WriteLine("すべてのプレイヤーの準備完了");
-            }else
-            {
-                Console.WriteLine("すべてのプレイヤーの準備が完了していません");
-            }
+            return (user.joinedUser, user.IsReady);
 
         }
-    
-        // 全員準備完了かどうかの判定処理
-       public bool IsAllUserReady()
+     
+        /// <summary>
+        /// 全員準備完了かどうかの判定処理
+        /// </summary>
+        public bool IsAllUserReady()
         {
             // 誰もいない場合は false
             if (RoomUserDataList.Count == 0)
@@ -178,6 +235,44 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             }
             // 全員 Ready
             return true;
+        }
+
+        /// <summary>
+        /// カウントダウン
+        /// </summary>
+        public int TickCountdown()
+        {
+            if (_currentCount > 0)
+            {
+                _currentCount--;
+            }
+            return _currentCount;
+        }
+
+        /// <summary>
+        /// カウントのリセット(未設定なら3で固定)
+        /// </summary>
+        public int ResetCountdown(int count = 3)
+        {
+            _currentCount = count;
+            return _currentCount;
+        }
+
+        /// <summary>
+        /// プレイヤーの最終プレイ順位の取得
+        /// </summary>
+        public (JoinedUser? user, int ranking) GetLastMiniGameRanking(Guid connectionId)
+        {
+            // 対象ユーザーが存在しない場合は何もしない
+            if (!RoomUserDataList.TryGetValue(connectionId, out var user))
+            {
+                Console.WriteLine($"[RoomContext]対象プレイヤーはルームに存在しません");
+                return (null, -99); // ユーザーデータなし
+            }
+
+            var ranking = user.miniGameResultData.rankings.LastOrDefault(-1);
+            return (user.joinedUser, ranking);
+
         }
     }
 }

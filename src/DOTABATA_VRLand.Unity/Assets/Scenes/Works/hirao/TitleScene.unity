@@ -4303,6 +4303,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ActionAssets:
   - {fileID: -944628639613478452, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  - {fileID: -944628639613478452, guid: 472c3f8791d95cc4d98584ee03f914fe, type: 3}
 --- !u!114 &6520291406080760278
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2,18 +2,21 @@ using Assets.Scenes.Works.otake.script;
 using DG.Tweening;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Rendering;
-using System.Collections;
 using UnityEngine.InputSystem;
-using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
+using System;
+using Valve.VR;
 
 
 public class GameManager : MonoBehaviour
 {
+    // Inspectorから設定
+    public SteamVR_Action_Boolean grabAction;
+    public SteamVR_Input_Sources handType;
+
     public List<string> miniGames = new List<string>();
+    public List<string> miniGameNames = new List<string>();
 
     static public bool rally = true;
     static public bool freePlay = false;
@@ -21,7 +24,18 @@ public class GameManager : MonoBehaviour
     public List<Transform> playerPos = new List<Transform>();
 
     public InputActionReference rightHandPrimaryAction;
+    InputAction action;
 
+    [SerializeField] GameObject CrownPrefab;
+    public float crownDistance;
+
+    AudioManager audioManager;
+
+    ///あとで消す
+    [SerializeField]Transform crowntrans;
+     
+     
+    
     /// <summary>
     /// 進行UI関係
     /// </summary>
@@ -82,7 +96,7 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
-        { 1,1 },{2,0 },{3,1},{4,0}
+        { 1,1},{2,0 },{3,2},{4,0}
     };//勝利数
 
     public List<Rank> RankingList = new List<Rank>()
@@ -96,7 +110,7 @@ public class GameManager : MonoBehaviour
 
     public List<Rank> miniRankingList = new List<Rank>()
     {
-        new Rank(1,0),
+        new Rank(1,1),
         new Rank(2,0),
         new Rank(3,0),
         new Rank(4,0),
@@ -106,14 +120,48 @@ public class GameManager : MonoBehaviour
 
     TitleMana mana;
 
+    private void Awake()
+    {
+        action = rightHandPrimaryAction.action;
+       // action.performed += MoveText;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-       // mana = GameObject.Find("TitleManager").GetComponent<TitleMana>();
+        audioManager = GetComponent<AudioManager>();
+        SteamVR_Fade.Start(new Color(0,0,0,0),2);
+        List<GameObject> crowns = new List<GameObject>();
+
+        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
+
+        for (int i = 0; i < playerWinlist[1]; i++)
+        {
+            //GameObject crown = Instantiate(CrownPrefab,
+            //    transform);
+            //crowns.Add(crown);
+
+            GameObject crown = Instantiate(CrownPrefab,
+              crowntrans);
+            crowns.Add(crown);
+        }
+        int index = 0;
+
+        foreach (GameObject crown in crowns)
+        {
+            crown.transform.position = new Vector3(crown.transform.position.x, crown.transform.position.y+(crownDistance * index), crown.transform.position.z);
+            index++;
+        }
+
+        // mana = GameObject.Find("TitleManager").GetComponent<TitleMana>();
+
+
         if (rally)
         {
             InitRally();
         }
+
+
 
      
 
@@ -134,8 +182,8 @@ public class GameManager : MonoBehaviour
             if (CenterObjRb.angularVelocity.y < 0.01f)
             {
                 MainText.text = "";
-                Debug.Log(selPointManager.SelectId + "にゲームが決まりました");
-                MainText.DOText(selPointManager.SelectId + "にゲームが決まりました", 1.0f);
+                Debug.Log(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました");
+                MainText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
 
                 onSelect = true;
                 onResult = false;
@@ -144,72 +192,11 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(0)|| rightHandPrimaryAction.action.IsPressed())
+  
+        if (Input.GetMouseButtonDown(0)|| grabAction.GetStateDown(handType))
         {
-            textIndex++;
-            MainText.text = "";
-            if (onResult)
-            {
-                if (textIndex >= AfterText.Count && !isSpin)
-                {
-                    SelectMiniGame();
-                    return;
-                }
 
-                if (AfterText[textIndex] == "!!! おめでとう！")
-                {
-
-                    MainText.DOText($"プレイヤー{winPlayerId}" + AfterText[textIndex], 1.0f);
-                    playerWinlist[RankingList[winPlayerId - 1].Id]++;
-
-                    SetRanking();
-
-                    if (playerWinlist[RankingList[winPlayerId - 1].Id] >= 3)
-                    {
-                        onEnd = true;
-                        onResult = false;
-                        textIndex = -1;
-                    }
-                }
-                else
-                {
-                    MainText.DOText(AfterText[textIndex], 1.0f);
-                }
-            }
-            else if (onEnd)
-            {
-                if (textIndex >= FinishText.Count)
-                {
-                    //タイトルに戻る
-                    Initiate.Fade("GameScene", Color.black, 1.0f);
-                    return;
-                }
-
-                if (FinishText[textIndex] == "!!! おめでとう！")
-                {
-
-                    MainText.DOText($"プレイヤー{winPlayerId}" + FinishText[textIndex], 1.0f);
-
-                }
-                else
-                {
-                    MainText.DOText(FinishText[textIndex], 1.0f);
-                }
-            }
-            else if (onSelect)
-            {
-                MoveScene(miniGames[selPointManager.SelectId]);
-            }
-            else
-            {
-                if (textIndex >= StartText.Count && !isSpin)
-                {
-                    SelectMiniGame();
-                    return;
-                }
-                MainText.DOText(StartText[textIndex], 1.0f);
-            }
-
+            MoveText();
 
         }
 
@@ -227,7 +214,16 @@ public class GameManager : MonoBehaviour
         onResult = false;
         onEnd = false;
 
-        //===
+
+        onResult = true;
+        MainText.text = "";
+        textIndex = 0;
+
+
+        MainText.DOText(AfterText[textIndex], 1.0f);
+        SetResult();
+
+
         //シーン移行後の位置配置
         var myId = NetworkManager.I.myConnectionId;
 
@@ -237,7 +233,12 @@ public class GameManager : MonoBehaviour
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position =
             playerPos[index].position;
 
-        //===
+
+        foreach(Guid guid in InRoomPlayerData.I.PlayerList.Keys)
+        {
+            SetCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+
+        }
 
 
         //ここで順位が決定されている状態だったらランキング処理のフラグを建てる
@@ -259,6 +260,8 @@ public class GameManager : MonoBehaviour
             textIndex = 0;
             MainText.DOText(StartText[textIndex], 1.0f);
         }
+
+       
         SetRanking();
     }
 
@@ -268,15 +271,16 @@ public class GameManager : MonoBehaviour
         isSpin = true;
         //TODO：抽選開始通知
 
-        float spinPower = Random.Range(3, 6);
+        float spinPower = UnityEngine.Random.Range(3, 6);
 
         CenterObjRb.angularVelocity = new Vector3(0, spinPower, 0);
     }
 
     public void MoveScene(string scene)
     {
-
-        Initiate.Fade(scene, Color.black, 1.0f);
+        DeleteCrown(Guid.NewGuid(), 0);
+        SteamVR_Fade.Start(new Color(0,0,0,1), 2);
+        Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
     }
 
     public void SetMiniGame()
@@ -310,6 +314,58 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void SetCrown(Guid guid,int ID)
+    {
+        List<GameObject> crowns = new List<GameObject>();
+        
+        Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
+  
+        for (int i = 0; i < playerWinlist[1]; i++)
+        {
+            GameObject crown = Instantiate(CrownPrefab,
+                transform);
+            crowns.Add(crown);
+
+
+        }
+        int index = 0;
+
+        foreach (GameObject crown in crowns)
+        {
+            crown.transform.position = new Vector3(crown.transform.position.x,transform.position.y+(crownDistance*index),crown.transform.position.z);
+            index++;
+        }
+    }
+
+    public void AddCrown(Guid guid, int ID)
+    {
+        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
+        //GameObject crown = Instantiate(CrownPrefab,
+        //       transform);
+
+        GameObject crown = Instantiate(CrownPrefab,
+              crowntrans);
+
+
+        crown.transform.position = new Vector3(crown.transform.position.x, transform.position.y + (crownDistance * playerWinlist[ID])+3f, crown.transform.position.z);
+
+        CrownManager manager = crown.GetComponent<CrownManager>();
+        manager.isNew = true;
+
+
+    }
+
+    public void DeleteCrown(Guid guid, int ID)
+    {
+        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
+
+        Transform transform = crowntrans;
+        foreach(Transform crown in transform)
+        {
+            Destroy(crown.gameObject);
+        }
+     
+    }
     public void SetResult()
     {
         for (int i = 0; i < miniRankingList.Count; i++)
@@ -349,5 +405,80 @@ public class GameManager : MonoBehaviour
 
     }
 
-   
+    private void MoveText()
+    {
+        if (!isSpin)
+        {
+            textIndex++;
+        }
+        MainText.text = "";
+        if (onResult)
+        {
+            if (textIndex >= AfterText.Count && !isSpin)
+            {
+                SelectMiniGame();
+                return;
+            }
+
+            if (AfterText[textIndex] == "!!! おめでとう！")
+            {
+
+                MainText.DOText($"プレイヤー{winPlayerId}" + AfterText[textIndex], 1.0f);
+                playerWinlist[winPlayerId]++;
+
+                SetRanking();
+                //一旦仮で入れてます。本実装は優勝者のGuidいれてください。
+                AddCrown(Guid.NewGuid(),1);
+
+                if (playerWinlist[RankingList[winPlayerId - 1].Id] >= 3)
+                {
+                    onEnd = true;
+                    onResult = false;
+                    textIndex = -1;
+                }
+            }
+            else
+            {
+                MainText.DOText(AfterText[textIndex], 1.0f);
+            }
+        }
+        else if (onEnd)
+        {
+            if (textIndex >= FinishText.Count)
+            {
+                //タイトルに戻る
+                MoveScene("GameScene");
+                return;
+            }
+
+            if (FinishText[textIndex] == "!!! おめでとう！")
+            {
+                AudioManager.ChangeBGM(AudioManager.BGM.Main_End);
+                MainText.DOText($"プレイヤー{winPlayerId}" + FinishText[textIndex], 1.0f);
+
+            }
+            else
+            {
+                MainText.DOText(FinishText[textIndex], 1.0f);
+            }
+        }
+        else if (onSelect)
+        {
+            MoveScene(miniGames[selPointManager.SelectId]);
+        }
+        else
+        {
+            if (textIndex >= StartText.Count && !isSpin)
+            {
+                SelectMiniGame();
+                return;
+            }
+            else if(textIndex < StartText.Count) 
+            {
+                MainText.DOText(StartText[textIndex], 1.0f);
+            }
+        }
+
+    }
+
 }

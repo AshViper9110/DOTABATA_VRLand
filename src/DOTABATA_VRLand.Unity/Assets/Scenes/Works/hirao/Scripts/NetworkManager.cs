@@ -1,4 +1,4 @@
-using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+ï»¿using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ public class NetworkManager : Singleton<NetworkManager>
     public Dictionary<Guid, GameObject> playerList = new Dictionary<Guid, GameObject>();
 
     /// <summary>
-    /// Text‚ÉLog‚ğ•\¦
+    /// Textã«Logã‚’è¡¨ç¤º
     /// </summary>
     public void TextLogs(string text)
     {
@@ -24,7 +24,7 @@ public class NetworkManager : Singleton<NetworkManager>
     }
 
     /// <summary>
-    /// ConnectionId‚Ìæ“¾
+    /// ConnectionIdã®å–å¾—
     /// </summary>
     public Guid GetConnectionId() => myConnectionId;
 
@@ -59,11 +59,11 @@ public class NetworkManager : Singleton<NetworkManager>
     }
 
     /// <summary>
-    /// GameƒV[ƒ“‚ÉˆÚ“®ƒ{ƒ^ƒ“
+    /// Gameã‚·ãƒ¼ãƒ³ã«ç§»å‹•ãƒœã‚¿ãƒ³
     /// </summary>
-    public async Task JointoNextScene(string name, RoomConfig roomConfig)
+    public async Task JointoNextScene(string scene, string name, RoomConfig roomConfig)
     {
-        await RoomModel.I.JoinRoomAsync(roomConfig);
+        await RoomModel.I.JoinRoomAsync(name, roomConfig);
 
         await Cysharp.Threading.Tasks.UniTask.WaitUntil(() =>
             InRoomPlayerData.I.PlayerList.ContainsKey(myConnectionId)
@@ -73,24 +73,24 @@ public class NetworkManager : Singleton<NetworkManager>
         SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
         syncPlayer.isLocalPlayer = true;
 
-        SceneManager.LoadScene(name);
+        SceneManager.LoadScene(scene);
     }
     /// <summary>
-    /// ƒ‹[ƒ€‘Sæ“¾
+    /// ãƒ«ãƒ¼ãƒ å…¨å–å¾—
     /// </summary>
     public async void GetAllRoom(int gameModeid)
     {
-        List<string> roomNames = await RoomModel.I.GetAllRoomNamesAsync(gameModeid);
+        List<RoomInfo> roomNames = await RoomModel.I.GetAllRoomAsync();
         Debug.Log(roomNames);
     }
 
     /// <summary>
-    /// [ƒT[ƒo[’Ê’m]
-    /// ƒƒr[‚Ì“üº’Ê’m
+    /// [ã‚µãƒ¼ãƒãƒ¼é€šçŸ¥]
+    /// ãƒ­ãƒ“ãƒ¼ã®å…¥å®¤é€šçŸ¥
     /// </summary>
     private void OnJoinedUser(JoinedUser user)
     {
-        TextLogs($"{user.Name}‚ª“üº");
+        TextLogs($"{user.Name}ãŒå…¥å®¤");
         if (user.ConnectionId != myConnectionId)
         {
             GameObject player = Instantiate(SyncPlayerPrefab);
@@ -116,7 +116,7 @@ public class NetworkManager : Singleton<NetworkManager>
     }
 
     /// <summary>
-    /// ©gˆÈŠO‚Ì“¯Šú
+    /// è‡ªèº«ä»¥å¤–ã®åŒæœŸ
     /// </summary>
     private void OnSyncPlayer(Guid connectionId, PlayerTransformDTO data)
     {
@@ -127,12 +127,12 @@ public class NetworkManager : Singleton<NetworkManager>
     }
 
     /// <summary>
-    /// [ƒT[ƒo[’Ê’m]
-    /// ƒƒr[‚Ì‘Şº’Ê’m
+    /// [ã‚µãƒ¼ãƒãƒ¼é€šçŸ¥]
+    /// ãƒ­ãƒ“ãƒ¼ã®é€€å®¤é€šçŸ¥
     /// </summary>
     private void OnLeavedUser(Guid connectionId, int joinOrder)
     {
-        TextLogs($"ConnectionIdF{connectionId} ‚ª‘Şº");
+        TextLogs($"ConnectionIdï¼š{connectionId} ãŒé€€å®¤");
         InRoomPlayerData.I.RemovePlayer(connectionId);
     }
 }

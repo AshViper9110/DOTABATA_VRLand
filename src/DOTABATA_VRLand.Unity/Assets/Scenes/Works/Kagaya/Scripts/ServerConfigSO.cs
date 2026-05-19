@@ -19,56 +19,56 @@ public class ServerConfigSO : ScriptableObject {
     /// <summary>
     /// チェックを一つだけに
     /// </summary>
-    private void Validate(List<ServerConfig> condigs) {
+    private void Validate(List<ServerConfig> list) {
         int index;
 
-        if (debugs.Count(_ => _.use) <= 1) {
-            index = debugs.FindIndex(_ => _.use);
+        if (list.Count(_ => _.use) <= 1) {
+            index = list.FindIndex(_ => _.use);
             if (index == -1) {
                 return;
             }
 
-            foreach (var item in debugs) {
+            foreach (var item in list) {
                 item.saveUse = false;
             }
 
-            debugs[index].saveUse = true;
+            list[index].saveUse = true;
 
             return;
         }
 
-        index = debugs.FindIndex(_ => _.saveUse);
-        if (index < 0 || index > debugs.Count() - 1) {
-            foreach (var item in debugs) {
+        index = list.FindIndex(_ => _.saveUse);
+        if (index < 0 || index > list.Count() - 1) {
+            foreach (var item in list) {
                 item.use = false;
             }
 
-            index = debugs.FindIndex(_ => _.use);
+            index = list.FindIndex(_ => _.use);
             if (index == -1) {
                 return;
             }
 
-            foreach (var item in debugs) {
+            foreach (var item in list) {
                 item.saveUse = false;
             }
 
-            debugs[index].saveUse = true;
+            list[index].saveUse = true;
 
             return;
         }
 
-        debugs[index].use = false;
+        list[index].use = false;
 
-        index = debugs.FindIndex(_ => _.use);
+        index = list.FindIndex(_ => _.use);
         if (index == -1) {
             return;
         }
 
-        foreach (var item in debugs) {
+        foreach (var item in list) {
             item.saveUse = false;
         }
 
-        debugs[index].saveUse = true;
+        list[index].saveUse = true;
     }
 }
 
