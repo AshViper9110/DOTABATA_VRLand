@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 
 public class MinigameFlowController : MonoBehaviour
 {
@@ -36,9 +37,6 @@ public class MinigameFlowController : MonoBehaviour
     [Header("Data")]
     public MinigameInfo info;
 
-    // 仮実装用
-    private bool[] ready = new bool[4];
-
     private bool isGameStarted = false;
     private bool isResultShown = false;
 
@@ -48,6 +46,11 @@ public class MinigameFlowController : MonoBehaviour
 
     void Start()
     {
+        // サーバー通知購読
+        RoomModel.Instance.OnCountdownAction += StartCountdown;
+        RoomModel.Instance.OnRegisterScoreAction += OnReceiveRanking;
+        RoomModel.Instance.OnUpdatedAllReadyStateAction += OnAllReadyState;
+
         StartCoroutine(GameFlow());
 
         waitingText.gameObject.SetActive(false);
@@ -58,29 +61,13 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // 仮実装
-    // サーバー通信完成後削除予定
+    // Update
     // =====================================================
 
     void Update()
     {
-        // 仮Readyデバッグ
-        if (waitingText.gameObject.activeSelf)
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) ready[1] = true;
-            if (Input.GetKeyDown(KeyCode.Alpha2)) ready[2] = true;
-            if (Input.GetKeyDown(KeyCode.Alpha3)) ready[3] = true;
-
-            UpdateReadyUI();
-
-            // 仮全員Ready判定
-            if (AllReady() && !isGameStarted)
-            {
-                AllPlayerReady();
-            }
-        }
-
-        // 仮リザルト表示
+        // 仮リザルト送信
+        // 後でゲーム終了タイミングに移動
         if (gameUI.activeSelf && !isResultShown)
         {
             if (Input.GetKeyDown(KeyCode.Space))
@@ -90,9 +77,22 @@ public class MinigameFlowController : MonoBehaviour
                 int score = 100;
 
                 // スコア送信
-                MinigameNetworkManager.Instance.SendScore(score);
+                RoomModel.Instance.SendScore(score);
             }
         }
+    }
+
+    // =====================================================
+    // Destroy
+    // =====================================================
+
+    private void OnDestroy()
+    {
+        if (RoomModel.Instance == null) return;
+
+        RoomModel.Instance.OnCountdownAction -= StartCountdown;
+        RoomModel.Instance.OnRegisterScoreAction -= OnReceiveRanking;
+        RoomModel.Instance.OnUpdatedAllReadyStateAction -= OnAllReadyState;
     }
 
     // =====================================================
@@ -114,47 +114,18 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // Ready UI
-    // =====================================================
-
-    void UpdateReadyUI()
-    {
-        int readyCount = 0;
-
-        foreach (bool r in ready)
-        {
-            if (r) readyCount++;
-        }
-
-        readyText.text = $"{readyCount}/4 プレイヤー準備完了";
-    }
-
-    bool AllReady()
-    {
-        foreach (bool r in ready)
-        {
-            if (!r) return false;
-        }
-
-        return true;
-    }
-
-    // =====================================================
     // Readyボタン
     // =====================================================
 
     public void OnReadyButton()
     {
-        // 自分のReady切り替え
-        ready[0] = !ready[0];
+        bool isReady = readyButton.GetComponentInChildren<Text>().text == "準備OK！";
 
         // サーバー送信
-        MinigameNetworkManager.Instance.SendReadyState(ready[0]);
+        RoomModel.Instance.SendReadyState(isReady);
 
-        UpdateReadyUI();
-
-        // ボタンUI変更
-        if (ready[0])
+        // UI変更
+        if (isReady)
         {
             readyButton.GetComponentInChildren<Text>().text = "取り消し";
 
@@ -169,7 +140,7 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // サーバーからReady更新受信
+    // Ready更新受信
     // =====================================================
 
     public void UpdatePlayerReady(string playerName, bool isReady)
@@ -181,17 +152,19 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // 全員Ready
+    // 全員Ready通知受信
     // =====================================================
 
-    public void AllPlayerReady()
+    void OnAllReadyState(bool isAllReady)
     {
-        Debug.Log("全員準備完了");
+        if (!isAllReady) return;
+
+        Debug.Log("全員Ready");
 
         StartCoroutine(StartGameFlow());
 
         // サーバーにカウントダウン開始要求
-        MinigameNetworkManager.Instance.StartCountdown();
+        RoomModel.Instance.StartCountdown();
     }
 
     // =====================================================
@@ -275,7 +248,23 @@ public class MinigameFlowController : MonoBehaviour
     // ランキング受信
     // =====================================================
 
-    public void ShowRanking(List<string> rankOrder)
+    void OnReceiveRanking(List<JoinedUser> rankOrder)
+    {
+        List<string> names = new List<string>();
+
+        foreach (var user in rankOrder)
+        {
+            names.Add(user.Name);
+        }
+
+        ShowRanking(names);
+    }
+
+    // =====================================================
+    // ランキング表示開始
+    // =====================================================
+
+    void ShowRanking(List<string> rankOrder)
     {
         StartCoroutine(ShowResult(rankOrder));
     }
@@ -290,10 +279,17 @@ public class MinigameFlowController : MonoBehaviour
 
         resultUI.SetActive(true);
 
-        rank1Text.text = $"1位 {rankOrder[0]}";
-        rank2Text.text = $"2位 {rankOrder[1]}";
-        rank3Text.text = $"3位 {rankOrder[2]}";
-        rank4Text.text = $"4位 {rankOrder[3]}";
+        if (rankOrder.Count > 0)
+            rank1Text.text = $"1位 {rankOrder[0]}";
+
+        if (rankOrder.Count > 1)
+            rank2Text.text = $"2位 {rankOrder[1]}";
+
+        if (rankOrder.Count > 2)
+            rank3Text.text = $"3位 {rankOrder[2]}";
+
+        if (rankOrder.Count > 3)
+            rank4Text.text = $"4位 {rankOrder[3]}";
 
         yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Return));
 
