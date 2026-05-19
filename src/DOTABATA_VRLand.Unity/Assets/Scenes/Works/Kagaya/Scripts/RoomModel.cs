@@ -78,6 +78,17 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid> OnDestroyedObject { get; set; }
 
+
+    /// <summary>
+    /// ミニゲームの順位取得通知
+    /// </summary>
+    public Action<JoinedUser,int> OnGetMiniGameRanking { get; set; }
+
+    /// <summary>
+    /// 順位取得通知
+    /// </summary>
+    public Action<List<JoinedUser>, List<int>> OnGetRanking { get; set; }
+
     /*
      * 処理
      */
@@ -341,9 +352,10 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     {
         for (int i = 0; i < ranking.Count; i++)
         {
-            Debug.Log($"{i + 1}位: {ranking[i].Name} 勝利数: {winCount[i]}");
+            Debug.Log($"{i + 1}位: ID:{ranking[i].JoinOrder}  {ranking[i].Name} 勝利数: {winCount[i]}");
         }
         // 順位表示UIの更新など
+        OnGetRanking(ranking,winCount);
     }
 
     /// <summary>
@@ -371,6 +383,11 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             return;
         }
         Debug.Log($"プレイヤー:{user.Name} 最終順位: {lastRank}位");
+
+        OnGetMiniGameRanking(user,lastRank);
+
+
+
     }
     /*
      * オブジェクト

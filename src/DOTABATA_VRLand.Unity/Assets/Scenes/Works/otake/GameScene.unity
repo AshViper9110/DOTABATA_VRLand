@@ -481,18 +481,30 @@ MonoBehaviour:
     needsReinit: 0
   handType: 2
   miniGames:
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
+  - GameScene
+  - GameScene
+  - GameScene
+  - GameScene
+  - GameScene
+  - GameScene
+  - GameScene
+  - GameScene
+  - GameScene
+  - GameScene
+  - GameScene
+  - GameScene
   miniGameNames:
   - "\u30CB\u30C3\u30C8\u30CB\u30C3\u30C8"
   - "\u30AC\u30EC\u30FC\u30B8\u30AA\u30FC\u30D7\u30CA\u30FC"
   - "\u30A2\u30EB\u30AB\u30CA\u30B9\u30B1\u30C3\u30C1"
   - "\u30B9\u30D1\u30C3\u3068\u4E00\u9583\uFF01"
   - "\u30DD\u30F3\u30C3\uFF01\u3068\u30B5\u30A4\u30C0\u30FC"
+  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
+  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
+  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
+  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
+  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
+  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
   - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
   playerPos:
   - {fileID: 603687270}
@@ -519,6 +531,12 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5d47e5032b12c914293920ba1c136c3a, type: 3}
   - {fileID: 21300000, guid: 549754ee000feaf449d5fe5f4a4d6dc4, type: 3}
   - {fileID: 21300000, guid: d1b005ef5c2da9f48bdf8570975d43f2, type: 3}
+  - {fileID: 21300000, guid: d1b005ef5c2da9f48bdf8570975d43f2, type: 3}
+  - {fileID: 21300000, guid: d1b005ef5c2da9f48bdf8570975d43f2, type: 3}
+  - {fileID: 21300000, guid: d1b005ef5c2da9f48bdf8570975d43f2, type: 3}
+  - {fileID: 21300000, guid: d1b005ef5c2da9f48bdf8570975d43f2, type: 3}
+  - {fileID: 21300000, guid: d1b005ef5c2da9f48bdf8570975d43f2, type: 3}
+  - {fileID: 21300000, guid: d1b005ef5c2da9f48bdf8570975d43f2, type: 3}
   rankingPosList:
   - {fileID: 1000456318}
   - {fileID: 1771292616}
@@ -540,7 +558,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1422,6 +1440,10 @@ PrefabInstance:
     - target: {fileID: 7072114806391354250, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7072114806391354250, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8476141236346117073, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2669,15 +2691,15 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1990077227}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 194.67857}
-  m_LocalScale: {x: 0.3988957, y: 0.3988957, z: 0.3988957}
+  m_LocalPosition: {x: 0, y: 0, z: 131.4}
+  m_LocalScale: {x: 0.26326773, y: 0.26326773, z: 0.26326773}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1298882891}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -960, y: -440.77}
+  m_AnchoredPosition: {x: -960, y: -368}
   m_SizeDelta: {x: 1408, y: 768}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1990077229
