@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 using Valve.VR;
+using System.Collections;
 
 public class PointerController : MonoBehaviour
 {
@@ -172,8 +173,8 @@ public class PointerController : MonoBehaviour
                 // InputField
                 if (inputField != null)
                 {
-                    inputField.Select();
-                    inputField.ActivateInputField();
+                    StartCoroutine(
+                        FocusInputField(inputField));
 
                     Debug.Log(
                         "Selected InputField : " +
@@ -183,8 +184,8 @@ public class PointerController : MonoBehaviour
                 // TMP_InputField
                 if (tmpInputField != null)
                 {
-                    tmpInputField.Select();
-                    tmpInputField.ActivateInputField();
+                    StartCoroutine(
+                        FocusTMPInputField(tmpInputField));
 
                     Debug.Log(
                         "Selected TMP_InputField : " +
@@ -245,5 +246,50 @@ public class PointerController : MonoBehaviour
         }
 
         Debug.DrawLine(start, end, Color.cyan);
+    }
+
+    private IEnumerator FocusInputField(
+    InputField input)
+    {
+        yield return null;
+
+        eventSystem.SetSelectedGameObject(null);
+
+        yield return null;
+
+        eventSystem.SetSelectedGameObject(
+            input.gameObject);
+
+        input.Select();
+
+        input.ActivateInputField();
+
+        input.MoveTextEnd(false);
+
+        Debug.Log(
+            "InputField Focused : " +
+            input.isFocused);
+    }
+    private IEnumerator FocusTMPInputField(
+    TMP_InputField input)
+    {
+        yield return null;
+
+        eventSystem.SetSelectedGameObject(null);
+
+        yield return null;
+
+        eventSystem.SetSelectedGameObject(
+            input.gameObject);
+
+        input.Select();
+
+        input.ActivateInputField();
+
+        input.MoveTextEnd(false);
+
+        Debug.Log(
+            "TMP Focused : " +
+            input.isFocused);
     }
 }

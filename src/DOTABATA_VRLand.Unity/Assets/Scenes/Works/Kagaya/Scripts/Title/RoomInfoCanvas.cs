@@ -6,7 +6,9 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Valve.VR;
 
 public class RoomInfoCanvas : MonoBehaviour {
     /*
@@ -50,6 +52,9 @@ public class RoomInfoCanvas : MonoBehaviour {
     // ルーム参加ボタン
     [SerializeField] private Button joinRoomBtn;
 
+    //SteamVRのボタン
+    public SteamVR_Action_Boolean triggerAction;
+
 
     /*
      * 共通
@@ -89,30 +94,30 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// どのInputFieldを選択しているか
     /// </summary>
     private void ChangeInputFieldFocuse() {
-        bool isOnClickBtn = false;
+        //bool isOnClickBtn = false;
 
-        // マウスクリックした瞬間、またはタッチした瞬間に処理
-        if (!Input.GetMouseButtonDown(0)) {
-            return;
-        }
-        // Ray（光線）の生成
-        PointerEventData pointerData = new PointerEventData(EventSystem.current);
-        pointerData.position = Input.mousePosition;
+        //// マウスクリックした瞬間、またはタッチした瞬間に処理
+        //if (!Input.GetMouseButtonDown(0) && !triggerAction.stateDown) {
+        //    return;
+        //}
+        //// Ray（光線）の生成
+        //PointerEventData pointerData = new PointerEventData(EventSystem.current);
+        //pointerData.position = Input.mousePosition;
 
-        // ヒットしたUIを格納するリスト
-        List<RaycastResult> results = new List<RaycastResult>();
+        //// ヒットしたUIを格納するリスト
+        //List<RaycastResult> results = new List<RaycastResult>();
 
-        // UIに対してRayを飛ばし、ヒットした要素を全て取得
-        EventSystem.current.RaycastAll(pointerData, results);
+        //// UIに対してRayを飛ばし、ヒットした要素を全て取得
+        //EventSystem.current.RaycastAll(pointerData, results);
 
-        // 結果の処理
-        if (results.Count > 0) {
-            foreach (RaycastResult result in results) {
-                if (result.gameObject.CompareTag("KeyBoard")) {
-                    isOnClickBtn = true;
-                }
-            }
-        }
+        //// 結果の処理
+        //if (results.Count > 0) {
+        //    foreach (RaycastResult result in results) {
+        //        if (result.gameObject.CompareTag("KeyBoard")) {
+        //            isOnClickBtn = true;
+        //        }
+        //    }
+        //}
 
         if (passwordInputField.isFocused) {
             if (!keyBoardUI.activeSelf) {
@@ -126,13 +131,19 @@ public class RoomInfoCanvas : MonoBehaviour {
             }
             targetInputFirld = joinPasswordInputField;
         }
-        else {
-            if (keyBoardUI.activeSelf &&
-                !isOnClickBtn) {
-                keyBoardUI.SetActive(false);
-                targetInputFirld = null;
-            }
-        }
+        //else {
+        //    if (keyBoardUI.activeSelf &&
+        //        !isOnClickBtn) {
+        //        keyBoardUI.SetActive(false);
+        //        targetInputFirld = null;
+        //    }
+        //}
+    }
+
+    public void CloseKeyBoard()
+    {
+        keyBoardUI.SetActive(false);
+        targetInputFirld = null;
     }
 
     /// <summary>
@@ -229,6 +240,7 @@ public class RoomInfoCanvas : MonoBehaviour {
         };
 
         await RoomModel.I.JoinRoomAsync(playerName, roomConfig);
+        SceneManager.LoadScene("GameScene");
     }
 
     /// <summary>
@@ -294,6 +306,7 @@ public class RoomInfoCanvas : MonoBehaviour {
                 Password = passwordString,
             };
             await RoomModel.I.JoinRoomAsync(playerName, roomConfig);
+            SceneManager.LoadScene("GameScene");
         });
     }
 }
