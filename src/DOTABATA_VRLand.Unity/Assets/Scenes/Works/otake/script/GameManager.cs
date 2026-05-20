@@ -29,6 +29,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject CrownPrefab;
     public float crownDistance;
 
+    AudioManager audioManager;
+
     ///あとで消す
     [SerializeField]Transform crowntrans;
      
@@ -94,7 +96,7 @@ public class GameManager : MonoBehaviour
 
     public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
-        { 1,5},{2,9 },{3,1},{4,0}
+        { 1,1},{2,0 },{3,2},{4,0}
     };//勝利数
 
     public List<Rank> RankingList = new List<Rank>()
@@ -127,6 +129,8 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        audioManager = GetComponent<AudioManager>();
+        SteamVR_Fade.Start(new Color(0,0,0,0),2);
         List<GameObject> crowns = new List<GameObject>();
 
         //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
@@ -229,12 +233,11 @@ public class GameManager : MonoBehaviour
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position =
             playerPos[index].position;
 
-        //var rayInteractor = InRoomPlayerData.I.PlayerList[myId].playerObj.GetComponent<XRRayInteractor>();
-        //rayInteractor.attachTransform = InRoomPlayerData.I.PlayerList[myId].playerObj.transform;
 
         foreach(Guid guid in InRoomPlayerData.I.PlayerList.Keys)
         {
             SetCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+
         }
 
 
@@ -275,8 +278,9 @@ public class GameManager : MonoBehaviour
 
     public void MoveScene(string scene)
     {
-
-        Initiate.Fade(scene, Color.black, 1.0f);
+        DeleteCrown(Guid.NewGuid(), 0);
+        SteamVR_Fade.Start(new Color(0,0,0,1), 2);
+        Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
     }
 
     public void SetMiniGame()
@@ -350,6 +354,18 @@ public class GameManager : MonoBehaviour
 
 
     }
+
+    public void DeleteCrown(Guid guid, int ID)
+    {
+        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
+
+        Transform transform = crowntrans;
+        foreach(Transform crown in transform)
+        {
+            Destroy(crown.gameObject);
+        }
+     
+    }
     public void SetResult()
     {
         for (int i = 0; i < miniRankingList.Count; i++)
@@ -408,7 +424,7 @@ public class GameManager : MonoBehaviour
             {
 
                 MainText.DOText($"プレイヤー{winPlayerId}" + AfterText[textIndex], 1.0f);
-                playerWinlist[RankingList[winPlayerId - 1].Id]++;
+                playerWinlist[winPlayerId]++;
 
                 SetRanking();
                 //一旦仮で入れてます。本実装は優勝者のGuidいれてください。
@@ -431,13 +447,13 @@ public class GameManager : MonoBehaviour
             if (textIndex >= FinishText.Count)
             {
                 //タイトルに戻る
-                Initiate.Fade("GameScene", Color.black, 1.0f);
+                MoveScene("GameScene");
                 return;
             }
 
             if (FinishText[textIndex] == "!!! おめでとう！")
             {
-
+                AudioManager.ChangeBGM(AudioManager.BGM.Main_End);
                 MainText.DOText($"プレイヤー{winPlayerId}" + FinishText[textIndex], 1.0f);
 
             }

@@ -67,5 +67,30 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// オブジェクトの削除
         /// </summary>
         Task DestroyObjectAsync(Guid objectId);
+
+        /// <summary>
+        /// 準備完了切り替え
+        /// </summary>
+        Task UpdateReadyStateAsync(bool isReady);
+
+        /// <summary>
+        /// 3秒カウントダウン
+        /// </summary>
+        Task StartCountdownAsync();
+
+        /// <summary>
+        /// ミニゲーム結果処理
+        /// </summary>
+        Task RegisterScoreAsync(int result);
+
+        /// <summary>
+        /// ミニゲーム大会順位取得
+        /// </summary>
+        Task GetAllRoundRankingAsync();
+
+        /// <summary>
+        /// プレイヤー最終プレイ順位
+        /// </summary>
+        Task GetLastRankingAsync(Guid connectionId);
     }
 }
