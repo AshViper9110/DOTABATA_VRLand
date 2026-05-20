@@ -92,5 +92,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// プレイヤー最終プレイ順位
         /// </summary>
         Task GetLastRankingAsync(Guid connectionId);
+
+        /// <summary>
+        /// ゲーム大会の司会進行
+        /// </summary>
+        Task HostProgress();
     }
 }

@@ -416,5 +416,15 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             return Task.CompletedTask;
         }
 
+
+        /// <summary>
+        /// ゲーム大会の司会進行
+        /// </summary>
+        public Task HostProgress()
+        {
+            // 自分以外に通知
+            this._roomContext.Group.All.OnHostProgress();
+            return Task.CompletedTask;
+        }
     }
 }
