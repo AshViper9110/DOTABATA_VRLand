@@ -44,12 +44,13 @@ public class MinigameFlowController : MonoBehaviour
     // Start
     // =====================================================
 
-    void Start()
+    async void Start()
     {
-        // サーバー通知購読
-        RoomModel.Instance.OnCountdownAction += StartCountdown;
-        RoomModel.Instance.OnRegisterScoreAction += OnReceiveRanking;
-        RoomModel.Instance.OnUpdatedAllReadyStateAction += OnAllReadyState;
+        // RoomModelイベント購読
+        RoomModel.I.OnCountdownAction += StartCountdown;
+        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
+        RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
+        RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
 
         StartCoroutine(GameFlow());
 
@@ -58,6 +59,8 @@ public class MinigameFlowController : MonoBehaviour
 
         resultUI.SetActive(false);
         gameUI.SetActive(false);
+
+        readyText.text = "0/4 プレイヤー準備完了";
     }
 
     // =====================================================
@@ -66,8 +69,8 @@ public class MinigameFlowController : MonoBehaviour
 
     void Update()
     {
-        // 仮リザルト送信
-        // 後でゲーム終了タイミングに移動
+        // 仮スコア送信
+        // あとで実際のゲーム終了タイミングに変更
         if (gameUI.activeSelf && !isResultShown)
         {
             if (Input.GetKeyDown(KeyCode.Space))
@@ -76,8 +79,7 @@ public class MinigameFlowController : MonoBehaviour
 
                 int score = 100;
 
-                // スコア送信
-                RoomModel.Instance.SendScore(score);
+                RoomModel.I.SendScore(score);
             }
         }
     }
@@ -88,11 +90,12 @@ public class MinigameFlowController : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (RoomModel.Instance == null) return;
+        if (RoomModel.I == null) return;
 
-        RoomModel.Instance.OnCountdownAction -= StartCountdown;
-        RoomModel.Instance.OnRegisterScoreAction -= OnReceiveRanking;
-        RoomModel.Instance.OnUpdatedAllReadyStateAction -= OnAllReadyState;
+        RoomModel.I.OnCountdownAction -= StartCountdown;
+        RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
+        RoomModel.I.OnUpdatedAllReadyStateAction -= OnAllReadyState;
+        RoomModel.I.OnUpdatedReadyStateAction -= OnUpdatePlayerReady;
     }
 
     // =====================================================
@@ -103,10 +106,9 @@ public class MinigameFlowController : MonoBehaviour
     {
         introUI.SetActive(false);
 
-        // 最初のフェード
+        // フェードイン
         yield return StartCoroutine(Fade(1f, 0f, 1f));
 
-        // 説明表示
         introUI.SetActive(true);
 
         titleText.text = info.gameName;
@@ -119,13 +121,14 @@ public class MinigameFlowController : MonoBehaviour
 
     public void OnReadyButton()
     {
-        bool isReady = readyButton.GetComponentInChildren<Text>().text == "準備OK！";
+        bool willReady =
+            readyButton.GetComponentInChildren<Text>().text == "準備OK！";
 
         // サーバー送信
-        RoomModel.Instance.SendReadyState(isReady);
+        RoomModel.I.SendReadyState(willReady);
 
-        // UI変更
-        if (isReady)
+        // UI更新
+        if (willReady)
         {
             readyButton.GetComponentInChildren<Text>().text = "取り消し";
 
@@ -140,19 +143,19 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // Ready更新受信
+    // プレイヤーReady更新
     // =====================================================
 
-    public void UpdatePlayerReady(string playerName, bool isReady)
+    void OnUpdatePlayerReady(JoinedUser user, bool isReady)
     {
-        Debug.Log($"{playerName} Ready : {isReady}");
+        Debug.Log($"{user.Name} Ready : {isReady}");
 
         // TODO:
-        // プレイヤー別UI更新
+        // プレイヤー一覧UI更新
     }
 
     // =====================================================
-    // 全員Ready通知受信
+    // 全員Ready通知
     // =====================================================
 
     void OnAllReadyState(bool isAllReady)
@@ -163,12 +166,13 @@ public class MinigameFlowController : MonoBehaviour
 
         StartCoroutine(StartGameFlow());
 
-        // サーバーにカウントダウン開始要求
-        RoomModel.Instance.StartCountdown();
+        // ホストだけが呼ぶようにするなら
+        // 後でホスト判定追加
+        RoomModel.I.StartCountdown();
     }
 
     // =====================================================
-    // ゲーム開始
+    // ゲーム開始準備
     // =====================================================
 
     IEnumerator StartGameFlow()
@@ -177,7 +181,6 @@ public class MinigameFlowController : MonoBehaviour
 
         isGameStarted = true;
 
-        // UI非表示
         descriptionPanel.SetActive(false);
         readyPanel.SetActive(false);
 
@@ -205,7 +208,7 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // ゲーム開始後
+    // ゲーム開始
     // =====================================================
 
     IEnumerator BeginGameAfterStart()
@@ -216,8 +219,10 @@ public class MinigameFlowController : MonoBehaviour
 
         introUI.SetActive(false);
 
-        // シーン移動
-        SceneManager.LoadScene("GameScene");
+        gameUI.SetActive(true);
+
+        // 必要ならシーン遷移
+        // SceneManager.LoadScene("GameScene");
     }
 
     // =====================================================
@@ -234,14 +239,16 @@ public class MinigameFlowController : MonoBehaviour
         {
             float alpha = Mathf.Lerp(start, end, time / duration);
 
-            fadeImage.color = new Color(color.r, color.g, color.b, alpha);
+            fadeImage.color =
+                new Color(color.r, color.g, color.b, alpha);
 
             time += Time.unscaledDeltaTime;
 
             yield return null;
         }
 
-        fadeImage.color = new Color(color.r, color.g, color.b, end);
+        fadeImage.color =
+            new Color(color.r, color.g, color.b, end);
     }
 
     // =====================================================
@@ -291,9 +298,11 @@ public class MinigameFlowController : MonoBehaviour
         if (rankOrder.Count > 3)
             rank4Text.text = $"4位 {rankOrder[3]}";
 
-        yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Return));
+        yield return new WaitUntil(() =>
+            Input.GetKeyDown(KeyCode.Return));
 
-        yield return StartCoroutine(FadeWithResult(0f, 1f, 1f));
+        yield return StartCoroutine(
+            FadeWithResult(0f, 1f, 1f));
 
         EndGame();
     }
@@ -302,7 +311,10 @@ public class MinigameFlowController : MonoBehaviour
     // リザルトフェード
     // =====================================================
 
-    IEnumerator FadeWithResult(float start, float end, float duration)
+    IEnumerator FadeWithResult(
+        float start,
+        float end,
+        float duration)
     {
         float time = 0f;
 
@@ -351,7 +363,8 @@ public class MinigameFlowController : MonoBehaviour
     {
         Color c = text.color;
 
-        text.color = new Color(c.r, c.g, c.b, alpha);
+        text.color =
+            new Color(c.r, c.g, c.b, alpha);
     }
 
     // =====================================================

@@ -78,6 +78,26 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid> OnDestroyedObject { get; set; }
 
+    /// <summary>
+    /// 個人準備完了状態切り替え通知
+    /// </summary>
+    public Action<JoinedUser, bool> OnUpdatedReadyStateAction { get; set; }
+
+    /// <summary>
+    /// 全員準備完了状態通知
+    /// </summary>
+    public Action<bool> OnUpdatedAllReadyStateAction { get; set; }
+
+    /// <summary>
+    /// カウントダウン通知
+    /// </summary>
+    public Action<int> OnCountdownAction { get; set; }
+
+    /// <summary>
+    /// ミニゲーム順位通知
+    /// </summary>
+    public Action<List<JoinedUser>> OnRegisterScoreAction { get; set; }
+
     /*
      * 処理
      */
@@ -259,6 +279,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnUpdateReadyState(JoinedUser updatedUser, bool isReady)
     {
         Debug.Log($"{updatedUser.Name}の準備状態: {isReady}");
+
+        OnUpdatedReadyStateAction?.Invoke(updatedUser, isReady);
     }
 
     /// <summary>
@@ -275,6 +297,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         {
             Debug.Log("準備中のプレイヤーがいます");
         }
+
+        OnUpdatedAllReadyStateAction?.Invoke(isAllReady);
     }
 
     /// <summary>
@@ -294,6 +318,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         Debug.Log($"カウント: {count}");
         // カウントダウンUIの更新
         // count == 0 でゲーム開始演出など
+        OnCountdownAction?.Invoke(count);
+
         if (count == 0)
         {
             Debug.Log("ゲームスタート");
@@ -323,6 +349,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         {
             Debug.Log($"{i + 1}位: {rankOrder[i].Name}");
         }
+
+        OnRegisterScoreAction?.Invoke(rankOrder);
     }
 
     /// <summary>
