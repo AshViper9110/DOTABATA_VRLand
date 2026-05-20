@@ -197,16 +197,17 @@ public class GameManager : MonoBehaviour
             }
         }
 
-  
-        if (Input.GetMouseButtonDown(0)|| grabAction.GetStateDown(handType))
+
+        //TODO：自身がホストの場合はミニゲーム一覧の回転同期とテキストの遷移
+        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
         {
+            if (Input.GetMouseButtonDown(0) || grabAction.GetStateDown(handType))
+            {
+                Debug.Log("会話進めます");
+                NetworkManager.I.SendHostProgress();
 
-            MoveText();
-
+            }
         }
-
-
-        //TODO：自身がホストの場合はミニゲーム一覧の回転同期
     }
 
     public void InitRally()
@@ -220,13 +221,13 @@ public class GameManager : MonoBehaviour
         onEnd = false;
 
 
-        onResult = true;
-        MainText.text = "";
-        textIndex = 0;
+        //onResult = true;
+        //MainText.text = "";
+        //textIndex = 0;
 
 
-        MainText.DOText(AfterText[textIndex], 1.0f);
-        SetResult();
+        //MainText.DOText(AfterText[textIndex], 1.0f);
+        //SetResult();
 
         SetRanking();
 
@@ -252,7 +253,7 @@ public class GameManager : MonoBehaviour
         }
 
 
-
+        if(InRoomPlayerData.I.PlayerList[myId].joinedUser.JoinOrder == 1)
 
             MainText.text = "";
             textIndex = 0;
@@ -288,7 +289,7 @@ public class GameManager : MonoBehaviour
     public void MoveScene(string scene)
     {
         DeleteCrown(Guid.NewGuid(), 0);
-        SteamVR_Fade.Start(new Color(0,0,0,1), 2);
+        SteamVR_Fade.Start(new Color(1,1,1,1), 2);
         Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
     }
 
@@ -384,7 +385,7 @@ public class GameManager : MonoBehaviour
             {
 
                 winPlayerId = miniRankingList[i + 1];
-                Debug.Log(miniRankingList[i + 1] + "  " + miniRankingList[1]);
+               
             }
 
         }
@@ -414,12 +415,29 @@ public class GameManager : MonoBehaviour
 
     }
 
-    private void MoveText()
+    public void MoveText()
     {
         if (!isSpin)
         {
             textIndex++;
         }
+        else if (isSpin && !onSelect)
+        {
+            if (CenterObjRb.angularVelocity.y < 0.01f)
+            {
+                MainText.text = "";
+                Debug.Log(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました");
+                MainText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
+
+                onSelect = true;
+                onResult = false;
+                onEnd = false;
+
+            }
+        }
+
+
+
         MainText.text = "";
         if (onResult)
         {

@@ -35,6 +35,7 @@ public class NetworkManager : Singleton<NetworkManager>
         RoomModel.I.OnUpdatedUserTransfrom += OnSyncPlayer;
         RoomModel.I.OnGetMiniGameRanking += OnGetMiniGameRanking;
         RoomModel.I.OnGetRanking += OnGetRanking;
+        RoomModel.I.OnHostProgressed += OnHostProgress;
     }
 
     private void OnDisable()
@@ -155,6 +156,8 @@ public class NetworkManager : Singleton<NetworkManager>
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         gameManager.miniRankingList[user.JoinOrder + 1]= rank;
+        Debug.Log($"{user.JoinOrder}:::{rank}");
+        
         if (rank != 0)
         {
             gameManager.InitResult();
@@ -188,5 +191,26 @@ public class NetworkManager : Singleton<NetworkManager>
             gameManager.SetCrown(user.ConnectionId,user.JoinOrder);
             index++;
         }
+    }
+
+
+    /// <summary>
+    ///ミニゲーム大会の司会進行通知送信
+    /// </summary>
+    public void SendHostProgress()
+    {
+        RoomModel.I.HostProgress();
+    }
+
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ミニゲームの順位取得通知
+    /// </summary>
+    public void OnHostProgress(Task task)
+    {
+
+        GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        gameManager.MoveText();
     }
 }

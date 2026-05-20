@@ -89,6 +89,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<List<JoinedUser>, List<int>> OnGetRanking { get; set; }
 
+    public Action<Task> OnHostProgressed { get; set; }
+
     /*
      * 処理
      */
@@ -466,4 +468,23 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             OnDestroyedObject(objectId);
         }
     }
+
+    /// <summary>
+    /// ミニゲーム大会の司会進行
+    /// </summary>
+    public async void HostProgress()
+    {
+       await roomHub.HostProgress();
+    }
+
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ミニゲーム大会の司会進行
+    /// </summary>
+    public void OnHostProgress()
+    {
+        OnHostProgressed(Task.CompletedTask);
+    }
+
 }
