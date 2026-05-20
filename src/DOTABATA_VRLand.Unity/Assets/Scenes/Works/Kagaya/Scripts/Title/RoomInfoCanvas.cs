@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class RoomInfoCanvas : MonoBehaviour {
@@ -14,6 +15,9 @@ public class RoomInfoCanvas : MonoBehaviour {
 
     private string playerName;
     private int gameModeId = 0;
+
+    // ルーム作成UI
+    [SerializeField] private GameObject createRoomUI;
 
     // ルーム名
     [SerializeField] private TextMeshProUGUI myRoomNameText;
@@ -29,10 +33,32 @@ public class RoomInfoCanvas : MonoBehaviour {
      * 参加用
      */
 
+    // ルーム参加UI
+    [SerializeField] private GameObject joinRoomUI;
+
     // ルームリストに使う要素
     [SerializeField] private GameObject roomInfoElement;
     // RoomInfoを生成する親オブジェクト
     [SerializeField] private Transform roomInfoParent;
+
+    // ルーム名
+    [SerializeField] private TextMeshProUGUI roomNameText;
+    // プレイヤー人数
+    [SerializeField] private TextMeshProUGUI playerAmountText;
+    // パスワード入力欄
+    [SerializeField] private TMP_InputField joinPasswordInputField;
+    // ルーム参加ボタン
+    [SerializeField] private Button joinRoomBtn;
+
+
+    /*
+     * 共通
+     */
+
+    // パスワード入力用キーボードUI
+    [SerializeField] private GameObject keyBoardUI;
+    // パスワード入力先
+    private TMP_InputField targetInputFirld;
 
     private void Start() {
         if (SteamManager.Initialized) {
@@ -55,6 +81,87 @@ public class RoomInfoCanvas : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.R)) {
             RefreshRoomInfoList();
         }
+
+        ChangeInputFieldFocuse();
+    }
+
+    /// <summary>
+    /// どのInputFieldを選択しているか
+    /// </summary>
+    private void ChangeInputFieldFocuse() {
+        bool isOnClickBtn = false;
+
+        // マウスクリックした瞬間、またはタッチした瞬間に処理
+        if (!Input.GetMouseButtonDown(0)) {
+            return;
+        }
+        // Ray（光線）の生成
+        PointerEventData pointerData = new PointerEventData(EventSystem.current);
+        pointerData.position = Input.mousePosition;
+
+        // ヒットしたUIを格納するリスト
+        List<RaycastResult> results = new List<RaycastResult>();
+
+        // UIに対してRayを飛ばし、ヒットした要素を全て取得
+        EventSystem.current.RaycastAll(pointerData, results);
+
+        // 結果の処理
+        if (results.Count > 0) {
+            foreach (RaycastResult result in results) {
+                if (result.gameObject.CompareTag("KeyBoard")) {
+                    isOnClickBtn = true;
+                }
+            }
+        }
+
+        if (passwordInputField.isFocused) {
+            if (!keyBoardUI.activeSelf) {
+                keyBoardUI.SetActive(true);
+            }
+            targetInputFirld = passwordInputField;
+        }
+        else if (joinPasswordInputField.isFocused) {
+            if (!keyBoardUI.activeSelf) {
+                keyBoardUI.SetActive(true);
+            }
+            targetInputFirld = joinPasswordInputField;
+        }
+        else {
+            if (keyBoardUI.activeSelf &&
+                !isOnClickBtn) {
+                keyBoardUI.SetActive(false);
+                targetInputFirld = null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// ワールド空間にあるテンキーが押されたら
+    /// </summary>
+    public void InputWorldNumKeyBtn(int num) {
+        if (targetInputFirld != null) {
+            if (num == -1) {
+                if (targetInputFirld.text.Length > 0) {
+                    targetInputFirld.text = targetInputFirld.text.Substring(0, targetInputFirld.text.Length - 1);
+                }
+            }
+            else if (num == -2) {
+                targetInputFirld.text = "";
+            }
+            else {
+                if (targetInputFirld.text.Length < 4) {
+                    targetInputFirld.text += num.ToString();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// ルーム作成画面にする
+    /// </summary>
+    public void ChangeCreateRoomUIBtn() {
+        createRoomUI.SetActive(true);
+        joinRoomUI.SetActive(false);
     }
 
     /// <summary>
@@ -142,18 +249,51 @@ public class RoomInfoCanvas : MonoBehaviour {
             TextMeshProUGUI[] roomInfoTexts = createdUI.GetComponentsInChildren<TextMeshProUGUI>();
             string roomNameString = roomInfo.Name;
             if (roomInfo.UsePassword) {
-                roomNameString += " 🔒";
+                roomNameString += " <sprite name=lock>";
             }
             roomInfoTexts.First(_ => _.gameObject.name == "RoomNameText").text = roomNameString;
             roomInfoTexts.First(_=>_.gameObject.name == "PlayerAmountText").text = roomInfo.PlayerAmount + "/4";
 
             Button joinBtn = createdUI.GetComponentInChildren<Button>();
-            joinBtn.onClick.AddListener(async () => {
-                RoomConfig roomConfig = new RoomConfig() {
-                    Name = roomInfo.Name,
-                };
-                await RoomModel.I.JoinRoomAsync("TestUser", roomConfig);
+            joinBtn.onClick.AddListener(() => {
+                ChangeJoinRoomUIBtn(roomInfo);
             });
         }
+    }
+
+    /// <summary>
+    /// ルーム参加画面にする
+    /// </summary>
+    private void ChangeJoinRoomUIBtn(RoomInfo roomInfo) {
+        createRoomUI.SetActive(false);
+        joinRoomUI.SetActive(true);
+
+        string roomNameString = roomInfo.Name;
+        if (roomInfo.UsePassword) {
+            roomNameString += " <sprite name=lock>";
+
+            joinPasswordInputField.GetComponent<Image>().color = Color.white;
+            joinPasswordInputField.readOnly = false;
+        }
+        else {
+            joinPasswordInputField.GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
+            joinPasswordInputField.text = string.Empty;
+            joinPasswordInputField.readOnly = true;
+        }
+        roomNameText.text = roomNameString;
+        playerAmountText.text = roomInfo.PlayerAmount + "/4";
+
+        joinRoomBtn.onClick.AddListener(async () => {
+            string passwordString = "";
+            if (roomInfo.UsePassword) {
+                passwordString = joinPasswordInputField.text;
+            }
+
+            RoomConfig roomConfig = new RoomConfig() {
+                Name = roomInfo.Name,
+                Password = passwordString,
+            };
+            await RoomModel.I.JoinRoomAsync(playerName, roomConfig);
+        });
     }
 }
