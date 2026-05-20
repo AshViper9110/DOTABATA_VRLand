@@ -2165,7 +2165,7 @@ MonoBehaviour:
   pointerOrigin: {fileID: 5389562813573880957}
   lineRenderer: {fileID: 6790920730235291602}
   rayDistance: 20
-  rotationOffset: {x: 25, y: 0, z: 0}
+  rotationOffset: {x: 15, y: 0, z: 0}
 --- !u!1 &6568915954568625978
 GameObject:
   m_ObjectHideFlags: 0
@@ -2696,7 +2696,7 @@ MonoBehaviour:
   pointerOrigin: {fileID: 2320737552905544906}
   lineRenderer: {fileID: 5625766397093702126}
   rayDistance: 20
-  rotationOffset: {x: 25, y: 0, z: 0}
+  rotationOffset: {x: 15, y: 0, z: 0}
 --- !u!1 &7072114806391354250
 GameObject:
   m_ObjectHideFlags: 0
