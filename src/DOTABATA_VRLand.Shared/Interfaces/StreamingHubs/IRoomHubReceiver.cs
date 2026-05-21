@@ -51,6 +51,11 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         public void OnDestroyObject(Guid objectId);
 
         /// <summary>
+        /// 所有者削除通知
+        /// </summary>
+        public void OnDeleateOwnership(Guid objectId);
+
+        /// <summary>
         /// 個人準備完了状態切り替え通知
         /// </summary>
         void OnUpdateReadyState(JoinedUser updatedUser, bool isReady);
@@ -80,9 +85,14 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
         void OnGetLastMiniGameRanking(JoinedUser joinedUser, int lastRank);
 
+        /// <summary>
+        /// 勝利カウントUP通知
+        /// </summary>
+        void OnWinCountUp(JoinedUser user, int winCount);
+
 
         /// <summary>
-        /// プレイヤー最終プレイ順位通知
+        /// ゲーム大会の司会進行
         /// </summary>
         void OnHostProgress();
     }

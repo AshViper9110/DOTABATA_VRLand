@@ -239,8 +239,7 @@ public class RoomInfoCanvas : MonoBehaviour {
             GameModeId = gameModeId,
         };
 
-        await RoomModel.I.JoinRoomAsync(playerName, roomConfig);
-        SceneManager.LoadScene("GameScene");
+        await NetworkManager.I.JointoNextScene("GameScene", playerName, roomConfig);
     }
 
     /// <summary>
@@ -305,8 +304,7 @@ public class RoomInfoCanvas : MonoBehaviour {
                 Name = roomInfo.Name,
                 Password = passwordString,
             };
-            await RoomModel.I.JoinRoomAsync(playerName, roomConfig);
-            SceneManager.LoadScene("GameScene");
+            await NetworkManager.I.JointoNextScene("GameScene", playerName, roomConfig);
         });
     }
 }

@@ -7,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEditor;
-using UnityEditor.MemoryProfiler;
 using UnityEngine;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
@@ -77,6 +75,11 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// オブジェクトの削除通知
     /// </summary>
     public Action<Guid> OnDestroyedObject { get; set; }
+
+    /// <summary>
+    /// オブジェクトの所有権削除通知
+    /// </summary>
+    public Action<Guid> OnDeleatedOwnership { get; set; }
 
 
     /// <summary>
@@ -412,6 +415,24 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
 
     }
+
+    /// <summary>
+    /// 勝利カウントUP
+    /// </summary>
+    public async void RequestWinCountUp(Guid connectionId)
+    {
+        await roomHub.WinCountUpAsync(connectionId);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 勝利カウントUP
+    /// </summary>
+    public void OnWinCountUp(JoinedUser user, int winCount)
+    {
+        Debug.Log($"{user.Name} の勝利数: {winCount}");
+        // UIの更新など
+    }
     /*
      * オブジェクト
      */
@@ -508,4 +529,35 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         OnHostProgressed(Task.CompletedTask);
     }
 
+    /// <summary>
+    /// 所有権を取得する
+    /// </summary>
+    public async UniTask<bool> GetOwnershipAsync(Guid objectId, bool forcibly = false) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        return await roomHub.GetOwnershipAsync(objectId, forcibly);
+    }
+
+    /// <summary>
+    /// 所有権を放棄する
+    /// </summary>
+    public async UniTask OwnershipAbandonmentAsync(Guid objectId) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.OwnershipAbandonmentAsync(objectId);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 所有者削除通知
+    /// </summary>
+    public void OnDeleateOwnership(Guid objectId) {
+        if(OnDeleatedOwnership != null) {
+            OnDeleatedOwnership(objectId);
+        }
+    }
 }

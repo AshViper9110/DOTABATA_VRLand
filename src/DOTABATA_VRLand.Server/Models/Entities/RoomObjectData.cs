@@ -16,5 +16,10 @@ namespace DOTABATA_VRLand.Server.Models.Entities {
         /// 所有者のConnectionId
         /// </summary>
         public Guid ownerConnectionId = Guid.Empty;
+
+        /// <summary>
+        /// 所有者が存在するか
+        /// </summary>
+        public bool ownerExist = false;
     }
 }
