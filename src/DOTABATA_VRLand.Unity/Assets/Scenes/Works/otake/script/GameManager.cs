@@ -286,7 +286,7 @@ public class GameManager : MonoBehaviour
     public void SelectMiniGame()
     {
         isSpin = true;
-        //TODO：抽選開始通知
+        
 
         float spinPower = UnityEngine.Random.Range(3, 6);
 
