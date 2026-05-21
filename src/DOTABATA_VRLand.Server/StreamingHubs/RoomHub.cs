@@ -344,6 +344,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 objectListId = objectListId,
                 simpleTransform = createdTransform,
                 ownerConnectionId = this.ConnectionId,
+                ownerExist = true,
             };
 
             // サーバーに保持
@@ -416,6 +417,68 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// 所有権を取得する
+        /// </summary>
+        public Task<bool> GetOwnershipAsync(Guid objectId, bool forcibly = false) {
+            // そのプレイヤーとオブジェとが存在するか
+            if (!this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId) ||
+                !this._roomContext.RoomObjectDataList.ContainsKey(objectId)) {
+                return Task.FromResult<bool>(false);
+            }
+
+            // もし所有者だったら何もしない
+            if (this._roomContext.RoomObjectDataList[objectId].ownerConnectionId == this.ConnectionId) {
+                return Task.FromResult<bool>(true);
+            }
+
+            // 前の所有者
+            Guid beforeOwner = this._roomContext.RoomObjectDataList[objectId].ownerConnectionId;
+
+            // 同時に所有権を取得しないように排他制御
+            lock (this._roomContext.RoomObjectDataList) {
+                // 強制じゃなければ
+                if (!forcibly) {
+                    // 別のプレイヤーが所有者を有していたら無効
+                    if (this._roomContext.RoomObjectDataList[objectId].ownerExist) {
+                        return Task.FromResult<bool>(false);
+                    }
+                }
+
+                this._roomContext.RoomObjectDataList[objectId].ownerExist = true;
+                this._roomContext.RoomObjectDataList[objectId].ownerConnectionId = this.ConnectionId;
+
+                // 前の所有者に所有権削除通知をおくる
+                this._roomContext.Group.Only([beforeOwner]).OnDeleateOwnership(objectId);
+            }
+
+            return Task.FromResult<bool>(true);
+        }
+
+        /// <summary>
+        /// 所有権を放棄する
+        /// </summary>
+        public Task OwnershipAbandonmentAsync(Guid objectId) {
+            if (this._roomContext == null) {
+                return Task.CompletedTask;
+            }
+
+            // そのプレイヤーとオブジェとが存在するか
+            if (!this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId) ||
+                !this._roomContext.RoomObjectDataList.ContainsKey(objectId)) {
+                return Task.CompletedTask;
+            }
+
+            // もし所有者じゃなかったら何もしない
+            if (this._roomContext.RoomObjectDataList[objectId].ownerConnectionId != this.ConnectionId) {
+                return Task.CompletedTask;
+            }
+
+            // 解除
+            this._roomContext.RoomObjectDataList[objectId].ownerExist = false;
+
+            return Task.CompletedTask;
+        }
         /// <summary>
         /// 勝利プレイヤーの勝利カウントUP
         /// </summary>
