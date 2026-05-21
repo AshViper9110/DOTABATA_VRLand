@@ -99,7 +99,7 @@ public class GameManager : MonoBehaviour
 
     static public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
-        { 1,1},{2,0 },{3,2},{4,0}
+        { 1,2},{2,2 },{3,1},{4,1}
     };//勝利数
 
     public Dictionary<int, int> RankingList = new Dictionary<int, int>()
@@ -116,7 +116,7 @@ public class GameManager : MonoBehaviour
     {
         {1,1},
         {2,0},
-        { 3,1},
+        { 3,0},
         { 4,0}
         
     };
@@ -207,6 +207,14 @@ public class GameManager : MonoBehaviour
                 NetworkManager.I.SendHostProgress();
 
             }
+
+            if (!isSpin)
+            {
+                if (CenterObjRb.angularVelocity.y < 0.29f)
+                {
+                    CenterObjRb.angularVelocity = new Vector3(0, 0.3f, 0);
+                }
+            }
         }
     }
 
@@ -253,8 +261,7 @@ public class GameManager : MonoBehaviour
         }
 
 
-        if(InRoomPlayerData.I.PlayerList[myId].joinedUser.JoinOrder == 1)
-
+     
             MainText.text = "";
             textIndex = 0;
             MainText.DOText(StartText[textIndex], 1.0f);
@@ -288,7 +295,10 @@ public class GameManager : MonoBehaviour
 
     public void MoveScene(string scene)
     {
-        DeleteCrown(Guid.NewGuid(), 0);
+        foreach (Guid guid in NetworkManager.I.playerList.Keys)
+        {
+            AddCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+        }
         SteamVR_Fade.Start(new Color(1,1,1,1), 2);
         Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
     }
@@ -367,9 +377,9 @@ public class GameManager : MonoBehaviour
 
     public void DeleteCrown(Guid guid, int ID)
     {
-        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
+        Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
 
-        Transform transform = crowntrans;
+        
         foreach(Transform crown in transform)
         {
             Destroy(crown.gameObject);
@@ -455,7 +465,8 @@ public class GameManager : MonoBehaviour
 
                 SetRanking();
                 //一旦仮で入れてます。本実装は優勝者のGuidいれてください。
-                AddCrown(Guid.NewGuid(),1);
+
+               
 
                 if (playerWinlist[RankingList[winPlayerId]] >= 3)
                 {
@@ -474,7 +485,7 @@ public class GameManager : MonoBehaviour
             if (textIndex >= FinishText.Count)
             {
                 //タイトルに戻る
-                MoveScene("GameScene");
+                MoveScene("TitleScene");
                 return;
             }
 
