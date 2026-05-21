@@ -411,5 +411,19 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// 勝利プレイヤーの勝利カウントUP
+        /// </summary>
+        public Task WinCountUpAsync(Guid connectionId)
+        {
+            var (user, winCount) = _roomContext.WinCountUp(connectionId);
+
+            if (user == null) return Task.CompletedTask; // ユーザーなし
+
+            // 全員に通知
+            _roomContext.Group.All.OnWinCountUp(user, winCount);
+            return Task.CompletedTask;
+        }
+
     }
 }
