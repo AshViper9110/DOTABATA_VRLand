@@ -78,25 +78,18 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid> OnDestroyedObject { get; set; }
 
-    /// <summary>
-    /// 個人準備完了状態切り替え通知
-    /// </summary>
-    public Action<JoinedUser, bool> OnUpdatedReadyStateAction { get; set; }
 
     /// <summary>
-    /// 全員準備完了状態通知
+    /// ミニゲームの順位取得通知
     /// </summary>
-    public Action<bool> OnUpdatedAllReadyStateAction { get; set; }
+    public Action<JoinedUser,int> OnGetMiniGameRanking { get; set; }
 
     /// <summary>
-    /// カウントダウン通知
+    /// 順位取得通知
     /// </summary>
-    public Action<int> OnCountdownAction { get; set; }
+    public Action<List<JoinedUser>, List<int>> OnGetRanking { get; set; }
 
-    /// <summary>
-    /// ミニゲーム順位通知
-    /// </summary>
-    public Action<List<JoinedUser>> OnRegisterScoreAction { get; set; }
+    public Action<Task> OnHostProgressed { get; set; }
 
     /*
      * 処理
@@ -279,8 +272,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnUpdateReadyState(JoinedUser updatedUser, bool isReady)
     {
         Debug.Log($"{updatedUser.Name}の準備状態: {isReady}");
-
-        OnUpdatedReadyStateAction?.Invoke(updatedUser, isReady);
     }
 
     /// <summary>
@@ -297,8 +288,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         {
             Debug.Log("準備中のプレイヤーがいます");
         }
-
-        OnUpdatedAllReadyStateAction?.Invoke(isAllReady);
     }
 
     /// <summary>
@@ -318,8 +307,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         Debug.Log($"カウント: {count}");
         // カウントダウンUIの更新
         // count == 0 でゲーム開始演出など
-        OnCountdownAction?.Invoke(count);
-
         if (count == 0)
         {
             Debug.Log("ゲームスタート");
@@ -349,8 +336,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         {
             Debug.Log($"{i + 1}位: {rankOrder[i].Name}");
         }
-
-        OnRegisterScoreAction?.Invoke(rankOrder);
     }
 
     /// <summary>
@@ -369,9 +354,10 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     {
         for (int i = 0; i < ranking.Count; i++)
         {
-            Debug.Log($"{i + 1}位: {ranking[i].Name} 勝利数: {winCount[i]}");
+            Debug.Log($"{i + 1}位: ID:{ranking[i].JoinOrder}  {ranking[i].Name} 勝利数: {winCount[i]}");
         }
         // 順位表示UIの更新など
+        OnGetRanking(ranking,winCount);
     }
 
     /// <summary>
@@ -399,6 +385,11 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             return;
         }
         Debug.Log($"プレイヤー:{user.Name} 最終順位: {lastRank}位");
+
+        OnGetMiniGameRanking(user,lastRank);
+
+
+
     }
     /*
      * オブジェクト
@@ -477,4 +468,23 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             OnDestroyedObject(objectId);
         }
     }
+
+    /// <summary>
+    /// ミニゲーム大会の司会進行
+    /// </summary>
+    public async void HostProgress()
+    {
+       await roomHub.HostProgress();
+    }
+
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ミニゲーム大会の司会進行
+    /// </summary>
+    public void OnHostProgress()
+    {
+        OnHostProgressed(Task.CompletedTask);
+    }
+
 }
