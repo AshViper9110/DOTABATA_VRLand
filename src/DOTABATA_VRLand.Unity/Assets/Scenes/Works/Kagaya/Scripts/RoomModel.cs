@@ -389,6 +389,24 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
 
     }
+
+    /// <summary>
+    /// 勝利カウントUP
+    /// </summary>
+    public async void RequestWinCountUp(Guid connectionId)
+    {
+        await roomHub.WinCountUpAsync(connectionId);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 勝利カウントUP
+    /// </summary>
+    public void OnWinCountUp(JoinedUser user, int winCount)
+    {
+        Debug.Log($"{user.Name} の勝利数: {winCount}");
+        // UIの更新など
+    }
     /*
      * オブジェクト
      */

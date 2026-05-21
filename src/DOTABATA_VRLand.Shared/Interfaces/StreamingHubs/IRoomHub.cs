@@ -97,5 +97,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ゲーム大会の司会進行
         /// </summary>
         Task HostProgress();
+
+        /// <summary>
+        /// 勝利カウントUP
+        /// </summary>
+        Task WinCountUpAsync(Guid connectionId);
     }
 }
