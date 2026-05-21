@@ -2623,11 +2623,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2979069226064090329, guid: 26369a01791ef97478927b5e1f8a3f2d, type: 3}
       propertyPath: SendTransform
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2979069226064090329, guid: 26369a01791ef97478927b5e1f8a3f2d, type: 3}
       propertyPath: stringObjectId
-      value: 
+      value: 4eb8ae9e-f1de-4910-b43f-ecbca565ce21
       objectReference: {fileID: 0}
     - target: {fileID: 4153907583266039688, guid: 26369a01791ef97478927b5e1f8a3f2d, type: 3}
       propertyPath: m_LocalPosition.x

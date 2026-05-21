@@ -274,5 +274,23 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             return (user.joinedUser, ranking);
 
         }
+
+        /// <summary>
+        /// 勝利プレイヤーの勝利カウントUP
+        /// </summary>
+        public (JoinedUser? user, int winCount) WinCountUp(Guid connectionId)
+        {
+            // 対象ユーザーが存在しない場合は何もしない
+            if (!RoomUserDataList.TryGetValue(connectionId, out var user))
+            {
+                Console.WriteLine($"[RoomContext]対象プレイヤーはルームに存在しません");
+                return (null, -99); // ユーザーデータなし
+            }
+
+            user.miniGameResultData.winCount++;
+            return (user.joinedUser, user.miniGameResultData.winCount);
+
+        }
+
     }
 }

@@ -2,6 +2,7 @@
 using DG.Tweening.Core.Easing;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using System;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
@@ -26,7 +27,13 @@ public class SyncObject : MonoBehaviour {
         set { objectId = value; }
     }
 
+    // ヒエラルキーに表示する用
     [ReadOnly] public string stringObjectId;
+
+    /// <summary>
+    /// 所有者かどうか
+    /// </summary>
+    public bool IsOwner { get; private set; } = false;
 
     // 作成者のコネクションId
     private Guid createrId = Guid.Empty;
@@ -77,6 +84,7 @@ public class SyncObject : MonoBehaviour {
 
         RoomModel.I.OnUpdatedObjectTransform += OnUpdatedObjectTransform;
         RoomModel.I.OnDestroyedObject += OnDestroyedObject;
+        RoomModel.I.OnDeleatedOwnership += OnDeleatedOwnership;
     }
 
     private void Start() {
@@ -91,6 +99,7 @@ public class SyncObject : MonoBehaviour {
         if (RoomModel.I != null) {
             RoomModel.I.OnUpdatedObjectTransform -= OnUpdatedObjectTransform;
             RoomModel.I.OnDestroyedObject -= OnDestroyedObject;
+            RoomModel.I.OnDeleatedOwnership -= OnDeleatedOwnership;
         }
     }
 
@@ -113,12 +122,14 @@ public class SyncObject : MonoBehaviour {
 
             if (InRoomPlayerData.I.MySelf.JoinOrder == 1) {
                 CreaterId = RoomModel.I.ConnectionId;
+                IsOwner = true;
                 await RoomModel.I.AddObjectListAsync(objectId, objectListId, this.transform.ToSimpleTransform());
             }
         }
         else if (SendCreate &&
             objectId == Guid.Empty) {
             createrId = RoomModel.I.ConnectionId;
+            IsOwner = true;
             objectId = await RoomModel.I.CreateObjectAsync(this.transform.ToSimpleTransform(), objectListId);
             ApplyGuidToInspector();
         }
@@ -131,7 +142,7 @@ public class SyncObject : MonoBehaviour {
         if (RoomModel.I == null ||
             !RoomModel.I.IsJoinRoom ||
             !SendTransform ||
-            RoomModel.I.ConnectionId != createrId) {
+            !IsOwner) {
             return;
         }
 
@@ -179,5 +190,32 @@ public class SyncObject : MonoBehaviour {
 
         SendDestroy = false;
         Destroy(this.gameObject);
+    }
+
+    /// <summary>
+    /// 所有権を取得
+    /// </summary>
+    public async UniTask<bool> GetOwnership(bool forcibly = false) {
+        IsOwner = await RoomModel.I.GetOwnershipAsync(objectId, forcibly);
+
+        return IsOwner;
+    }
+
+    /// <summary>
+    /// 所有権を放棄する
+    /// </summary>
+    public async void OwnershipAbandonment() {
+        await RoomModel.I.OwnershipAbandonmentAsync(objectId);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 所有者削除通知
+    /// </summary>
+    public void OnDeleatedOwnership(Guid objectId) {
+        if (this.objectId != objectId) {
+            return;
+        }
+        IsOwner = false;
     }
 }
