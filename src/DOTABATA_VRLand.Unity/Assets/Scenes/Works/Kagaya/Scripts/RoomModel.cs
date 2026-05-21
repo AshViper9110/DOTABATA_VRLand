@@ -7,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEditor;
-using UnityEditor.MemoryProfiler;
 using UnityEngine;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
@@ -78,6 +76,11 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid> OnDestroyedObject { get; set; }
 
+    /// <summary>
+    /// オブジェクトの所有権削除通知
+    /// </summary>
+    public Action<Guid> OnDeleatedOwnership { get; set; }
+
 
     /// <summary>
     /// ミニゲームの順位取得通知
@@ -90,6 +93,27 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public Action<List<JoinedUser>, List<int>> OnGetRanking { get; set; }
 
     public Action<Task> OnHostProgressed { get; set; }
+
+    /// <summary>
+    /// 個人準備完了状態切り替え通知
+    /// </summary>
+    public Action<JoinedUser, bool> OnUpdatedReadyStateAction { get; set; }
+
+    /// <summary>
+    /// 全員準備完了状態通知
+    /// </summary>
+    public Action<bool> OnUpdatedAllReadyStateAction { get; set; }
+
+    /// <summary>
+    /// カウントダウン通知
+    /// </summary>
+    public Action<int> OnCountdownAction { get; set; }
+
+    /// <summary>
+    /// ミニゲーム順位通知
+    /// </summary>
+    public Action<List<JoinedUser>> OnRegisterScoreAction { get; set; }
+
 
     /*
      * 処理
@@ -505,4 +529,35 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         OnHostProgressed(Task.CompletedTask);
     }
 
+    /// <summary>
+    /// 所有権を取得する
+    /// </summary>
+    public async UniTask<bool> GetOwnershipAsync(Guid objectId, bool forcibly = false) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        return await roomHub.GetOwnershipAsync(objectId, forcibly);
+    }
+
+    /// <summary>
+    /// 所有権を放棄する
+    /// </summary>
+    public async UniTask OwnershipAbandonmentAsync(Guid objectId) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.OwnershipAbandonmentAsync(objectId);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 所有者削除通知
+    /// </summary>
+    public void OnDeleateOwnership(Guid objectId) {
+        if(OnDeleatedOwnership != null) {
+            OnDeleatedOwnership(objectId);
+        }
+    }
 }
