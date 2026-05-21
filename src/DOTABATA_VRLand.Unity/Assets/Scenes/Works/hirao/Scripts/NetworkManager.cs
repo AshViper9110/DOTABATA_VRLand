@@ -33,6 +33,9 @@ public class NetworkManager : Singleton<NetworkManager>
         RoomModel.I.OnJoinedUser += OnJoinedUser;
         RoomModel.I.OnLeavedUser += OnLeavedUser;
         RoomModel.I.OnUpdatedUserTransfrom += OnSyncPlayer;
+        RoomModel.I.OnGetMiniGameRanking += OnGetMiniGameRanking;
+        RoomModel.I.OnGetRanking += OnGetRanking;
+        RoomModel.I.OnHostProgressed += OnHostProgress;
     }
 
     private void OnDisable()
@@ -103,6 +106,7 @@ public class NetworkManager : Singleton<NetworkManager>
                 joinedUser = user,
             };
             InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
+          
         }
         else
         {
@@ -134,5 +138,80 @@ public class NetworkManager : Singleton<NetworkManager>
     {
         TextLogs($"ConnectionId：{connectionId} が退室");
         InRoomPlayerData.I.RemovePlayer(connectionId);
+    }
+
+    /// <summary>
+    ///ミニゲームの順位要求
+    /// </summary>
+    public async void ReqestMinigameRanking(Guid guid)
+    {
+         RoomModel.I.RequestLastRanking(guid);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ミニゲームの順位取得通知
+    /// </summary>
+    public void OnGetMiniGameRanking(JoinedUser user,int rank)
+    {
+        GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+        gameManager.miniRankingList[user.JoinOrder + 1]= rank;
+        Debug.Log($"{user.JoinOrder}:::{rank}");
+        
+        if (rank != 0)
+        {
+            gameManager.InitResult();
+        }
+        else
+        {
+
+        }
+    }
+
+    /// <summary>
+    ///勝利数要求
+    /// </summary>
+    public async void ReqestRanking()
+    {
+        RoomModel.I.RequestAllRoundRanking();
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ミニゲームの順位取得通知
+    /// </summary>
+    public void OnGetRanking(List<JoinedUser> ranking, List<int> winCount)
+    {
+        GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        int index = 0;
+        foreach (JoinedUser user in ranking)
+        {
+            gameManager.RankingList[user.JoinOrder] = index+1;
+            GameManager.playerWinlist[user.JoinOrder] = winCount[index];
+            gameManager.SetCrown(user.ConnectionId,user.JoinOrder);
+            index++;
+        }
+    }
+
+
+    /// <summary>
+    ///ミニゲーム大会の司会進行通知送信
+    /// </summary>
+    public void SendHostProgress()
+    {
+        RoomModel.I.HostProgress();
+    }
+
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ミニゲームの順位取得通知
+    /// </summary>
+    public void OnHostProgress(Task task)
+    {
+
+        GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        gameManager.MoveText();
     }
 }

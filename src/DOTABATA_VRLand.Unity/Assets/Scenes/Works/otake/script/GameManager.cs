@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using System;
 using Valve.VR;
+using UnityEditor;
 
 
 public class GameManager : MonoBehaviour
@@ -32,10 +33,12 @@ public class GameManager : MonoBehaviour
     AudioManager audioManager;
 
     ///あとで消す
-    [SerializeField]Transform crowntrans;
-     
-     
-    
+    [SerializeField] Transform crowntrans;
+
+
+
+
+
     /// <summary>
     /// 進行UI関係
     /// </summary>
@@ -94,31 +97,33 @@ public class GameManager : MonoBehaviour
 
 
 
-    public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
+    static public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
-        { 1,1},{2,0 },{3,2},{4,0}
+        { 1,2},{2,2 },{3,1},{4,1}
     };//勝利数
 
-    public List<Rank> RankingList = new List<Rank>()
+    public Dictionary<int, int> RankingList = new Dictionary<int, int>()
     {
-        new Rank(1,3),
-        new Rank(2,1),
-        new Rank(3,4),
-        new Rank(4,2),
+        {1,1},
+        {2,2},
+        { 3,3},
+        { 4,4}
+
     };
 
 
-    public List<Rank> miniRankingList = new List<Rank>()
+    public Dictionary<int, int> miniRankingList = new Dictionary<int, int>()
     {
-        new Rank(1,1),
-        new Rank(2,0),
-        new Rank(3,0),
-        new Rank(4,0),
+        {1,1},
+        {2,0},
+        { 3,0},
+        { 4,0}
+        
     };
 
     public int winPlayerId;
 
-    TitleMana mana;
+  
 
     private void Awake()
     {
@@ -131,29 +136,29 @@ public class GameManager : MonoBehaviour
     {
         audioManager = GetComponent<AudioManager>();
         SteamVR_Fade.Start(new Color(0,0,0,0),2);
-        List<GameObject> crowns = new List<GameObject>();
+        //List<GameObject> crowns = new List<GameObject>();
 
-        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
+        ////Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
 
-        for (int i = 0; i < playerWinlist[1]; i++)
-        {
-            //GameObject crown = Instantiate(CrownPrefab,
-            //    transform);
-            //crowns.Add(crown);
+        //for (int i = 0; i < playerWinlist[1]; i++)
+        //{
+        //    //GameObject crown = Instantiate(CrownPrefab,
+        //    //    transform);
+        //    //crowns.Add(crown);
 
-            GameObject crown = Instantiate(CrownPrefab,
-              crowntrans);
-            crowns.Add(crown);
-        }
-        int index = 0;
+        //    GameObject crown = Instantiate(CrownPrefab,
+        //      crowntrans);
+        //    crowns.Add(crown);
+        //}
+        //int index = 0;
 
-        foreach (GameObject crown in crowns)
-        {
-            crown.transform.position = new Vector3(crown.transform.position.x, crown.transform.position.y+(crownDistance * index), crown.transform.position.z);
-            index++;
-        }
+        //foreach (GameObject crown in crowns)
+        //{
+        //    crown.transform.position = new Vector3(crown.transform.position.x, crown.transform.position.y+(crownDistance * index), crown.transform.position.z);
+        //    index++;
+        //}
 
-        // mana = GameObject.Find("TitleManager").GetComponent<TitleMana>();
+        //// mana = GameObject.Find("TitleManager").GetComponent<TitleMana>();
 
 
         if (rally)
@@ -192,16 +197,25 @@ public class GameManager : MonoBehaviour
             }
         }
 
-  
-        if (Input.GetMouseButtonDown(0)|| grabAction.GetStateDown(handType))
+
+        //TODO：自身がホストの場合はミニゲーム一覧の回転同期とテキストの遷移
+        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
         {
+            if (Input.GetMouseButtonDown(0) || grabAction.GetStateDown(handType))
+            {
+                Debug.Log("会話進めます");
+                NetworkManager.I.SendHostProgress();
 
-            MoveText();
+            }
 
+            if (!isSpin)
+            {
+                if (CenterObjRb.angularVelocity.y < 0.29f)
+                {
+                    CenterObjRb.angularVelocity = new Vector3(0, 0.3f, 0);
+                }
+            }
         }
-
-
-        //TODO：自身がホストの場合はミニゲーム一覧の回転同期
     }
 
     public void InitRally()
@@ -215,13 +229,15 @@ public class GameManager : MonoBehaviour
         onEnd = false;
 
 
-        onResult = true;
-        MainText.text = "";
-        textIndex = 0;
+        //onResult = true;
+        //MainText.text = "";
+        //textIndex = 0;
 
 
-        MainText.DOText(AfterText[textIndex], 1.0f);
-        SetResult();
+        //MainText.DOText(AfterText[textIndex], 1.0f);
+        //SetResult();
+
+        SetRanking();
 
 
         //シーン移行後の位置配置
@@ -233,36 +249,37 @@ public class GameManager : MonoBehaviour
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position =
             playerPos[index].position;
 
+        //ここで全体ランキング、勝利数の取得、王冠の配置
+        NetworkManager.I.ReqestRanking();
 
-        foreach(Guid guid in InRoomPlayerData.I.PlayerList.Keys)
+        //ここで前回のミニゲーム結果,勝利数を反映
+        foreach (Guid guid in InRoomPlayerData.I.PlayerList.Keys)
         {
-            SetCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+            NetworkManager.I.ReqestMinigameRanking(guid);
 
+            
         }
 
 
-        //ここで順位が決定されている状態だったらランキング処理のフラグを建てる
-        if (miniRankingList[0].rank != 0)
-        {
-            onResult = true;
-            MainText.text = "";
-            textIndex = 0;
-
-
-            MainText.DOText(AfterText[textIndex], 1.0f);
-            SetResult();
-        }
-        else
-        {
-
-
+     
             MainText.text = "";
             textIndex = 0;
             MainText.DOText(StartText[textIndex], 1.0f);
-        }
+        
 
        
-        SetRanking();
+        
+    }
+
+    public　void InitResult()
+    {
+        onResult = true;
+        MainText.text = "";
+        textIndex = 0;
+
+
+        MainText.DOText(AfterText[textIndex], 1.0f);
+        SetResult();
     }
 
     //ミニゲーム抽選開始(ホストのみ実行)
@@ -278,8 +295,11 @@ public class GameManager : MonoBehaviour
 
     public void MoveScene(string scene)
     {
-        DeleteCrown(Guid.NewGuid(), 0);
-        SteamVR_Fade.Start(new Color(0,0,0,1), 2);
+        foreach (Guid guid in NetworkManager.I.playerList.Keys)
+        {
+            AddCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+        }
+        SteamVR_Fade.Start(new Color(1,1,1,1), 2);
         Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
     }
 
@@ -357,9 +377,9 @@ public class GameManager : MonoBehaviour
 
     public void DeleteCrown(Guid guid, int ID)
     {
-        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
+        Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
 
-        Transform transform = crowntrans;
+        
         foreach(Transform crown in transform)
         {
             Destroy(crown.gameObject);
@@ -371,11 +391,11 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < miniRankingList.Count; i++)
         {
 
-            if (miniRankingList[i].rank == 1)
+            if (miniRankingList[i+1] == 1)
             {
 
-                winPlayerId = miniRankingList[i].Id;
-                Debug.Log(miniRankingList[i].Id + "  " + miniRankingList[i].rank);
+                winPlayerId = miniRankingList[i + 1];
+               
             }
 
         }
@@ -393,24 +413,41 @@ public class GameManager : MonoBehaviour
         foreach (int ID in playerWinlist.Keys)
         {
 
-            RankingList[ID - 1].rank = index;
+            RankingList[ID] = index;
             index++;
 
         }
 
         for (int i = 0; i < RankingList.Count; i++)
         {
-            rankingUis[i].DOAnchorPosY(rankingPosList[RankingList[i].rank - 1].anchoredPosition.y, 1f);
+            rankingUis[i].DOAnchorPosY(rankingPosList[RankingList[i + 1] - 1].anchoredPosition.y, 1f);
         }
 
     }
 
-    private void MoveText()
+    public void MoveText()
     {
         if (!isSpin)
         {
             textIndex++;
         }
+        else if (isSpin && !onSelect)
+        {
+            if (CenterObjRb.angularVelocity.y < 0.01f)
+            {
+                MainText.text = "";
+                Debug.Log(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました");
+                MainText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
+
+                onSelect = true;
+                onResult = false;
+                onEnd = false;
+
+            }
+        }
+
+
+
         MainText.text = "";
         if (onResult)
         {
@@ -428,9 +465,10 @@ public class GameManager : MonoBehaviour
 
                 SetRanking();
                 //一旦仮で入れてます。本実装は優勝者のGuidいれてください。
-                AddCrown(Guid.NewGuid(),1);
 
-                if (playerWinlist[RankingList[winPlayerId - 1].Id] >= 3)
+               
+
+                if (playerWinlist[RankingList[winPlayerId]] >= 3)
                 {
                     onEnd = true;
                     onResult = false;
@@ -447,7 +485,7 @@ public class GameManager : MonoBehaviour
             if (textIndex >= FinishText.Count)
             {
                 //タイトルに戻る
-                MoveScene("GameScene");
+                MoveScene("TitleScene");
                 return;
             }
 

@@ -7,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEditor;
-using UnityEditor.MemoryProfiler;
 using UnityEngine;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
@@ -82,6 +80,19 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// オブジェクトの所有権削除通知
     /// </summary>
     public Action<Guid> OnDeleatedOwnership { get; set; }
+
+
+    /// <summary>
+    /// ミニゲームの順位取得通知
+    /// </summary>
+    public Action<JoinedUser,int> OnGetMiniGameRanking { get; set; }
+
+    /// <summary>
+    /// 順位取得通知
+    /// </summary>
+    public Action<List<JoinedUser>, List<int>> OnGetRanking { get; set; }
+
+    public Action<Task> OnHostProgressed { get; set; }
 
     /*
      * 処理
@@ -346,9 +357,10 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     {
         for (int i = 0; i < ranking.Count; i++)
         {
-            Debug.Log($"{i + 1}位: {ranking[i].Name} 勝利数: {winCount[i]}");
+            Debug.Log($"{i + 1}位: ID:{ranking[i].JoinOrder}  {ranking[i].Name} 勝利数: {winCount[i]}");
         }
         // 順位表示UIの更新など
+        OnGetRanking(ranking,winCount);
     }
 
     /// <summary>
@@ -376,6 +388,29 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             return;
         }
         Debug.Log($"プレイヤー:{user.Name} 最終順位: {lastRank}位");
+
+        OnGetMiniGameRanking(user,lastRank);
+
+
+
+    }
+
+    /// <summary>
+    /// 勝利カウントUP
+    /// </summary>
+    public async void RequestWinCountUp(Guid connectionId)
+    {
+        await roomHub.WinCountUpAsync(connectionId);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 勝利カウントUP
+    /// </summary>
+    public void OnWinCountUp(JoinedUser user, int winCount)
+    {
+        Debug.Log($"{user.Name} の勝利数: {winCount}");
+        // UIの更新など
     }
     /*
      * オブジェクト
@@ -453,6 +488,24 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (OnDestroyedObject != null) {
             OnDestroyedObject(objectId);
         }
+    }
+
+    /// <summary>
+    /// ミニゲーム大会の司会進行
+    /// </summary>
+    public async void HostProgress()
+    {
+       await roomHub.HostProgress();
+    }
+
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ミニゲーム大会の司会進行
+    /// </summary>
+    public void OnHostProgress()
+    {
+        OnHostProgressed(Task.CompletedTask);
     }
 
     /// <summary>
