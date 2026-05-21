@@ -106,6 +106,7 @@ public class NetworkManager : Singleton<NetworkManager>
                 joinedUser = user,
             };
             InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
+          
         }
         else
         {
@@ -186,8 +187,8 @@ public class NetworkManager : Singleton<NetworkManager>
         int index = 0;
         foreach (JoinedUser user in ranking)
         {
-            gameManager.RankingList[user.JoinOrder+1] = index+1;
-            GameManager.playerWinlist[user.JoinOrder+1] = winCount[index];
+            gameManager.RankingList[user.JoinOrder] = index+1;
+            GameManager.playerWinlist[user.JoinOrder] = winCount[index];
             gameManager.SetCrown(user.ConnectionId,user.JoinOrder);
             index++;
         }
