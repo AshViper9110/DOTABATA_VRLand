@@ -84,6 +84,12 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// 勝利カウントUP通知
         /// </summary>
         void OnWinCountUp(JoinedUser user, int winCount);
+
+
+        /// <summary>
+        /// ゲーム大会の司会進行
+        /// </summary>
+        void OnHostProgress();
     }
 
 }

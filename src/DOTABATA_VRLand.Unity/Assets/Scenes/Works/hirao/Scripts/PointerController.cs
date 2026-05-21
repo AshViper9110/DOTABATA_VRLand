@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TMPro;
 using Valve.VR;
+using System.Collections;
 
 public class PointerController : MonoBehaviour
 {
@@ -35,7 +37,6 @@ public class PointerController : MonoBehaviour
 
         eventSystem = EventSystem.current;
 
-        // LineRenderer 初期化
         if (lineRenderer != null)
         {
             lineRenderer.positionCount = 2;
@@ -45,7 +46,6 @@ public class PointerController : MonoBehaviour
 
             lineRenderer.enabled = false;
 
-            // VR向け設定
             lineRenderer.alignment =
                 LineAlignment.View;
 
@@ -58,7 +58,6 @@ public class PointerController : MonoBehaviour
 
     void Update()
     {
-        // シーン内の全GraphicRaycaster取得
         GraphicRaycaster[] raycasters =
             FindObjectsOfType<GraphicRaycaster>();
 
@@ -75,12 +74,11 @@ public class PointerController : MonoBehaviour
         Vector3 end =
             start + direction * rayDistance;
 
-        bool hitButton = false;
+        bool hitUI = false;
 
         PointerEventData pointerData =
             new PointerEventData(eventSystem);
 
-        // 画面座標化
         Vector2 screenPoint =
             Camera.main.WorldToScreenPoint(end);
 
@@ -89,7 +87,6 @@ public class PointerController : MonoBehaviour
         List<RaycastResult> results =
             new List<RaycastResult>();
 
-        // 全CanvasにRaycast
         foreach (GraphicRaycaster raycaster in raycasters)
         {
             if (raycaster == null)
@@ -98,39 +95,46 @@ public class PointerController : MonoBehaviour
             if (!raycaster.isActiveAndEnabled)
                 continue;
 
-            if (raycaster.gameObject == null)
-                continue;
-
             raycaster.Raycast(pointerData, results);
         }
 
-        GameObject newHover = null;
+        GameObject target = null;
 
-        // Buttonのみ検出
         foreach (RaycastResult result in results)
         {
+            GameObject obj = result.gameObject;
+
             Button button =
-                result.gameObject
-                .GetComponentInParent<Button>();
+                obj.GetComponentInParent<Button>();
 
-            if (button == null)
+            InputField inputField =
+                obj.GetComponentInParent<InputField>();
+
+            TMP_InputField tmpInputField =
+                obj.GetComponentInParent<TMP_InputField>();
+
+            Toggle toggle = obj.GetComponentInParent<Toggle>();
+
+            // Button / InputField のみ対象
+            if (button == null &&
+                inputField == null &&
+                tmpInputField == null &&
+                toggle == null)
+            {
                 continue;
+            }
 
-            hitButton = true;
+            hitUI = true;
 
-            GameObject target =
-                button.gameObject;
-
-            newHover =
+            target =
                 ExecuteEvents.GetEventHandler
-                <IPointerEnterHandler>(target);
+                <IPointerEnterHandler>(obj);
 
             end = result.worldPosition;
 
             // Hover開始
-            if (newHover != currentHover)
+            if (target != currentHover)
             {
-                // Hover解除
                 if (currentHover != null)
                 {
                     ExecuteEvents.Execute(
@@ -140,39 +144,72 @@ public class PointerController : MonoBehaviour
                     );
                 }
 
-                // Hover開始
-                if (newHover != null)
+                if (target != null)
                 {
                     ExecuteEvents.Execute(
-                        newHover,
+                        target,
                         pointerData,
                         ExecuteEvents.pointerEnterHandler
                     );
                 }
 
-                currentHover = newHover;
+                currentHover = target;
             }
 
-            // Triggerクリック
+            // Trigger
             if (triggerAction != null &&
                 triggerAction.stateDown)
             {
-                ExecuteEvents.Execute(
-                    target,
-                    pointerData,
-                    ExecuteEvents.pointerClickHandler
-                );
+                // Button
+                if (button != null)
+                {
+                    button.onClick.Invoke();
 
-                Debug.Log(
-                    "Clicked : " + target.name);
+                    Debug.Log(
+                        "Clicked Button : " +
+                        button.name);
+                }
+
+                // InputField
+                if (inputField != null)
+                {
+                    StartCoroutine(
+                        FocusInputField(inputField));
+
+                    Debug.Log(
+                        "Selected InputField : " +
+                        inputField.name);
+                }
+
+                // TMP_InputField
+                if (tmpInputField != null)
+                {
+                    StartCoroutine(
+                        FocusTMPInputField(tmpInputField));
+
+                    Debug.Log(
+                        "Selected TMP_InputField : " +
+                        tmpInputField.name);
+                }
+
+                // Toggle
+                if (toggle != null)
+                {
+                    toggle.Select();
+
+                    toggle.isOn = !toggle.isOn;
+
+                    Debug.Log(
+                        "Toggled : " +
+                        toggle.name);
+                }
             }
 
-            // 最初のButtonだけ処理
             break;
         }
 
         // Hover解除
-        if (!hitButton)
+        if (!hitUI)
         {
             if (currentHover != null)
             {
@@ -184,21 +221,75 @@ public class PointerController : MonoBehaviour
 
                 currentHover = null;
             }
+
+            // 何もない場所でTrigger
+            if (triggerAction != null &&
+                triggerAction.stateDown)
+            {
+                // UI選択解除
+                eventSystem.SetSelectedGameObject(null);
+
+                Debug.Log("UI Selection Cleared");
+            }
         }
 
-        // レーザー表示
+        // レーザー
         if (lineRenderer != null)
         {
-            lineRenderer.enabled = hitButton;
+            lineRenderer.enabled = hitUI;
 
-            if (hitButton)
+            if (hitUI)
             {
                 lineRenderer.SetPosition(0, start);
                 lineRenderer.SetPosition(1, end);
             }
         }
 
-        // Debug
         Debug.DrawLine(start, end, Color.cyan);
+    }
+
+    private IEnumerator FocusInputField(
+    InputField input)
+    {
+        yield return null;
+
+        eventSystem.SetSelectedGameObject(null);
+
+        yield return null;
+
+        eventSystem.SetSelectedGameObject(
+            input.gameObject);
+
+        input.Select();
+
+        input.ActivateInputField();
+
+        input.MoveTextEnd(false);
+
+        Debug.Log(
+            "InputField Focused : " +
+            input.isFocused);
+    }
+    private IEnumerator FocusTMPInputField(
+    TMP_InputField input)
+    {
+        yield return null;
+
+        eventSystem.SetSelectedGameObject(null);
+
+        yield return null;
+
+        eventSystem.SetSelectedGameObject(
+            input.gameObject);
+
+        input.Select();
+
+        input.ActivateInputField();
+
+        input.MoveTextEnd(false);
+
+        Debug.Log(
+            "TMP Focused : " +
+            input.isFocused);
     }
 }

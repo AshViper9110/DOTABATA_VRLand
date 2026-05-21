@@ -1,12 +1,18 @@
-using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 
 public class MinigameFlowController : MonoBehaviour
 {
+    [Header("UI")]
     public GameObject introUI;
     public GameObject gameUI;
+    public GameObject resultUI;
 
+    [Header("Intro")]
     public GameObject descriptionPanel;
     public GameObject readyPanel;
 
@@ -14,222 +20,321 @@ public class MinigameFlowController : MonoBehaviour
     public Text descriptionText;
     public Text readyText;
 
-    public MinigameInfo info;
-
+    [Header("Ready")]
     public Button readyButton;
     public Text waitingText;
 
+    [Header("Countdown")]
     public Image fadeImage;
     public Text countdownText;
 
-    public GameObject resultUI;
-
+    [Header("Result")]
     public Text rank1Text;
     public Text rank2Text;
     public Text rank3Text;
     public Text rank4Text;
 
-    private bool[] ready = new bool[4];
+    [Header("Data")]
+    public MinigameInfo info;
 
-    private bool isReadyPhase = false;
     private bool isGameStarted = false;
     private bool isResultShown = false;
 
-    void Start()
+    // =====================================================
+    // Start
+    // =====================================================
+
+    async void Start()
     {
+        // RoomModelイベント購読
+        RoomModel.I.OnCountdownAction += StartCountdown;
+        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
+        RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
+        RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
+
         StartCoroutine(GameFlow());
+
         waitingText.gameObject.SetActive(false);
+        countdownText.gameObject.SetActive(false);
+
+        resultUI.SetActive(false);
+        gameUI.SetActive(false);
+
+        readyText.text = "0/4 プレイヤー準備完了";
     }
+
+    // =====================================================
+    // Update
+    // =====================================================
 
     void Update()
     {
-        // リザルト
-        if (gameUI.activeSelf && !isResultShown && Input.GetKeyDown(KeyCode.Space))
+        // 仮スコア送信
+        // あとで実際のゲーム終了タイミングに変更
+        if (gameUI.activeSelf && !isResultShown)
         {
-            isResultShown = true;
-            StartCoroutine(ShowResult());
-        }
-
-        if (waitingText.gameObject.activeSelf)
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) ready[1] = true;
-            if (Input.GetKeyDown(KeyCode.Alpha2)) ready[2] = true;
-            if (Input.GetKeyDown(KeyCode.Alpha3)) ready[3] = true;
-
-            UpdateReadyUI();
-
-            if (AllReady() && !isGameStarted)
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                StartCoroutine(StartGameFlow());
+                isResultShown = true;
+
+                int score = 100;
+
+                RoomModel.I.SendScore(score);
             }
         }
     }
 
-    // =========================
-    // メインフロー
-    // =========================
+    // =====================================================
+    // Destroy
+    // =====================================================
+
+    private void OnDestroy()
+    {
+        if (RoomModel.I == null) return;
+
+        RoomModel.I.OnCountdownAction -= StartCountdown;
+        RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
+        RoomModel.I.OnUpdatedAllReadyStateAction -= OnAllReadyState;
+        RoomModel.I.OnUpdatedReadyStateAction -= OnUpdatePlayerReady;
+    }
+
+    // =====================================================
+    // 初期フロー
+    // =====================================================
+
     IEnumerator GameFlow()
     {
         introUI.SetActive(false);
-        gameUI.SetActive(false);
-        resultUI.SetActive(false);
-        countdownText.gameObject.SetActive(false);
 
-        // 最初のフェード
+        // フェードイン
         yield return StartCoroutine(Fade(1f, 0f, 1f));
 
-        // 説明表示
         introUI.SetActive(true);
+
         titleText.text = info.gameName;
         descriptionText.text = info.description;
     }
 
-    // =========================
-    // Ready UI
-    // =========================
-    void UpdateReadyUI()
-    {
-        int readyCount = 0;
-
-        foreach (bool r in ready)
-        {
-            if (r) readyCount++;
-        }
-
-        readyText.text = $"{readyCount}/4 プレイヤー準備完了";
-    }
-
-    bool AllReady()
-    {
-        foreach (bool r in ready)
-        {
-            if (!r) return false;
-        }
-        return true;
-    }
+    // =====================================================
+    // Readyボタン
+    // =====================================================
 
     public void OnReadyButton()
     {
-        // Ready切り替え
-        ready[0] = !ready[0];
+        bool willReady =
+            readyButton.GetComponentInChildren<Text>().text == "準備OK！";
 
-        UpdateReadyUI();
+        // サーバー送信
+        RoomModel.I.SendReadyState(willReady);
 
-        // Ready状態
-        if (ready[0])
+        // UI更新
+        if (willReady)
         {
             readyButton.GetComponentInChildren<Text>().text = "取り消し";
+
             waitingText.gameObject.SetActive(true);
         }
-        // 未Ready状態
         else
         {
             readyButton.GetComponentInChildren<Text>().text = "準備OK！";
-            waitingText.gameObject.SetActive(false);
-        }
 
-        // 全員Readyなら開始
-        if (AllReady() && !isGameStarted)
-        {
-            StartCoroutine(StartGameFlow());
+            waitingText.gameObject.SetActive(false);
         }
     }
 
-    // =========================
-    // ゲーム開始
-    // =========================
+    // =====================================================
+    // プレイヤーReady更新
+    // =====================================================
+
+    void OnUpdatePlayerReady(JoinedUser user, bool isReady)
+    {
+        Debug.Log($"{user.Name} Ready : {isReady}");
+
+        // TODO:
+        // プレイヤー一覧UI更新
+    }
+
+    // =====================================================
+    // 全員Ready通知
+    // =====================================================
+
+    void OnAllReadyState(bool isAllReady)
+    {
+        if (!isAllReady) return;
+
+        Debug.Log("全員Ready");
+
+        StartCoroutine(StartGameFlow());
+
+        // ホストだけが呼ぶようにするなら
+        // 後でホスト判定追加
+        RoomModel.I.StartCountdown();
+    }
+
+    // =====================================================
+    // ゲーム開始準備
+    // =====================================================
+
     IEnumerator StartGameFlow()
     {
         if (isGameStarted) yield break;
 
         isGameStarted = true;
 
-        // 説明とReady両方消す
         descriptionPanel.SetActive(false);
         readyPanel.SetActive(false);
 
-        yield return StartCoroutine(Countdown());
-
-        introUI.SetActive(false);
-        gameUI.SetActive(true);
+        yield return null;
     }
 
-    // =========================
-    // カウントダウン
-    // =========================
-    IEnumerator Countdown()
+    // =====================================================
+    // カウントダウン受信
+    // =====================================================
+
+    public void StartCountdown(int remain)
     {
         countdownText.gameObject.SetActive(true);
 
-        countdownText.text = "3";
-        yield return new WaitForSecondsRealtime(1f);
+        if (remain > 0)
+        {
+            countdownText.text = remain.ToString();
+        }
+        else
+        {
+            countdownText.text = "START!";
 
-        countdownText.text = "2";
-        yield return new WaitForSecondsRealtime(1f);
+            StartCoroutine(BeginGameAfterStart());
+        }
+    }
 
-        countdownText.text = "1";
-        yield return new WaitForSecondsRealtime(1f);
+    // =====================================================
+    // ゲーム開始
+    // =====================================================
 
-        countdownText.text = "START!";
+    IEnumerator BeginGameAfterStart()
+    {
         yield return new WaitForSecondsRealtime(1f);
 
         countdownText.gameObject.SetActive(false);
+
+        introUI.SetActive(false);
+
+        gameUI.SetActive(true);
+
+        // 必要ならシーン遷移
+        // SceneManager.LoadScene("GameScene");
     }
 
-    // =========================
-    // フェード（最初だけ使用）
-    // =========================
+    // =====================================================
+    // フェード
+    // =====================================================
+
     IEnumerator Fade(float start, float end, float duration)
     {
         float time = 0f;
+
         Color color = fadeImage.color;
 
         while (time < duration)
         {
             float alpha = Mathf.Lerp(start, end, time / duration);
-            fadeImage.color = new Color(color.r, color.g, color.b, alpha);
+
+            fadeImage.color =
+                new Color(color.r, color.g, color.b, alpha);
 
             time += Time.unscaledDeltaTime;
+
             yield return null;
         }
 
-        fadeImage.color = new Color(color.r, color.g, color.b, end);
+        fadeImage.color =
+            new Color(color.r, color.g, color.b, end);
     }
 
-    // =========================
-    // リザルト
-    // =========================
-    IEnumerator ShowResult()
+    // =====================================================
+    // ランキング受信
+    // =====================================================
+
+    void OnReceiveRanking(List<JoinedUser> rankOrder)
+    {
+        List<string> names = new List<string>();
+
+        foreach (var user in rankOrder)
+        {
+            names.Add(user.Name);
+        }
+
+        ShowRanking(names);
+    }
+
+    // =====================================================
+    // ランキング表示開始
+    // =====================================================
+
+    void ShowRanking(List<string> rankOrder)
+    {
+        StartCoroutine(ShowResult(rankOrder));
+    }
+
+    // =====================================================
+    // リザルト表示
+    // =====================================================
+
+    IEnumerator ShowResult(List<string> rankOrder)
     {
         gameUI.SetActive(false);
+
         resultUI.SetActive(true);
 
-        ShowRanksInstant();
+        if (rankOrder.Count > 0)
+            rank1Text.text = $"1位 {rankOrder[0]}";
 
-        // Enter待ち
-        yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Return));
+        if (rankOrder.Count > 1)
+            rank2Text.text = $"2位 {rankOrder[1]}";
 
-        // フェード＋テキスト同時消し
-        yield return StartCoroutine(FadeWithResult(0f, 1f, 1f));
+        if (rankOrder.Count > 2)
+            rank3Text.text = $"3位 {rankOrder[2]}";
 
-        // 終了処理
+        if (rankOrder.Count > 3)
+            rank4Text.text = $"4位 {rankOrder[3]}";
+
+        yield return new WaitUntil(() =>
+            Input.GetKeyDown(KeyCode.Return));
+
+        yield return StartCoroutine(
+            FadeWithResult(0f, 1f, 1f));
+
         EndGame();
     }
 
-    IEnumerator FadeWithResult(float start, float end, float duration)
+    // =====================================================
+    // リザルトフェード
+    // =====================================================
+
+    IEnumerator FadeWithResult(
+        float start,
+        float end,
+        float duration)
     {
         float time = 0f;
+
         Color fadeColor = fadeImage.color;
 
         while (time < duration)
         {
             float t = time / duration;
+
             float alpha = Mathf.Lerp(start, end, t);
 
             // 背景フェード
-            fadeImage.color = new Color(fadeColor.r, fadeColor.g, fadeColor.b, alpha);
+            fadeImage.color = new Color(
+                fadeColor.r,
+                fadeColor.g,
+                fadeColor.b,
+                alpha
+            );
 
-            // テキストもフェードアウト
+            // テキストフェード
             float textAlpha = 1f - t;
 
             SetTextAlpha(rank1Text, textAlpha);
@@ -238,36 +343,33 @@ public class MinigameFlowController : MonoBehaviour
             SetTextAlpha(rank4Text, textAlpha);
 
             time += Time.unscaledDeltaTime;
+
             yield return null;
         }
 
-        fadeImage.color = new Color(fadeColor.r, fadeColor.g, fadeColor.b, end);
+        fadeImage.color = new Color(
+            fadeColor.r,
+            fadeColor.g,
+            fadeColor.b,
+            end
+        );
     }
+
+    // =====================================================
+    // テキスト透明度
+    // =====================================================
 
     void SetTextAlpha(Text text, float alpha)
     {
         Color c = text.color;
-        text.color = new Color(c.r, c.g, c.b, alpha);
+
+        text.color =
+            new Color(c.r, c.g, c.b, alpha);
     }
 
-    void ShowRanksInstant()
-    {
-        rank1Text.text = "1位";
-        rank2Text.text = "2位";
-        rank3Text.text = "3位";
-        rank4Text.text = "4位";
-
-        rank1Text.color = new Color(1f, 0.84f, 0f);
-        rank2Text.color = new Color(0.75f, 0.75f, 0.75f);
-        rank3Text.color = new Color(0.8f, 0.5f, 0.2f);
-        rank4Text.color = new Color(0.5f, 0.7f, 1f);
-
-        rank1Text.gameObject.SetActive(true);
-        rank2Text.gameObject.SetActive(true);
-        rank3Text.gameObject.SetActive(true);
-        rank4Text.gameObject.SetActive(true);
-    }
-
+    // =====================================================
+    // 終了
+    // =====================================================
 
     void EndGame()
     {
