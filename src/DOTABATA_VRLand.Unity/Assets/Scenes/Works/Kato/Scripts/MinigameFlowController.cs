@@ -47,10 +47,10 @@ public class MinigameFlowController : MonoBehaviour
     async void Start()
     {
         // RoomModelÉCÉxÉìÉgçwì«
-        RoomModel.I.OnCountdownAction += StartCountdown;
-        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
-        RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
-        RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
+        //RoomModel.I.OnCountdownAction += StartCountdown;
+        //RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
+        //RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
+        //RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
 
         StartCoroutine(GameFlow());
 
@@ -92,10 +92,10 @@ public class MinigameFlowController : MonoBehaviour
     {
         if (RoomModel.I == null) return;
 
-        RoomModel.I.OnCountdownAction -= StartCountdown;
-        RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
-        RoomModel.I.OnUpdatedAllReadyStateAction -= OnAllReadyState;
-        RoomModel.I.OnUpdatedReadyStateAction -= OnUpdatePlayerReady;
+        //RoomModel.I.OnCountdownAction -= StartCountdown;
+        //RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
+        //RoomModel.I.OnUpdatedAllReadyStateAction -= OnAllReadyState;
+        //RoomModel.I.OnUpdatedReadyStateAction -= OnUpdatePlayerReady;
     }
 
     // =====================================================
