@@ -69,6 +69,16 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         Task DestroyObjectAsync(Guid objectId);
 
         /// <summary>
+        /// 所有権を取得する
+        /// </summary>
+        Task<bool> GetOwnershipAsync(Guid objectId, bool forcibly = false);
+
+        /// <summary>
+        /// 所有権を放棄する
+        /// </summary>
+        Task OwnershipAbandonmentAsync(Guid objectId);
+
+        /// <summary>
         /// 準備完了切り替え
         /// </summary>
         Task UpdateReadyStateAsync(bool isReady);
