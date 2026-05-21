@@ -78,6 +78,11 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid> OnDestroyedObject { get; set; }
 
+    /// <summary>
+    /// オブジェクトの所有権削除通知
+    /// </summary>
+    public Action<Guid> OnDeleatedOwnership { get; set; }
+
     /*
      * 処理
      */
@@ -447,6 +452,38 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnDestroyObject(Guid objectId) {
         if (OnDestroyedObject != null) {
             OnDestroyedObject(objectId);
+        }
+    }
+
+    /// <summary>
+    /// 所有権を取得する
+    /// </summary>
+    public async UniTask<bool> GetOwnershipAsync(Guid objectId, bool forcibly = false) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        return await roomHub.GetOwnershipAsync(objectId, forcibly);
+    }
+
+    /// <summary>
+    /// 所有権を放棄する
+    /// </summary>
+    public async UniTask OwnershipAbandonmentAsync(Guid objectId) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.OwnershipAbandonmentAsync(objectId);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 所有者削除通知
+    /// </summary>
+    public void OnDeleateOwnership(Guid objectId) {
+        if(OnDeleatedOwnership != null) {
+            OnDeleatedOwnership(objectId);
         }
     }
 }

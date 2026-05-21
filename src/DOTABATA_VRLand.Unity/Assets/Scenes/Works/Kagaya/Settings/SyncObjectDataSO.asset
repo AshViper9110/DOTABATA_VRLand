@@ -25,3 +25,5 @@ MonoBehaviour:
     syncObject: {fileID: 173346, guid: f1f5f898fbfdb80478825ce9b01fe8ae, type: 3}
   - objectListId: 6
     syncObject: {fileID: 173732, guid: 81fc1450441aca64e8cc1a0e14b1aa77, type: 3}
+  - objectListId: 7
+    syncObject: {fileID: 1243675114579145479, guid: 971d0cdd745db0c4bb978ff426f66dfd, type: 3}
