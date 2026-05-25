@@ -112,8 +112,33 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             // ルームに参加 ＆ ルームを保持
             this._roomContext.Group.Add(this.ConnectionId, Client);
 
-            //// DBからユーザー情報取得
-            //User user = await _dbContext.Users.FirstAsync(user => user.Name == userName);
+            /*
+            // DBからユーザー情報取得
+            User user = await _dbContext.Users.FirstAsync(user => user.Name == userName);
+
+            // 今日すでにアクティブ記録があるか確認
+            var today = DateTime.Today;
+            var existingRecord = await _dbContext.DailyActiveUsers
+                .FirstOrDefaultAsync(d => d.UserId == user.Id
+                                       && d.ActivityDate.Date == today);
+
+            if (existingRecord == null)
+            {
+                // 今日初めてのログインなら登録
+                _dbContext.DailyActiveUsers.Add(new DailyActiveUser
+                {
+                    UserId = user.Id,
+                    ActivityDate = DateTime.Now,
+                    CreatedDay = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                });
+                await _dbContext.SaveChangesAsync();
+                Console.WriteLine($"[DB] {userName} の本日初回ログインを記録");
+            }
+            else
+            {
+                Console.WriteLine($"[DB] {userName} は本日すでにログイン済み");
+            }*/
 
             // 入室済みユーザーのデータを作成
             var joinedUser = new JoinedUser();
@@ -325,6 +350,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public Task GetLastRankingAsync(Guid connectionId)
         {
             var (joinedUser, ranking) = _roomContext.GetLastMiniGameRanking(connectionId);
+
+            if (joinedUser == null) return Task.CompletedTask;//nullチェック
+
             // 呼び出した本人にだけ送信
             Client.OnGetLastMiniGameRanking(joinedUser,ranking); 
             return Task.CompletedTask;
