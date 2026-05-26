@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
 
@@ -13,10 +14,14 @@ public class NitnitManager : MonoBehaviour
     Vector3 TempRightPos;
     Vector3 TempLeftPos;
 
-    [SerializeField] GameObject nitPrefab;
+    [SerializeField] List<GameObject> nitPrefabs = new List<GameObject>();
+    [SerializeField] List<Material> materials = new List<Material>();
+    int nitIndex;
+    int indexVector;
     [SerializeField] Transform nitsParent;
     public float distans;
     public int nitCount;
+    public int nitLate;//L‚Ñ—¦
      // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -27,7 +32,8 @@ public class NitnitManager : MonoBehaviour
         point = 0;
         nitCount = 0;
         tempPoint = 0;
-
+        nitIndex = 0;
+        indexVector = 1;
 
     }
 
@@ -41,27 +47,31 @@ public class NitnitManager : MonoBehaviour
 
 
         float sqrtRight = Mathf.Sqrt(Mathf.Abs(RightVector.y));
-        sqrtRight = Mathf.Floor(sqrtRight * 1000) / 1000;
+        sqrtRight = Mathf.Floor(sqrtRight * 10) / 10;
         float sqrtLeft = Mathf.Sqrt(Mathf.Abs(LeftVector.y));
-        sqrtLeft = Mathf.Floor(sqrtLeft * 1000) / 1000;
+        sqrtLeft = Mathf.Floor(sqrtLeft * 10) / 10;
 
         float temp = Mathf.Abs(sqrtRight + sqrtLeft);
-        temp = Mathf.Floor(temp*100)/100;
+        temp = Mathf.Floor(temp*10)/10;
        
-        //Debug.Log(temp);
+        temp = temp * nitLate;        //Debug.Log(temp);
          
         point += temp;
-        if( point > MaxPoint )
+       
+        if ( point > MaxPoint )
         {
             point = MaxPoint;
         }
        
-        Debug.Log(point);
+       
 
-        if(point-tempPoint >= 1)
+        if (Mathf.Floor(point -tempPoint) >= 1)
         {
-            
-            addNit();
+           // Debug.Log(Mathf.Floor(point - tempPoint));
+            for (int i = 0; i < (int)(point - tempPoint); i++)
+            {
+                addNit();
+            }
             tempPoint = point;
         }
         else
@@ -77,9 +87,27 @@ public class NitnitManager : MonoBehaviour
 
     public void addNit()
     {
-        GameObject nit = Instantiate(nitPrefab,nitsParent);
+        GameObject nit = Instantiate(nitPrefabs[nitIndex],nitsParent);
         nit.transform.position = new Vector3(nit.transform.position.x + (distans * nitCount), nit.transform.position.y, nit.transform.position.z);
+        if(indexVector == -1)
+        {
+            nit.transform.Rotate(0, 180, 0);
+            nit.GetComponent<MeshRenderer>().material = materials[1];
+        }
         nitsParent.position = new Vector3(nitsParent.transform.position.x - (distans), nitsParent.transform.position.y, nitsParent.gameObject.transform.position.z);
         nitCount++;
+        nitIndex += indexVector;
+
+        Debug.Log(nitIndex);
+        if (nitIndex >= nitPrefabs.Count)
+        {
+           indexVector = -indexVector;
+            nitIndex = nitPrefabs.Count - 1;
+        }
+        else if(nitIndex < 0)
+        {
+            indexVector = -indexVector;
+            nitIndex = 0;
+        }
     }
 }
