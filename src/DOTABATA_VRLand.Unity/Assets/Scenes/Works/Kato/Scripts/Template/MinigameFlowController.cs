@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using Valve.VR;
 
 public class MinigameFlowController : MonoBehaviour
 {
@@ -52,6 +53,7 @@ public class MinigameFlowController : MonoBehaviour
 
     async void Start()
     {
+        SteamVR_Fade.Start(new Color(0,0,0,0),1.0f);
         //RoomModelイベント購読
         RoomModel.I.OnCountdownAction += StartCountdown;
         RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
@@ -245,6 +247,20 @@ public class MinigameFlowController : MonoBehaviour
 
         // 必要ならシーン遷移
         // SceneManager.LoadScene("GameScene");
+    }
+
+    // =====================================================
+    // Readyボタン
+    // =====================================================
+
+    public void OnSendScore()
+    {
+        int Score = 100;
+
+        // サーバー送信
+        RoomModel.I.SendScore(Score);
+
+
     }
 
     // =====================================================
