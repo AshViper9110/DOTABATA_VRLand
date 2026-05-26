@@ -481,18 +481,18 @@ MonoBehaviour:
     needsReinit: 0
   handType: 2
   miniGames:
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
   miniGameNames:
   - "\u30CB\u30C3\u30C8\u30CB\u30C3\u30C8"
   - "\u30AC\u30EC\u30FC\u30B8\u30AA\u30FC\u30D7\u30CA\u30FC"
@@ -1576,7 +1576,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7072114806391354250, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8476141236346117073, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2756,7 +2756,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2605816537857199021, guid: 26369a01791ef97478927b5e1f8a3f2d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2979069226064090329, guid: 26369a01791ef97478927b5e1f8a3f2d, type: 3}
       propertyPath: SendTransform
