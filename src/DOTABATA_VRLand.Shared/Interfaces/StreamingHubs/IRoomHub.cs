@@ -112,5 +112,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// 勝利カウントUP
         /// </summary>
         Task WinCountUpAsync(Guid connectionId);
+
+        /// <summary>
+        /// シーン移行が完了したことを他プレイヤーに伝える
+        /// </summary>
+        Task CompleteSceneTransition();
     }
 }

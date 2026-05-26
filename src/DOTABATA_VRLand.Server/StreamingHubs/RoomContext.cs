@@ -292,5 +292,28 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         }
 
+        /// <summary>
+        /// シーン移行状態変更
+        /// 全員が完了したらTrue返す
+        /// </summary>
+        public bool ChangeIsCompleteSceneTransition(Guid connectionId) {
+            // いるか
+            if (!RoomUserDataList.Any(_=>_.Key == connectionId)) {
+                return false;
+            }
+
+            RoomUserDataList[connectionId].IsCompleteSceneTransition = true;
+
+            // 全員完了していたらfalseにもどしてTrue返す
+            if (RoomUserDataList.Count(_=>_.Value.IsCompleteSceneTransition == true) == RoomUserDataList.Count()) {
+                foreach (var user in RoomUserDataList.Values) {
+                    user.IsCompleteSceneTransition = false;
+                }
+
+                return true;
+            }
+            
+            return false;
+        }
     }
 }

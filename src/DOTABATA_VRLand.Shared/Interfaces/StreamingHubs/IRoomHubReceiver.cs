@@ -95,6 +95,16 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ゲーム大会の司会進行
         /// </summary>
         void OnHostProgress();
+
+        /// <summary>
+        /// シーン移行完了通知
+        /// </summary>
+        public void OnCompleteSceneTransition(Guid connectionId);
+
+        /// <summary>
+        /// 全員のシーン移行完了通知
+        /// </summary>
+        public void OnAllCompleteSceneTransition();
     }
 
 }

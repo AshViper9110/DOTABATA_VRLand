@@ -503,5 +503,22 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             this._roomContext.Group.All.OnHostProgress();
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// シーン移行が完了したことを他プレイヤーに伝える
+        /// </summary>
+        public Task CompleteSceneTransition() {
+            bool allComplete = this._roomContext.ChangeIsCompleteSceneTransition(this.ConnectionId);
+
+            // 自分以外に完了通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnCompleteSceneTransition(this.ConnectionId);
+            // もし全員が完了してたら
+            if (allComplete) {
+                // 全員に通知
+                this._roomContext.Group.All.OnAllCompleteSceneTransition();
+            }
+
+            return Task.CompletedTask;
+        }
     }
 }

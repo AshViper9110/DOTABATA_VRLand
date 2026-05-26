@@ -114,6 +114,15 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<List<JoinedUser>> OnRegisterScoreAction { get; set; }
 
+    /// <summary>
+    /// シーン移行完了通知
+    /// </summary>
+    public Action<Guid> OnCompletedSceneTransition { get; set; }
+
+    /// <summary>
+    /// 全員のシーン移行完了通知
+    /// </summary>
+    public Action OnAllCompletedSceneTransition { get; set; }
 
     /*
      * 処理
@@ -558,6 +567,36 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnDeleateOwnership(Guid objectId) {
         if(OnDeleatedOwnership != null) {
             OnDeleatedOwnership(objectId);
+        }
+    }
+
+    /// <summary>
+    /// シーン移行が完了したことを他プレイヤーに伝える
+    /// </summary>
+    public async UniTask CompleteSceneTransition() {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.CompleteSceneTransition();
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// シーン移行完了通知
+    /// </summary>
+    public void OnCompleteSceneTransition(Guid connectionId) {
+        if (OnCompletedSceneTransition != null) {
+            OnCompletedSceneTransition(connectionId);
+        }
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 全員のシーン移行完了通知
+    /// </summary>
+    public void OnAllCompleteSceneTransition() {
+        if (OnAllCompletedSceneTransition  != null) {
+            OnAllCompletedSceneTransition();
         }
     }
 }
