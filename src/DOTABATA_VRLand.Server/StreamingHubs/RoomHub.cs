@@ -112,8 +112,33 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             // ルームに参加 ＆ ルームを保持
             this._roomContext.Group.Add(this.ConnectionId, Client);
 
-            //// DBからユーザー情報取得
-            //User user = await _dbContext.Users.FirstAsync(user => user.Name == userName);
+            /*
+            // DBからユーザー情報取得
+            User user = await _dbContext.Users.FirstAsync(user => user.Name == userName);
+
+            // 今日すでにアクティブ記録があるか確認
+            var today = DateTime.Today;
+            var existingRecord = await _dbContext.DailyActiveUsers
+                .FirstOrDefaultAsync(d => d.UserId == user.Id
+                                       && d.ActivityDate.Date == today);
+
+            if (existingRecord == null)
+            {
+                // 今日初めてのログインなら登録
+                _dbContext.DailyActiveUsers.Add(new DailyActiveUser
+                {
+                    UserId = user.Id,
+                    ActivityDate = DateTime.Now,
+                    CreatedDay = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                });
+                await _dbContext.SaveChangesAsync();
+                Console.WriteLine($"[DB] {userName} の本日初回ログインを記録");
+            }
+            else
+            {
+                Console.WriteLine($"[DB] {userName} は本日すでにログイン済み");
+            }*/
 
             // 入室済みユーザーのデータを作成
             var joinedUser = new JoinedUser();
@@ -220,23 +245,26 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public async Task UpdateReadyStateAsync(bool isReady)
         {
-            var (updatedUser, isReadyResult) = _roomContext.UpdateReadyState(ConnectionId, isReady);
+            var allReadyStates = _roomContext.UpdateReadyState(ConnectionId, isReady);
 
-            if (updatedUser == null) return; // 対象ユーザーが存在しない場合
+            if (allReadyStates == null) return; // 対象ユーザーが存在しない場合
 
-            //全員に更新されたプレイヤーと準備状態を通知
-            // Group.All.OnUpdateReadyState(updatedUser, isReadyResult); Interface追加後に解除
+            // 配列に変換して送信
+            var users = allReadyStates.Select(x => x.User).ToArray();
+            var isReadyList = allReadyStates.Select(x => x.IsReady).ToArray();
+
+            await _roomContext.Group.All.OnUpdateReadyState(users, isReadyList);
 
             //すべてのプレイヤーの準備が完了してるのかどうか
             if (_roomContext.IsAllUserReady() == true)
             {
                 Console.WriteLine("[RoomHub]すべてのプレイヤーの準備完了");
-                _roomContext.Group.All.OnUpdateAllReadyState(true);
+                await _roomContext.Group.All.OnUpdateAllReadyState(true);
             }
             else
             {
                 Console.WriteLine("[RoomHub]すべてのプレイヤーの準備が完了していません");
-                _roomContext.Group.All.OnUpdateAllReadyState(false); 
+                await _roomContext.Group.All.OnUpdateAllReadyState(false); 
             }
         }
 
@@ -245,14 +273,19 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public async Task StartCountdownAsync()
         {
-            
+            // JoinOrderが最小のプレイヤーだけ処理
+            if (!_roomContext.RoomUserDataList.TryGetValue(ConnectionId, out var self)) return;
+
+            int minOrder = _roomContext.RoomUserDataList.Values.Min(u => u.joinedUser.JoinOrder);
+            if (self.joinedUser.JoinOrder != minOrder) return;
+
             int count = _roomContext.ResetCountdown(3); // 初期値設定
 
             while (true)
             {
                 await Task.Delay(1000); // 1秒おく
 
-                _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
+                await _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
 
                 count = _roomContext.TickCountdown();//カウント-1
 
@@ -260,7 +293,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
                 if (count == 0)
                 {
-                    _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
+                    await _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
                     break;
                 }
 
@@ -325,6 +358,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public Task GetLastRankingAsync(Guid connectionId)
         {
             var (joinedUser, ranking) = _roomContext.GetLastMiniGameRanking(connectionId);
+
+            if (joinedUser == null) return Task.CompletedTask;//nullチェック
+
             // 呼び出した本人にだけ送信
             Client.OnGetLastMiniGameRanking(joinedUser,ranking); 
             return Task.CompletedTask;
