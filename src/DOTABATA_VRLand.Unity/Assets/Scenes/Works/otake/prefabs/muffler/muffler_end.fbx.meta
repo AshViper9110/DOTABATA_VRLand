@@ -1,14 +1,9 @@
 fileFormatVersion: 2
-guid: 46cc40cfecf0dca4484f6ec4dd028a64
+guid: 428d90606837f9a47a716ef6b5708c22
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: muffler
-    second: {fileID: 2100000, guid: ee1b00b44f141744295156f4c870fb23, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

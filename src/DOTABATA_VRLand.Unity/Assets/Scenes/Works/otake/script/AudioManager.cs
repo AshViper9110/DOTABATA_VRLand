@@ -13,6 +13,7 @@ public class AudioManager : MonoBehaviour
         Main_crown_add,
         Main_miniGame_select,
         Main_miniGeme_decision,
+        Move_Scene,
         
     }
 
@@ -21,6 +22,11 @@ public class AudioManager : MonoBehaviour
         Title = 0,
         Main_Normal,
         Main_End,
+        Nit_Nit,
+        Garage,
+        Bom_doge,
+        Arcana,
+        Bank,
     }
 
     [SerializeField] public List<AudioClip> seClips = new List<AudioClip>();

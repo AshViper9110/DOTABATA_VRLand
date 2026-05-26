@@ -15,7 +15,9 @@ public class NitnitManager : MonoBehaviour
     Vector3 TempLeftPos;
 
     [SerializeField] List<GameObject> nitPrefabs = new List<GameObject>();
+    [SerializeField] List<Material> materials = new List<Material>();
     int nitIndex;
+    int indexVector;
     [SerializeField] Transform nitsParent;
     public float distans;
     public int nitCount;
@@ -31,6 +33,7 @@ public class NitnitManager : MonoBehaviour
         nitCount = 0;
         tempPoint = 0;
         nitIndex = 0;
+        indexVector = 1;
 
     }
 
@@ -51,8 +54,7 @@ public class NitnitManager : MonoBehaviour
         float temp = Mathf.Abs(sqrtRight + sqrtLeft);
         temp = Mathf.Floor(temp*10)/10;
        
-        temp = temp * nitLate;
-        //Debug.Log(temp);
+        temp = temp * nitLate;        //Debug.Log(temp);
          
         point += temp;
        
@@ -65,7 +67,7 @@ public class NitnitManager : MonoBehaviour
 
         if (Mathf.Floor(point -tempPoint) >= 1)
         {
-            Debug.Log(Mathf.Floor(point - tempPoint));
+           // Debug.Log(Mathf.Floor(point - tempPoint));
             for (int i = 0; i < (int)(point - tempPoint); i++)
             {
                 addNit();
@@ -87,11 +89,24 @@ public class NitnitManager : MonoBehaviour
     {
         GameObject nit = Instantiate(nitPrefabs[nitIndex],nitsParent);
         nit.transform.position = new Vector3(nit.transform.position.x + (distans * nitCount), nit.transform.position.y, nit.transform.position.z);
+        if(indexVector == -1)
+        {
+            nit.transform.Rotate(0, 180, 0);
+            nit.GetComponent<MeshRenderer>().material = materials[1];
+        }
         nitsParent.position = new Vector3(nitsParent.transform.position.x - (distans), nitsParent.transform.position.y, nitsParent.gameObject.transform.position.z);
         nitCount++;
-        nitIndex++;
+        nitIndex += indexVector;
+
+        Debug.Log(nitIndex);
         if (nitIndex >= nitPrefabs.Count)
         {
+           indexVector = -indexVector;
+            nitIndex = nitPrefabs.Count - 1;
+        }
+        else if(nitIndex < 0)
+        {
+            indexVector = -indexVector;
             nitIndex = 0;
         }
     }
