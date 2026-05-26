@@ -92,7 +92,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<List<JoinedUser>, List<int>> OnGetRanking { get; set; }
 
-    public Action<Task> OnHostProgressed { get; set; }
+    public Action OnHostProgressed { get; set; }
 
     /// <summary>
     /// 個人準備完了状態切り替え通知
@@ -293,20 +293,18 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// 個人準備完了状態切り替え
     /// </summary>
-    public Task OnUpdateReadyState(JoinedUser[] users, bool[] isReadyList)
+    public void OnUpdateReadyState(JoinedUser[] users, bool[] isReadyList)
     {
-        //Debug.Log($"{updatedUser.Name}の準備状態: {isReady}");
-        //OnUpdatedReadyStateAction?.Invoke(updatedUser, isReady);
-        OnUpdatedReadyStateAction?.Invoke(users, isReadyList);
-        return Task.CompletedTask;
-
+        OnUpdatedReadyStateAction?.Invoke(
+            users,
+            isReadyList);
     }
 
     /// <summary>
     /// [サーバー通知]
     /// 全員準備完了状態切り替え
     /// </summary>
-    public Task OnUpdateAllReadyState(bool isAllReady)
+    public void OnUpdateAllReadyState(bool isAllReady)
     {
         if (isAllReady)
         {
@@ -316,8 +314,9 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         {
             Debug.Log("準備中のプレイヤーがいます");
         }
-        OnUpdatedAllReadyStateAction?.Invoke(isAllReady);
-        return Task.CompletedTask;
+
+        OnUpdatedAllReadyStateAction?.Invoke(
+            isAllReady);
     }
 
     /// <summary>
@@ -332,17 +331,16 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// カウントダウン受け取り
     /// </summary>
-    public Task OnCountdown(int count)
+    public void OnCountdown(int count)
     {
         Debug.Log($"カウント: {count}");
+
         OnCountdownAction?.Invoke(count);
-        // カウントダウンUIの更新
-        // count == 0 でゲーム開始演出など
+
         if (count == 0)
         {
             Debug.Log("ゲームスタート");
         }
-        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -536,7 +534,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public void OnHostProgress()
     {
-        OnHostProgressed(Task.CompletedTask);
+        OnHostProgressed?.Invoke();
     }
 
     /// <summary>
