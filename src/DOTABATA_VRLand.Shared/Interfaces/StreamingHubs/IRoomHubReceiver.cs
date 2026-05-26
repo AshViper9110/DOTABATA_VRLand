@@ -58,17 +58,17 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// 個人準備完了状態切り替え通知
         /// </summary>
-        void OnUpdateReadyState(JoinedUser updatedUser, bool isReady);
+        Task OnUpdateReadyState(JoinedUser[] users, bool[] isReadyList);
 
         /// <summary>
         /// 全員準備完了状態切り替え通知
         /// </summary>
-        void OnUpdateAllReadyState(bool isAllReady);
+        Task OnUpdateAllReadyState(bool isAllReady);
 
         /// <summary>
         /// カウントダウンカウント通知
         /// </summary>
-        void OnCountdown(int count);
+        Task OnCountdown(int count);
 
         /// <summary>
         /// ミニゲーム結果順位通知
