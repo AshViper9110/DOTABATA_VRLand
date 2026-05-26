@@ -2435,6 +2435,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3811458814915362142, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
+      propertyPath: posOffset.x
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 3811458814915362142, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
+      propertyPath: posOffset.y
+      value: -0.05
+      objectReference: {fileID: 0}
     - target: {fileID: 5948413936465260933, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
       propertyPath: far clip plane
       value: 3000
@@ -14365,6 +14373,9 @@ MonoBehaviour:
   readyText: {fileID: 579456312}
   readyButton: {fileID: 1461571380}
   waitingText: {fileID: 591000766}
+  UserReadyObject: {fileID: 0}
+  playerNamePrefab: {fileID: 0}
+  UserReadyText: []
   fadeImage: {fileID: 878534115}
   countdownText: {fileID: 1761012984}
   rank1Text: {fileID: 1911033664}
@@ -33170,12 +33181,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   followMoveSpeed: 0.1
-  followRotateSpeed: 0.02
+  followRotateSpeed: 0.1
   rotateSpeedThreshold: 0.9
   isImmediateMove: 0
   isLockX: 0
   isLockY: 0
-  isLockZ: 1
+  isLockZ: 0
 --- !u!4 &1596732176 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4152540453919604208, guid: 33d4ecb787fb20f4a86f8e894a8a74c7, type: 3}
