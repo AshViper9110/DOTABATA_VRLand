@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Works/otake/Scene/GameScene.unity
     guid: 41a2d0a112918f140a5741db1c92c93b
+  - enabled: 1
+    path: Assets/Scenes/Works/Wata/MinigameTemplateScene.unity
+    guid: 6e8a97aa2038d3c4787c1a541353aa30
   m_configObjects:
     Unity.XR.OpenVR.Settings: {fileID: 11400000, guid: e72154ae63307f2439f6369a9cb84281, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
