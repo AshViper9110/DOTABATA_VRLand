@@ -245,27 +245,30 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public async Task UpdateReadyStateAsync(bool isReady)
         {
-            var allReadyStates = _roomContext.UpdateReadyState(ConnectionId, isReady);
+            var allReadyStates =
+                _roomContext.UpdateReadyState(ConnectionId, isReady);
 
-            if (allReadyStates == null) return; // 対象ユーザーが存在しない場合
+            if (allReadyStates == null) return;
 
-            // 配列に変換して送信
-            var users = allReadyStates.Select(x => x.User).ToArray();
-            var isReadyList = allReadyStates.Select(x => x.IsReady).ToArray();
+            var users =
+                allReadyStates.Select(x => x.User).ToArray();
 
-            await _roomContext.Group.All.OnUpdateReadyState(users, isReadyList);
+            var isReadyList =
+                allReadyStates.Select(x => x.IsReady).ToArray();
 
-            //すべてのプレイヤーの準備が完了してるのかどうか
-            if (_roomContext.IsAllUserReady() == true)
-            {
-                Console.WriteLine("[RoomHub]すべてのプレイヤーの準備完了");
-                await _roomContext.Group.All.OnUpdateAllReadyState(true);
-            }
-            else
-            {
-                Console.WriteLine("[RoomHub]すべてのプレイヤーの準備が完了していません");
-                await _roomContext.Group.All.OnUpdateAllReadyState(false); 
-            }
+            _roomContext.Group.All.OnUpdateReadyState(
+                users,
+                isReadyList);
+
+            bool isAllReady = _roomContext.IsAllUserReady();
+
+            Console.WriteLine(
+                isAllReady
+                    ? "[RoomHub]すべてのプレイヤーの準備完了"
+                    : "[RoomHub]すべてのプレイヤーの準備が完了していません");
+
+            _roomContext.Group.All.OnUpdateAllReadyState(
+                isAllReady);
         }
 
         /// <summary>
@@ -273,31 +276,35 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public async Task StartCountdownAsync()
         {
-            // JoinOrderが最小のプレイヤーだけ処理
-            if (!_roomContext.RoomUserDataList.TryGetValue(ConnectionId, out var self)) return;
-
-            int minOrder = _roomContext.RoomUserDataList.Values.Min(u => u.joinedUser.JoinOrder);
-            if (self.joinedUser.JoinOrder != minOrder) return;
-
-            int count = _roomContext.ResetCountdown(3); // 初期値設定
-
-            while (true)
+            if (!_roomContext.RoomUserDataList
+                .TryGetValue(ConnectionId, out var self))
             {
-                await Task.Delay(1000); // 1秒おく
+                return;
+            }
 
-                await _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
+            int minOrder =
+                _roomContext.RoomUserDataList.Values
+                .Min(u => u.joinedUser.JoinOrder);
 
-                count = _roomContext.TickCountdown();//カウント-1
+            if (self.joinedUser.JoinOrder != minOrder)
+            {
+                return;
+            }
+
+            int count = _roomContext.ResetCountdown(3);
+
+            while (count > 0)
+            {
+                _roomContext.Group.All.OnCountdown(count);
 
                 Console.WriteLine($"カウントダウン:{count}");
 
-                if (count == 0)
-                {
-                    await _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
-                    break;
-                }
+                await Task.Delay(1000);
 
+                count = _roomContext.TickCountdown();
             }
+
+            _roomContext.Group.All.OnCountdown(0);
         }
 
         /// <summary>

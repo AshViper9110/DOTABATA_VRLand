@@ -208,7 +208,7 @@ public class NetworkManager : Singleton<NetworkManager>
     /// [サーバー通知]
     /// ミニゲームの順位取得通知
     /// </summary>
-    public void OnHostProgress(Task task)
+    public void OnHostProgress()
     {
 
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
