@@ -23,6 +23,7 @@ public class PointerController : MonoBehaviour
     [Header("Rotation Offset")]
     public Vector3 rotationOffset =
         new Vector3(25f, 0f, 0f);
+    public Vector3 posOffset = new Vector3(0f, 0f, 0f);
 
     private EventSystem eventSystem;
 
@@ -69,7 +70,7 @@ public class PointerController : MonoBehaviour
             rotation * Vector3.forward;
 
         Vector3 start =
-            pointerOrigin.position;
+            pointerOrigin.position + posOffset;
 
         Vector3 end =
             start + direction * rayDistance;
