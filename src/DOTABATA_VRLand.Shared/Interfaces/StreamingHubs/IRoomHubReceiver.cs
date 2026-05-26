@@ -58,43 +58,43 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// 個人準備完了状態切り替え通知
         /// </summary>
-        void OnUpdateReadyState(JoinedUser updatedUser, bool isReady);
+        public void OnUpdateReadyState(JoinedUser[] users, bool[] isReadyList);
 
         /// <summary>
         /// 全員準備完了状態切り替え通知
         /// </summary>
-        void OnUpdateAllReadyState(bool isAllReady);
+        public void OnUpdateAllReadyState(bool isAllReady);
 
         /// <summary>
         /// カウントダウンカウント通知
         /// </summary>
-        void OnCountdown(int count);
+        public void OnCountdown(int count);
 
         /// <summary>
         /// ミニゲーム結果順位通知
         /// </summary>
-        void OnRegisterScore(List<JoinedUser> rankOrder);
+        public void OnRegisterScore(List<JoinedUser> rankOrder);
 
         /// <summary>
         /// ミニゲーム大会全体順位通知
         /// </summary>
-        void OnGetAllRoundRanking(List<JoinedUser> ranking, List<int> winCounts);
+        public void OnGetAllRoundRanking(List<JoinedUser> ranking, List<int> winCounts);
 
         /// <summary>
         /// プレイヤー最終プレイ順位通知
         /// </summary>
-        void OnGetLastMiniGameRanking(JoinedUser joinedUser, int lastRank);
+        public void OnGetLastMiniGameRanking(JoinedUser joinedUser, int lastRank);
 
         /// <summary>
         /// 勝利カウントUP通知
         /// </summary>
-        void OnWinCountUp(JoinedUser user, int winCount);
+        public void OnWinCountUp(JoinedUser user, int winCount);
 
 
         /// <summary>
         /// ゲーム大会の司会進行
         /// </summary>
-        void OnHostProgress();
+        public void OnHostProgress();
     }
 
 }

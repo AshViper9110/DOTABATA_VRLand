@@ -2166,6 +2166,7 @@ MonoBehaviour:
   lineRenderer: {fileID: 6790920730235291602}
   rayDistance: 20
   rotationOffset: {x: 30, y: 0, z: 0}
+  posOffset: {x: -0.04, y: -0.05, z: 0}
 --- !u!1 &6568915954568625978
 GameObject:
   m_ObjectHideFlags: 0
@@ -2698,6 +2699,7 @@ MonoBehaviour:
   lineRenderer: {fileID: 5625766397093702126}
   rayDistance: 20
   rotationOffset: {x: 30, y: 0, z: 0}
+  posOffset: {x: 0.04, y: -0.05, z: 0}
 --- !u!1 &7072114806391354250
 GameObject:
   m_ObjectHideFlags: 0
@@ -2848,10 +2850,14 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 8300000, guid: 6d95938827cb8f04292ab548e010162e, type: 3}
   - {fileID: 8300000, guid: 831c23db56ae87c4db9b4e16806965e9, type: 3}
+  - {fileID: 8300000, guid: 831c23db56ae87c4db9b4e16806965e9, type: 3}
+  - {fileID: 8300000, guid: 831c23db56ae87c4db9b4e16806965e9, type: 3}
+  - {fileID: 8300000, guid: b4477235ec52c794eb58061859f8c5ef, type: 3}
   bgmClips:
   - {fileID: 0}
   - {fileID: 8300000, guid: 87305fce6b0589d45bce43e184db18c9, type: 3}
   - {fileID: 8300000, guid: 1323dc805fc9f3c4eb1b502af84d0bfd, type: 3}
+  - {fileID: 8300000, guid: f2fc43e7ab7e06e469a77ad81ae6ab6a, type: 3}
 --- !u!1 &7252673175841146701
 GameObject:
   m_ObjectHideFlags: 0

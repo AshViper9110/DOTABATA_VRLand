@@ -481,18 +481,18 @@ MonoBehaviour:
     needsReinit: 0
   handType: 2
   miniGames:
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
-  - GameScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
+  - MinigameTemplateScene
   miniGameNames:
   - "\u30CB\u30C3\u30C8\u30CB\u30C3\u30C8"
   - "\u30AC\u30EC\u30FC\u30B8\u30AA\u30FC\u30D7\u30CA\u30FC"
@@ -2701,7 +2701,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -960, y: -414}
+  m_AnchoredPosition: {x: -960, y: -368}
   m_SizeDelta: {x: 1408, y: 768}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1990077229
@@ -2724,7 +2724,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 2e674b2b661b11440a83013404170d03, type: 3}
+  m_Sprite: {fileID: 21300000, guid: adf61885b98c59446b36c7a3358a69a0, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2753,6 +2753,10 @@ PrefabInstance:
     - target: {fileID: 2605816537857199021, guid: 26369a01791ef97478927b5e1f8a3f2d, type: 3}
       propertyPath: m_Name
       value: MiniGames
+      objectReference: {fileID: 0}
+    - target: {fileID: 2605816537857199021, guid: 26369a01791ef97478927b5e1f8a3f2d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2979069226064090329, guid: 26369a01791ef97478927b5e1f8a3f2d, type: 3}
       propertyPath: SendTransform

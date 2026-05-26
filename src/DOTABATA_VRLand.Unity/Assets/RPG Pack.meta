@@ -1,8 +1,14 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:src/DOTABATA_VRLand.Unity/Assets/Scenes/Works/hirao/Texture/Materials/森背景.mat.meta
+guid: 5fc868ddc2041f241ac1f97e2ce37159
+NativeFormatImporter:
+========
 guid: 322c9dd4c4d72e94e9bf17bce8d41074
 folderAsset: yes
 DefaultImporter:
+>>>>>>>> main:src/DOTABATA_VRLand.Unity/Assets/RPG Pack.meta
   externalObjects: {}
+  mainObjectFileID: 2100000
   userData: 
   assetBundleName: 
   assetBundleVariant: 
