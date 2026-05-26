@@ -23,6 +23,9 @@ public class MinigameFlowController : MonoBehaviour
     [Header("Ready")]
     public Button readyButton;
     public Text waitingText;
+    public Transform UserReadyObject;//プレイヤー情報整列用オブジェクト
+    public GameObject playerNamePrefab;  //プレイヤーテキストプレハブ
+    public List<GameObject> UserReadyText;   //プレイヤー準備情報テキスト 
 
     [Header("Countdown")]
     public Image fadeImage;
@@ -34,11 +37,14 @@ public class MinigameFlowController : MonoBehaviour
     public Text rank3Text;
     public Text rank4Text;
 
+
     [Header("Data")]
     public MinigameInfo info;
 
     private bool isGameStarted = false;
     private bool isResultShown = false;
+
+    InRoomPlayerData inRoomPlayerData;
 
     // =====================================================
     // Start
@@ -46,11 +52,12 @@ public class MinigameFlowController : MonoBehaviour
 
     async void Start()
     {
-        // RoomModelイベント購読
-        //RoomModel.I.OnCountdownAction += StartCountdown;
-        //RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
-        //RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
-        //RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
+        //RoomModelイベント購読
+        RoomModel.I.OnCountdownAction += StartCountdown;
+        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
+        RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
+        RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
+        inRoomPlayerData = new InRoomPlayerData();
 
         StartCoroutine(GameFlow());
 
@@ -92,10 +99,10 @@ public class MinigameFlowController : MonoBehaviour
     {
         if (RoomModel.I == null) return;
 
-        //RoomModel.I.OnCountdownAction -= StartCountdown;
-        //RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
-        //RoomModel.I.OnUpdatedAllReadyStateAction -= OnAllReadyState;
-        //RoomModel.I.OnUpdatedReadyStateAction -= OnUpdatePlayerReady;
+        RoomModel.I.OnCountdownAction -= StartCountdown;
+        RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
+        RoomModel.I.OnUpdatedAllReadyStateAction -= OnAllReadyState;
+        RoomModel.I.OnUpdatedReadyStateAction -= OnUpdatePlayerReady;
     }
 
     // =====================================================
@@ -146,9 +153,24 @@ public class MinigameFlowController : MonoBehaviour
     // プレイヤーReady更新
     // =====================================================
 
-    void OnUpdatePlayerReady(JoinedUser user, bool isReady)
+    void OnUpdatePlayerReady(JoinedUser[] users, bool[] isReadyList)
     {
-        Debug.Log($"{user.Name} Ready : {isReady}");
+       
+        // 既存アイテムを全削除
+        foreach (var item in UserReadyText)
+        {
+            Destroy(item);
+        }
+        UserReadyText.Clear();
+
+        // 人数分生成
+        for (int i = 0; i < users.Length; i++)
+        {
+            GameObject item = Instantiate(playerNamePrefab, UserReadyObject);
+            item.GetComponentInChildren<Text>().text =
+            isReadyList[i] ? $"{users[i].Name} : 準備OK" : $"{users[i].Name} : 待機中";//isReadyListの状況でテキストを編集
+            UserReadyText.Add(item);
+        }
 
         // TODO:
         // プレイヤー一覧UI更新

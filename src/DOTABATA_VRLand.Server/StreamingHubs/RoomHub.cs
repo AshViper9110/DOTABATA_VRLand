@@ -245,23 +245,26 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public async Task UpdateReadyStateAsync(bool isReady)
         {
-            var (updatedUser, isReadyResult) = _roomContext.UpdateReadyState(ConnectionId, isReady);
+            var allReadyStates = _roomContext.UpdateReadyState(ConnectionId, isReady);
 
-            if (updatedUser == null) return; // 対象ユーザーが存在しない場合
+            if (allReadyStates == null) return; // 対象ユーザーが存在しない場合
 
-            //全員に更新されたプレイヤーと準備状態を通知
-            // Group.All.OnUpdateReadyState(updatedUser, isReadyResult); Interface追加後に解除
+            // 配列に変換して送信
+            var users = allReadyStates.Select(x => x.User).ToArray();
+            var isReadyList = allReadyStates.Select(x => x.IsReady).ToArray();
+
+            await _roomContext.Group.All.OnUpdateReadyState(users, isReadyList);
 
             //すべてのプレイヤーの準備が完了してるのかどうか
             if (_roomContext.IsAllUserReady() == true)
             {
                 Console.WriteLine("[RoomHub]すべてのプレイヤーの準備完了");
-                _roomContext.Group.All.OnUpdateAllReadyState(true);
+                await _roomContext.Group.All.OnUpdateAllReadyState(true);
             }
             else
             {
                 Console.WriteLine("[RoomHub]すべてのプレイヤーの準備が完了していません");
-                _roomContext.Group.All.OnUpdateAllReadyState(false); 
+                await _roomContext.Group.All.OnUpdateAllReadyState(false); 
             }
         }
 
@@ -270,14 +273,19 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public async Task StartCountdownAsync()
         {
-            
+            // JoinOrderが最小のプレイヤーだけ処理
+            if (!_roomContext.RoomUserDataList.TryGetValue(ConnectionId, out var self)) return;
+
+            int minOrder = _roomContext.RoomUserDataList.Values.Min(u => u.joinedUser.JoinOrder);
+            if (self.joinedUser.JoinOrder != minOrder) return;
+
             int count = _roomContext.ResetCountdown(3); // 初期値設定
 
             while (true)
             {
                 await Task.Delay(1000); // 1秒おく
 
-                _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
+                await _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
 
                 count = _roomContext.TickCountdown();//カウント-1
 
@@ -285,7 +293,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
                 if (count == 0)
                 {
-                    _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
+                    await _roomContext.Group.All.OnCountdown(count);//現在のカウントを通知
                     break;
                 }
 
