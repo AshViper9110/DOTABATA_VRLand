@@ -12,6 +12,9 @@ public class InputManager : MonoBehaviour
 
     void Update()
     {
+        if (shuttergameManager.isGameOver)
+            return;
+
         if (!shuttergameManager.canInput)
             return;
 
@@ -28,7 +31,6 @@ public class InputManager : MonoBehaviour
 
             Shutter.Direction inputDir = GetDirection(dir);
 
-            // 👇 ここが重要
             Shutter current = shuttergameManager.GetCurrentShutter();
             if (current != null)
             {

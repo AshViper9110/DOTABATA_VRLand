@@ -1,3 +1,4 @@
+using DG.Tweening.Core.Easing;
 using UnityEngine;
 
 public class AutoMove : MonoBehaviour
@@ -8,6 +9,10 @@ public class AutoMove : MonoBehaviour
 
     void Update()
     {
+        if (shuttergameManager.isGameOver)
+            return;
+
+
         Shutter current = shuttergameManager.GetCurrentShutter();
         if (current == null) return;
 

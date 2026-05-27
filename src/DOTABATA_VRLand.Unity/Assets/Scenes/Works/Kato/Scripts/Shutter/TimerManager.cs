@@ -1,5 +1,6 @@
-using UnityEngine;
+using DG.Tweening.Core.Easing;
 using TMPro;
+using UnityEngine;
 
 public class TimerManager : MonoBehaviour
 {
@@ -9,9 +10,16 @@ public class TimerManager : MonoBehaviour
 
     bool isFinished = false;
 
+    public ShutterGameManager shuttergameManager;
+
+    public GameObject gameOverText;
+
     void Update()
     {
         if (isFinished)
+            return;
+
+        if (shuttergameManager.isGameOver)
             return;
 
         timeLimit -= Time.deltaTime;
@@ -20,6 +28,10 @@ public class TimerManager : MonoBehaviour
         {
             timeLimit = 0;
             isFinished = true;
+
+            shuttergameManager.isGameOver = true;
+
+            gameOverText.SetActive(true);
 
             Debug.Log("TIME UP!");
         }
