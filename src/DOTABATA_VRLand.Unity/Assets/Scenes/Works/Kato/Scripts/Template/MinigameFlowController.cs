@@ -45,7 +45,7 @@ public class MinigameFlowController : MonoBehaviour
     private bool isGameStarted = false;
     private bool isResultShown = false;
 
-    InRoomPlayerData inRoomPlayerData;
+    public List<string> names;
 
     // =====================================================
     // Start
@@ -59,7 +59,14 @@ public class MinigameFlowController : MonoBehaviour
         RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
         RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
         RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
-        inRoomPlayerData = new InRoomPlayerData();
+        InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position = Vector3.zero;
+        foreach (GameObject player in NetworkManager.I.playerList.Values)
+        {
+            JoinedUser joinedUser = player.GetComponent<JoinedUser>();
+            if (joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
+            player.SetActive(false);
+        }
+        
 
         //StartCoroutine(GameFlow());
 
@@ -254,6 +261,13 @@ public class MinigameFlowController : MonoBehaviour
 
         gameUI.SetActive(true);
 
+        foreach (GameObject player in NetworkManager.I.playerList.Values)
+        {
+            JoinedUser joinedUser = player.GetComponent<JoinedUser>();
+            if (joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
+            player.SetActive(true);
+        }
+
         // 必要ならシーン遷移
         // SceneManager.LoadScene("GameScene");
     }
@@ -304,13 +318,17 @@ public class MinigameFlowController : MonoBehaviour
 
     void OnReceiveRanking(List<JoinedUser> rankOrder)
     {
-        List<string> names = new List<string>();
+        names.Clear();
 
         foreach (var user in rankOrder)
         {
             names.Add(user.Name);
         }
-
+        Debug.Log("OnReceiveRanking受信");
+        foreach (var user in names)
+        {
+            Debug.Log($"ランキング受信{user}");
+        }
         ShowRanking(names);
 
     }
@@ -321,7 +339,9 @@ public class MinigameFlowController : MonoBehaviour
 
     void ShowRanking(List<string> rankOrder)
     {
-        StartCoroutine(ShowResult(rankOrder));
+        //StartCoroutine(ShowResult(rankOrder));
+        SceneManager.LoadScene("GameScene");
+        Debug.Log("ShowRanking受信");
     }
 
     // =====================================================
@@ -330,6 +350,7 @@ public class MinigameFlowController : MonoBehaviour
 
     IEnumerator ShowResult(List<string> rankOrder)
     {
+        Debug.Log("ShowResult受信");
         gameUI.SetActive(false);
 
         resultUI.SetActive(true);

@@ -139,7 +139,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 return null;
             }
 
-            Console.WriteLine($"[RoomContext]GetScore{userData}:{result}");
+            Console.WriteLine($"[RoomContext]GetScore{userData.joinedUser.Name}:{result}");
 
             //クリアした順番に追加
             rankOrder.Add((userData.joinedUser, result));
