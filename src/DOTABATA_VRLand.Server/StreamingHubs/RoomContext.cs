@@ -139,6 +139,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 return null;
             }
 
+            Console.WriteLine($"[RoomContext]GetScore{userData}:{result}");
+
             //クリアした順番に追加
             rankOrder.Add((userData.joinedUser, result));
 
@@ -162,6 +164,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                     //if (rank == 1) roomUserData.miniGameResultData.winCount++;//一位のプレイヤーは勝利カウントを+
              
                 }
+
+
 
                 return ranked;//joinedUser型の順位リストを返す
             }

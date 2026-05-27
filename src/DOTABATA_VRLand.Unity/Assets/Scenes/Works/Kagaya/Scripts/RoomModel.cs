@@ -367,7 +367,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
             Debug.Log($"{i + 1}位: {rankOrder[i].Name}");
         }
 
-        
+        OnRegisterScoreAction ?.Invoke(rankOrder);
     }
 
     /// <summary>
