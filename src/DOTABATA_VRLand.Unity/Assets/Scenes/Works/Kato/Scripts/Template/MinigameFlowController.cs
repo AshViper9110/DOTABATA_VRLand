@@ -61,13 +61,22 @@ public class MinigameFlowController : MonoBehaviour
         RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
         inRoomPlayerData = new InRoomPlayerData();
 
-        StartCoroutine(GameFlow());
+        //StartCoroutine(GameFlow());
 
         waitingText.gameObject.SetActive(false);
         countdownText.gameObject.SetActive(false);
 
         resultUI.SetActive(false);
         gameUI.SetActive(false);
+
+        introUI.SetActive(false);
+
+       
+
+        introUI.SetActive(true);
+
+        titleText.text = info.gameName;
+        descriptionText.text = info.description;
 
         readyText.text = "0/4 プレイヤー準備完了";
     }
@@ -250,7 +259,7 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // Readyボタン
+    // Score送信
     // =====================================================
 
     public void OnSendScore()
@@ -303,6 +312,7 @@ public class MinigameFlowController : MonoBehaviour
         }
 
         ShowRanking(names);
+
     }
 
     // =====================================================
