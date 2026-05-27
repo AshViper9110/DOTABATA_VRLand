@@ -1,12 +1,14 @@
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
 
-public class NitnitManager : MonoBehaviour
+public class MufflerSetManager : MonoBehaviour
 {
-    public float MaxPoint = 999;
-    public float point;
-    public float tempPoint = 0;
+    [Header("ÉvÉåÉCÉÑÅ[ÇÃéQâ¡èá")]
+    [SerializeField] int order;
+
+    [Header("ñ_ä÷åW")]
     [SerializeField] GameObject RightRod;
     [SerializeField] GameObject LeftRod;
     ParticleSystem RightEffect;
@@ -16,6 +18,7 @@ public class NitnitManager : MonoBehaviour
     Vector3 TempRightPos;
     Vector3 TempLeftPos;
 
+    [Header("É}ÉtÉâÅ[ä÷åW")]
     [SerializeField] List<GameObject> nitPrefabs = new List<GameObject>();
     [SerializeField] List<Material> materials = new List<Material>();
     int nitIndex;
@@ -24,35 +27,46 @@ public class NitnitManager : MonoBehaviour
     public float distans;
     public int nitCount;
     public int nitLate;//êLÇ—ó¶
-     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+
+
+    NitnitManager nitManager;
+
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         TempRightPos = RightRod.transform.position;
         TempLeftPos = LeftRod.transform.position;
         RightInteractable = RightRod.GetComponent<Interactable>();
         LeftInteractable = LeftRod.GetComponent<Interactable>();
-        point = 0;
+    
         nitCount = 0;
-        tempPoint = 0;
+
         nitIndex = 0;
         indexVector = 1;
 
         RightEffect = RightRod.GetComponentInChildren<ParticleSystem>();
         LeftEffect = LeftRod.GetComponentInChildren<ParticleSystem>();
 
+        nitManager = GameObject.Find("GameManager").GetComponent<NitnitManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(!RightInteractable.attachedToHand || !LeftInteractable.attachedToHand) {
+      
+
+        if (!RightInteractable.attachedToHand || !LeftInteractable.attachedToHand)
+            //|| InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == order)
+        {
             RightEffect.Stop();
             LeftEffect.Stop();
-            return; 
-                }
+            return;
+        }
         Vector3 RightVector = (RightRod.transform.position - TempRightPos);
         Vector3 LeftVector = (LeftRod.transform.position - TempLeftPos);
-   
+
 
 
         float sqrtRight = Mathf.Sqrt(Mathf.Abs(RightVector.y));
@@ -61,29 +75,29 @@ public class NitnitManager : MonoBehaviour
         sqrtLeft = Mathf.Floor(sqrtLeft * 10) / 10;
 
         float temp = Mathf.Abs(sqrtRight + sqrtLeft);
-        temp = Mathf.Floor(temp*10)/10;
-       
+        temp = Mathf.Floor(temp * 10) / 10;
+
         temp = temp * nitLate;        //Debug.Log(temp);
-         
-        point += temp;
-       
-        if ( point > MaxPoint )
+
+        nitManager.point += temp;
+
+        if (nitManager.point > nitManager.MaxPoint)
         {
-            point = MaxPoint;
+            nitManager.point = nitManager.MaxPoint;
             RightEffect.Stop();
             LeftEffect.Stop();
         }
-       
-       
 
-        if (Mathf.Floor(point -tempPoint) >= 1)
+
+
+        if (Mathf.Floor(nitManager.point - nitManager.tempPoint) >= 1)
         {
-           // Debug.Log(Mathf.Floor(point - tempPoint));
-            for (int i = 0; i < (int)(point - tempPoint); i++)
+            // Debug.Log(Mathf.Floor(point - tempPoint));
+            for (int i = 0; i < (int)(nitManager.point - nitManager.tempPoint); i++)
             {
                 addNit();
             }
-            tempPoint = point;
+            nitManager.tempPoint = nitManager.point;
 
             RightEffect.Play();
             LeftEffect.Play();
@@ -93,7 +107,7 @@ public class NitnitManager : MonoBehaviour
             RightEffect.Stop();
             LeftEffect.Stop();
         }
-        
+
 
 
         TempRightPos = RightRod.transform.position;
@@ -102,9 +116,9 @@ public class NitnitManager : MonoBehaviour
 
     public void addNit()
     {
-        GameObject nit = Instantiate(nitPrefabs[nitIndex],nitsParent);
+        GameObject nit = Instantiate(nitPrefabs[nitIndex], nitsParent);
         nit.transform.position = new Vector3(nit.transform.position.x + (distans * nitCount), nit.transform.position.y, nit.transform.position.z);
-        if(indexVector == -1)
+        if (indexVector == -1)
         {
             nit.transform.Rotate(0, 180, 0);
             nit.GetComponent<MeshRenderer>().material = materials[1];
@@ -116,10 +130,10 @@ public class NitnitManager : MonoBehaviour
         Debug.Log(nitIndex);
         if (nitIndex >= nitPrefabs.Count)
         {
-           indexVector = -indexVector;
+            indexVector = -indexVector;
             nitIndex = nitPrefabs.Count - 1;
         }
-        else if(nitIndex < 0)
+        else if (nitIndex < 0)
         {
             indexVector = -indexVector;
             nitIndex = 0;

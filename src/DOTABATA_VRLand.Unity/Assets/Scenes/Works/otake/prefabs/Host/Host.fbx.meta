@@ -3,7 +3,47 @@ guid: ce848f273ab4c28458fcc9b34404289f
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Host_BowTie
+    second: {fileID: 2100000, guid: 05531f1b11aa2a64396e08de58289d3c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Host_beard
+    second: {fileID: 2100000, guid: be33540b8a5b56141a1fb1b047e1cea1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Host_eyes
+    second: {fileID: 2100000, guid: 42477b09109d728479586baed5abbeb1, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Host_glasses
+    second: {fileID: 2100000, guid: 2c67b314dde915b4bae4bd284a6ebc75, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Host_hand_L
+    second: {fileID: 2100000, guid: 1bc32847887623046b76eff9745e6005, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Host_hand_R
+    second: {fileID: 2100000, guid: 26761c935d3feb14fb1ed80c3b38a1dd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Host_hat
+    second: {fileID: 2100000, guid: a83f9e8ef57492a449f3f5a59fa9c10d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Host_head
+    second: {fileID: 2100000, guid: 71388a10443a2f34483314877e3a2434, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
