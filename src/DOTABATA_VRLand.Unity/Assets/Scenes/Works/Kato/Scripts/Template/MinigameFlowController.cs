@@ -47,6 +47,7 @@ public class MinigameFlowController : MonoBehaviour
     private bool isResultShown = false;
 
     public List<string> names;
+    bool willReady = false;
 
     // =====================================================
     // Start
@@ -148,20 +149,19 @@ public class MinigameFlowController : MonoBehaviour
 
     public void OnReadyButton()
     {
-        bool willReady =
-            readyButton.GetComponentInChildren<Text>().text == "準備OK！";
+         willReady = !willReady;
 
         // サーバー送信
         RoomModel.I.SendReadyState(willReady);
 
         // UI更新
-        if (willReady　== true )
+        if (willReady)
         {
             readyButton.GetComponentInChildren<Text>().text = "取り消し";
 
             waitingText.gameObject.SetActive(true);
         }
-        else if(willReady == false ) {
+        else{
         
             readyButton.GetComponentInChildren<Text>().text = "準備OK！";
 
@@ -207,7 +207,7 @@ public class MinigameFlowController : MonoBehaviour
         Debug.Log("全員Ready");
 
 
-       if(InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1) return;
+       if(InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 0) return;
 
         readyButton.gameObject.SetActive(false);
 
@@ -354,6 +354,7 @@ public class MinigameFlowController : MonoBehaviour
     {
         //StartCoroutine(ShowResult(rankOrder));
         SceneManager.LoadScene("GameScene");
+        willReady = false;
         Debug.Log("ShowRanking受信");
     }
 
