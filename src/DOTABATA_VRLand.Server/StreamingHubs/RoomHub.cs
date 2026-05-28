@@ -318,7 +318,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             _roomContext.InitializeMiniGameResultData(); 
             // 全員に通知
             _roomContext.Group.All.OnGameStart();
-           
+            Console.WriteLine("[RoomHub]ゲーム開始");
 
             return Task.CompletedTask;
         }
