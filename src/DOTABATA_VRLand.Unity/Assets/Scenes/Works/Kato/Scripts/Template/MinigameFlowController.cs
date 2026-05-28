@@ -60,11 +60,10 @@ public class MinigameFlowController : MonoBehaviour
         RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
         RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
         InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position = Vector3.zero;
-        foreach (GameObject player in NetworkManager.I.playerList.Values)
+        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)
         {
-            JoinedUser joinedUser = player.GetComponent<JoinedUser>();
-            if (joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
-            player.SetActive(false);
+            if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
+            player.playerObj.SetActive(false);
         }
         
 
@@ -261,11 +260,10 @@ public class MinigameFlowController : MonoBehaviour
 
         gameUI.SetActive(true);
 
-        foreach (GameObject player in NetworkManager.I.playerList.Values)
+        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)
         {
-            JoinedUser joinedUser = player.GetComponent<JoinedUser>();
-            if (joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
-            player.SetActive(true);
+            if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
+            player.playerObj.SetActive(true);
         }
 
         // 必要ならシーン遷移
