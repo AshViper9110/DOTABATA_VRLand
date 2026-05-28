@@ -210,9 +210,9 @@ public class MinigameFlowController : MonoBehaviour
         if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder != 1) return;
 
 
-        readyButton.gameObject.SetActive(isAllReady);
+        readyButton.gameObject.SetActive(!isAllReady);
 
-        StartButton.gameObject.SetActive(!isAllReady);
+        StartButton.gameObject.SetActive(isAllReady);
     
           
 
