@@ -107,7 +107,12 @@ public class NetworkManager : Singleton<NetworkManager>
         }
         else
         {
-            InRoomPlayerData.I.SetMySelf(user);
+            PlayerData data = new PlayerData()
+            {
+                playerObj = player,
+                joinedUser = user,
+            };
+            InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
         }
     }
 
