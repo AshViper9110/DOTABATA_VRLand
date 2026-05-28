@@ -202,16 +202,19 @@ public class MinigameFlowController : MonoBehaviour
 
     void OnAllReadyState(bool isAllReady)
     {
-        if (!isAllReady) return;
+        
 
-        Debug.Log("‘SˆõReady");
+        if(isAllReady)Debug.Log("‘SˆõReady");
+        else Debug.Log("’N‚©‚Ì€”õ‚ª‚Å‚«‚Ä‚¢‚Ü‚¹‚ñ");
+
+        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder != 1) return;
 
 
-       if(InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 0) return;
+        readyButton.gameObject.SetActive(isAllReady);
 
-        readyButton.gameObject.SetActive(false);
-
-        StartButton.gameObject.SetActive(true);
+        StartButton.gameObject.SetActive(!isAllReady);
+    
+          
 
         //StartCoroutine(StartGameFlow());
 
