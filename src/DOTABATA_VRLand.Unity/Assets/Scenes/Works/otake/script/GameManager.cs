@@ -295,7 +295,7 @@ public class GameManager : MonoBehaviour
 
     public void MoveScene(string scene)
     {
-        foreach (Guid guid in NetworkManager.I.playerList.Keys)
+        foreach (Guid guid in InRoomPlayerData.I.PlayerList.Keys)
         {
             AddCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
         }
