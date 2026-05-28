@@ -27,6 +27,7 @@ public class MinigameFlowController : MonoBehaviour
     public Transform UserReadyObject;//プレイヤー情報整列用オブジェクト
     public GameObject playerNamePrefab;  //プレイヤーテキストプレハブ
     public List<GameObject> UserReadyText;   //プレイヤー準備情報テキスト 
+    public Button StartButton;
 
     [Header("Countdown")]
     public Image fadeImage;
@@ -59,6 +60,7 @@ public class MinigameFlowController : MonoBehaviour
         RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
         RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
         RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
+        RoomModel.I.OnGameStartAction += StartGameFlow;
         InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position = Vector3.zero;
         foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)
         {
@@ -76,7 +78,7 @@ public class MinigameFlowController : MonoBehaviour
         gameUI.SetActive(false);
 
         introUI.SetActive(false);
-
+        StartButton.gameObject.SetActive(false);
        
 
         introUI.SetActive(true);
@@ -92,7 +94,7 @@ public class MinigameFlowController : MonoBehaviour
     // =====================================================
 
     void Update()
-    {
+    {   /*
         // 仮スコア送信
         // あとで実際のゲーム終了タイミングに変更
         if (gameUI.activeSelf && !isResultShown)
@@ -105,7 +107,7 @@ public class MinigameFlowController : MonoBehaviour
 
                 RoomModel.I.SendScore(score);
             }
-        }
+        }*/
     }
 
     // =====================================================
@@ -120,6 +122,7 @@ public class MinigameFlowController : MonoBehaviour
         RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
         RoomModel.I.OnUpdatedAllReadyStateAction -= OnAllReadyState;
         RoomModel.I.OnUpdatedReadyStateAction -= OnUpdatePlayerReady;
+        RoomModel.I.OnGameStartAction -= StartGameFlow;
     }
 
     // =====================================================
@@ -152,14 +155,14 @@ public class MinigameFlowController : MonoBehaviour
         RoomModel.I.SendReadyState(willReady);
 
         // UI更新
-        if (willReady)
+        if (willReady　== true )
         {
             readyButton.GetComponentInChildren<Text>().text = "取り消し";
 
             waitingText.gameObject.SetActive(true);
         }
-        else
-        {
+        else if(willReady == false ) {
+        
             readyButton.GetComponentInChildren<Text>().text = "準備OK！";
 
             waitingText.gameObject.SetActive(false);
@@ -203,27 +206,33 @@ public class MinigameFlowController : MonoBehaviour
 
         Debug.Log("全員Ready");
 
-        StartCoroutine(StartGameFlow());
+        readyButton.gameObject.SetActive(false);
+        StartButton.gameObject.SetActive(true);
+
+        //StartCoroutine(StartGameFlow());
 
         // ホストだけが呼ぶようにするなら
         // 後でホスト判定追加
-        RoomModel.I.StartCountdown();
+
+    }
+
+    public void GameStrat()
+    {
+        RoomModel.I.OnGameStartAsync();
     }
 
     // =====================================================
     // ゲーム開始準備
     // =====================================================
 
-    IEnumerator StartGameFlow()
+    void StartGameFlow()
     {
-        if (isGameStarted) yield break;
-
         isGameStarted = true;
-
+        StartButton.gameObject.SetActive(false);
         descriptionPanel.SetActive(false);
         readyPanel.SetActive(false);
+        RoomModel.I.StartCountdown();
 
-        yield return null;
     }
 
     // =====================================================
@@ -255,6 +264,8 @@ public class MinigameFlowController : MonoBehaviour
         yield return new WaitForSecondsRealtime(1f);
 
         countdownText.gameObject.SetActive(false);
+
+        
 
         introUI.SetActive(false);
 
