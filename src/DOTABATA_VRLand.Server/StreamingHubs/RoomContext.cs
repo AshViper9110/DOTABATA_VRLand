@@ -177,6 +177,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public List<(JoinedUser user, int winCount)> SortAllRoundRanking()
         {
+            foreach(var user in RoomUserDataList)
+            {
+                user.Value.IsReady = false;
+            }
+
+
             var ranked = RoomUserDataList
                 .OrderByDescending(u => u.Value.miniGameResultData.winCount)
                 .ThenBy(u => u.Key)
