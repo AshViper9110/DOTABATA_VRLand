@@ -206,7 +206,11 @@ public class MinigameFlowController : MonoBehaviour
 
         Debug.Log("‘SˆõReady");
 
+
+       if(InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1) return;
+
         readyButton.gameObject.SetActive(false);
+
         StartButton.gameObject.SetActive(true);
 
         //StartCoroutine(StartGameFlow());
