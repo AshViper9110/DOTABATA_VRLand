@@ -114,6 +114,10 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<List<JoinedUser>> OnRegisterScoreAction { get; set; }
 
+    ///<summary>
+    ///ニットの更新
+    /// </summary>
+    public Action<Guid, float> onUpdateNit;
 
     /*
      * 処理
@@ -567,5 +571,23 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if(OnDeleatedOwnership != null) {
             OnDeleatedOwnership(objectId);
         }
+    }
+
+    /// <summary>
+    /// ニット生成とポイント更新
+    ///</summary>
+    public void UpdateNit(Guid id,float point)
+    {
+        roomHub.UpdateNit(id, point);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// ニット生成とポイント更新
+    ///</summary>
+    public void OnUpdateNit(Guid id, float point)
+    {
+       
+        onUpdateNit(id, point);
     }
 }

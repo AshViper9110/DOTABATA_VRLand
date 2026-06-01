@@ -36,6 +36,7 @@ public class NetworkManager : Singleton<NetworkManager>
         RoomModel.I.OnGetMiniGameRanking += OnGetMiniGameRanking;
         RoomModel.I.OnGetRanking += OnGetRanking;
         RoomModel.I.OnHostProgressed += OnHostProgress;
+        RoomModel.I.onUpdateNit += OnUpdateNit;
     }
 
     private void OnDisable()
@@ -213,5 +214,30 @@ public class NetworkManager : Singleton<NetworkManager>
 
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         gameManager.MoveText();
+    }
+
+    ///<summary>
+    ///ニットの更新
+    /// </summary>
+    public void UpdateNit(Guid id,float point)
+    {
+        RoomModel.I.UpdateNit(id,point);
+    }
+
+    ///<summary>
+    ///[サーバー通知]
+    ///ニットの更新
+    /// </summary>
+    public void OnUpdateNit(Guid id,float point)
+    {
+        
+        NitnitManager nitnitManager = GameObject.Find("GameManager").GetComponent<NitnitManager>();
+        MufflerSetManager mufflerSet = nitnitManager.mufflerSets[InRoomPlayerData.I.PlayerList[id].joinedUser.JoinOrder-1];
+     
+
+       
+            mufflerSet.addNit(point);
+        
+       
     }
 }
