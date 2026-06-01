@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     [SerializeField] private ServerConfigSO serverConfig;
@@ -114,10 +115,14 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<List<JoinedUser>> OnRegisterScoreAction { get; set; }
 
+<<<<<<< HEAD
     ///<summary>
     ///ニットの更新
     /// </summary>
     public Action<Guid, float> onUpdateNit;
+=======
+    public Action OnGameStartAction { get; set; }
+>>>>>>> main
 
     /*
      * 処理
@@ -278,10 +283,20 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     }
 
     /// <summary>
+    /// 個人準備完了状態切り替え
+    /// </summary>
+    public async Task OnGameStartAsync()
+    {
+        await roomHub.GameStartAsync();
+    }
+
+    /// <summary>
     /// [サーバー通知]
     /// ゲームスタート通知
     /// </summary>
     public void OnGameStart() {
+
+        OnGameStartAction?.Invoke();
 
     }
 

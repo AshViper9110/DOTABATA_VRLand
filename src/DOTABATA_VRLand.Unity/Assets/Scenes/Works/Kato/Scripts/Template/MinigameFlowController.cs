@@ -27,6 +27,7 @@ public class MinigameFlowController : MonoBehaviour
     public Transform UserReadyObject;//プレイヤー情報整列用オブジェクト
     public GameObject playerNamePrefab;  //プレイヤーテキストプレハブ
     public List<GameObject> UserReadyText;   //プレイヤー準備情報テキスト 
+    public Button StartButton;
 
     [Header("Countdown")]
     public Image fadeImage;
@@ -45,7 +46,8 @@ public class MinigameFlowController : MonoBehaviour
     private bool isGameStarted = false;
     private bool isResultShown = false;
 
-    InRoomPlayerData inRoomPlayerData;
+    public List<string> names;
+    bool willReady = false;
 
     // =====================================================
     // Start
@@ -59,7 +61,14 @@ public class MinigameFlowController : MonoBehaviour
         RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
         RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
         RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
-        inRoomPlayerData = new InRoomPlayerData();
+        RoomModel.I.OnGameStartAction += StartGameFlow;
+        InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position = Vector3.zero;
+        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)
+        {
+            if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
+            player.playerObj.SetActive(false);
+        }
+        
 
         //StartCoroutine(GameFlow());
 
@@ -70,7 +79,7 @@ public class MinigameFlowController : MonoBehaviour
         gameUI.SetActive(false);
 
         introUI.SetActive(false);
-
+        StartButton.gameObject.SetActive(false);
        
 
         introUI.SetActive(true);
@@ -86,7 +95,7 @@ public class MinigameFlowController : MonoBehaviour
     // =====================================================
 
     void Update()
-    {
+    {   /*
         // 仮スコア送信
         // あとで実際のゲーム終了タイミングに変更
         if (gameUI.activeSelf && !isResultShown)
@@ -99,7 +108,7 @@ public class MinigameFlowController : MonoBehaviour
 
                 RoomModel.I.SendScore(score);
             }
-        }
+        }*/
     }
 
     // =====================================================
@@ -114,6 +123,7 @@ public class MinigameFlowController : MonoBehaviour
         RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
         RoomModel.I.OnUpdatedAllReadyStateAction -= OnAllReadyState;
         RoomModel.I.OnUpdatedReadyStateAction -= OnUpdatePlayerReady;
+        RoomModel.I.OnGameStartAction -= StartGameFlow;
     }
 
     // =====================================================
@@ -139,8 +149,7 @@ public class MinigameFlowController : MonoBehaviour
 
     public void OnReadyButton()
     {
-        bool willReady =
-            readyButton.GetComponentInChildren<Text>().text == "準備OK！";
+         willReady = !willReady;
 
         // サーバー送信
         RoomModel.I.SendReadyState(willReady);
@@ -152,8 +161,8 @@ public class MinigameFlowController : MonoBehaviour
 
             waitingText.gameObject.SetActive(true);
         }
-        else
-        {
+        else{
+        
             readyButton.GetComponentInChildren<Text>().text = "準備OK！";
 
             waitingText.gameObject.SetActive(false);
@@ -193,31 +202,44 @@ public class MinigameFlowController : MonoBehaviour
 
     void OnAllReadyState(bool isAllReady)
     {
-        if (!isAllReady) return;
+        
 
-        Debug.Log("全員Ready");
+        if(isAllReady)Debug.Log("全員Ready");
+        else Debug.Log("誰かの準備ができていません");
 
-        StartCoroutine(StartGameFlow());
+        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder != 1) return;
+
+
+        readyButton.gameObject.SetActive(!isAllReady);
+
+        StartButton.gameObject.SetActive(isAllReady);
+    
+          
+
+        //StartCoroutine(StartGameFlow());
 
         // ホストだけが呼ぶようにするなら
         // 後でホスト判定追加
-        RoomModel.I.StartCountdown();
+
+    }
+
+    public void GameStrat()
+    {
+        RoomModel.I.OnGameStartAsync();
     }
 
     // =====================================================
     // ゲーム開始準備
     // =====================================================
 
-    IEnumerator StartGameFlow()
+    void StartGameFlow()
     {
-        if (isGameStarted) yield break;
-
         isGameStarted = true;
-
+        StartButton.gameObject.SetActive(false);
         descriptionPanel.SetActive(false);
         readyPanel.SetActive(false);
+        RoomModel.I.StartCountdown();
 
-        yield return null;
     }
 
     // =====================================================
@@ -250,9 +272,17 @@ public class MinigameFlowController : MonoBehaviour
 
         countdownText.gameObject.SetActive(false);
 
+        
+
         introUI.SetActive(false);
 
         gameUI.SetActive(true);
+
+        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)
+        {
+            if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
+            player.playerObj.SetActive(true);
+        }
 
         // 必要ならシーン遷移
         // SceneManager.LoadScene("GameScene");
@@ -304,13 +334,17 @@ public class MinigameFlowController : MonoBehaviour
 
     void OnReceiveRanking(List<JoinedUser> rankOrder)
     {
-        List<string> names = new List<string>();
+        names.Clear();
 
         foreach (var user in rankOrder)
         {
             names.Add(user.Name);
         }
-
+        Debug.Log("OnReceiveRanking受信");
+        foreach (var user in names)
+        {
+            Debug.Log($"ランキング受信{user}");
+        }
         ShowRanking(names);
 
     }
@@ -321,7 +355,10 @@ public class MinigameFlowController : MonoBehaviour
 
     void ShowRanking(List<string> rankOrder)
     {
-        StartCoroutine(ShowResult(rankOrder));
+        //StartCoroutine(ShowResult(rankOrder));
+        SceneManager.LoadScene("GameScene");
+        willReady = false;
+        Debug.Log("ShowRanking受信");
     }
 
     // =====================================================
@@ -330,6 +367,7 @@ public class MinigameFlowController : MonoBehaviour
 
     IEnumerator ShowResult(List<string> rankOrder)
     {
+        Debug.Log("ShowResult受信");
         gameUI.SetActive(false);
 
         resultUI.SetActive(true);
