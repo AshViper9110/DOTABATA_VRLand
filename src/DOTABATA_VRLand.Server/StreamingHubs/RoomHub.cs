@@ -4,6 +4,7 @@ using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion.Server.Hubs;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
 
@@ -544,8 +545,19 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public Task HostProgress()
         {
-            // 自分以外に通知
+            // 全員（自分も含む）に通知
             this._roomContext.Group.All.OnHostProgress();
+            return Task.CompletedTask;
+        }
+
+        ///<summary>
+        ///ニットの更新
+        /// </summary>
+        public Task UpdateNit(Guid connectionId,float point)
+        {
+           
+            // 全員（自分も含む）に通知
+            this._roomContext.Group.All.OnUpdateNit(connectionId,point);
             return Task.CompletedTask;
         }
     }

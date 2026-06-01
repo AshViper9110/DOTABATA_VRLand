@@ -481,18 +481,18 @@ MonoBehaviour:
     needsReinit: 0
   handType: 2
   miniGames:
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
-  - MinigameTemplateScene
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
   miniGameNames:
   - "\u30CB\u30C3\u30C8\u30CB\u30C3\u30C8"
   - "\u30AC\u30EC\u30FC\u30B8\u30AA\u30FC\u30D7\u30CA\u30FC"

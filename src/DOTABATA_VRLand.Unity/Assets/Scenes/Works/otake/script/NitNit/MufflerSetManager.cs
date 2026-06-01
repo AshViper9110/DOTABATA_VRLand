@@ -5,8 +5,7 @@ using Valve.VR.InteractionSystem;
 
 public class MufflerSetManager : MonoBehaviour
 {
-    [Header("プレイヤーの参加順")]
-    [SerializeField] int order;
+
 
     [Header("棒関係")]
     [SerializeField] GameObject RightRod;
@@ -26,8 +25,11 @@ public class MufflerSetManager : MonoBehaviour
     [SerializeField] Transform nitsParent;
     public float distans;
     public int nitCount;
-    public int nitLate;//伸び率
+    public int nitLate = 3;//伸び率
 
+
+    public float point;
+    public float tempPoint = 0;
 
 
     NitnitManager nitManager;
@@ -50,12 +52,15 @@ public class MufflerSetManager : MonoBehaviour
         LeftEffect = LeftRod.GetComponentInChildren<ParticleSystem>();
 
         nitManager = GameObject.Find("GameManager").GetComponent<NitnitManager>();
+
+        tempPoint = 0;
+        point = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-      
+   
 
         if (!RightInteractable.attachedToHand || !LeftInteractable.attachedToHand)
             //|| InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == order)
@@ -79,25 +84,25 @@ public class MufflerSetManager : MonoBehaviour
 
         temp = temp * nitLate;        //Debug.Log(temp);
 
-        nitManager.point += temp;
+        point += temp;
 
-        if (nitManager.point > nitManager.MaxPoint)
+        if (point > nitManager.MaxPoint)
         {
-            nitManager.point = nitManager.MaxPoint;
+            point = nitManager.MaxPoint;
             RightEffect.Stop();
             LeftEffect.Stop();
         }
 
 
 
-        if (Mathf.Floor(nitManager.point - nitManager.tempPoint) >= 1)
+        if (Mathf.Floor(point - tempPoint) >= 1)
         {
-            // Debug.Log(Mathf.Floor(point - tempPoint));
-            for (int i = 0; i < (int)(nitManager.point - nitManager.tempPoint); i++)
-            {
-                addNit();
-            }
-            nitManager.tempPoint = nitManager.point;
+            Debug.Log(Mathf.Floor(point - tempPoint));
+                //サーバーに自身のマフラー追加を送信、ポイント更新
+                NetworkManager.I.UpdateNit(NetworkManager.I.myConnectionId,point);
+                
+            
+          
 
             RightEffect.Play();
             LeftEffect.Play();
@@ -114,29 +119,39 @@ public class MufflerSetManager : MonoBehaviour
         TempLeftPos = LeftRod.transform.position;
     }
 
-    public void addNit()
+    public void addNit(float point)
     {
-        GameObject nit = Instantiate(nitPrefabs[nitIndex], nitsParent);
-        nit.transform.position = new Vector3(nit.transform.position.x + (distans * nitCount), nit.transform.position.y, nit.transform.position.z);
-        if (indexVector == -1)
+        for (int i = 0; i < (int)this.point - point; i++)
         {
-            nit.transform.Rotate(0, 180, 0);
-            nit.GetComponent<MeshRenderer>().material = materials[1];
-        }
-        nitsParent.position = new Vector3(nitsParent.transform.position.x - (distans), nitsParent.transform.position.y, nitsParent.gameObject.transform.position.z);
-        nitCount++;
-        nitIndex += indexVector;
+           
+            GameObject nit = Instantiate(nitPrefabs[nitIndex], nitsParent);
+            nit.transform.position = new Vector3(nit.transform.position.x + (distans * nitCount), nit.transform.position.y, nit.transform.position.z);
+            if (indexVector == -1)
+            {
+                nit.transform.Rotate(0, 180, 0);
+                nit.GetComponent<MeshRenderer>().material = materials[1];
+            }
+            else
+            {
+                nit.GetComponent<MeshRenderer>().material = materials[0];
+            }
+            nitsParent.position = new Vector3(nitsParent.transform.position.x - (distans), nitsParent.transform.position.y, nitsParent.gameObject.transform.position.z);
+            nitCount++;
+            nitIndex += indexVector;
 
-        Debug.Log(nitIndex);
-        if (nitIndex >= nitPrefabs.Count)
-        {
-            indexVector = -indexVector;
-            nitIndex = nitPrefabs.Count - 1;
+
+            if (nitIndex >= nitPrefabs.Count)
+            {
+                indexVector = -indexVector;
+                nitIndex = nitPrefabs.Count - 1;
+            }
+            else if (nitIndex < 0)
+            {
+                indexVector = -indexVector;
+                nitIndex = 0;
+            }
         }
-        else if (nitIndex < 0)
-        {
-            indexVector = -indexVector;
-            nitIndex = 0;
-        }
+        this.point = point;
+        tempPoint = point;
     }
 }
