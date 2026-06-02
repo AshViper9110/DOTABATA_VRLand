@@ -115,11 +115,22 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<List<JoinedUser>> OnRegisterScoreAction { get; set; }
 
+<<<<<<< HEAD
     ///<summary>
     ///ニットの更新
     /// </summary>
     public Action<Guid, float> onUpdateNit { get; set; }
     public Action OnGameStartAction { get; set; }
+=======
+
+    ///<summary>
+    ///ニットの更新
+    /// </summary>
+    public Action<Guid, float> onUpdateNit;
+
+    public Action OnGameStartAction { get; set; }
+
+>>>>>>> main
 
     /*
      * 処理
