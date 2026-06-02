@@ -16237,7 +16237,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxPoint: 999
-  maxTimer: 0
+  maxTimer: 15
   nitPrefabs:
   - {fileID: 3183480595815487849, guid: ad7528cb65724944992cf92cbad12a7c, type: 3}
   - {fileID: 8909744078923645105, guid: 4f4148a5f201bad499652d757728ce57, type: 3}
