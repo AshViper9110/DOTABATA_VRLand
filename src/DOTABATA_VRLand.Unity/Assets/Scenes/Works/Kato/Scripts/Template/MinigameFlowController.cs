@@ -184,7 +184,7 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // ゲーム開始
+    // ゲーム開始取得
     // =====================================================
 
     void StartGameFlow()
@@ -216,7 +216,7 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // ゲーム開始
+    // ミニゲーム開始
     // =====================================================
 
     IEnumerator BeginGameAfterStart()
