@@ -43,7 +43,7 @@ public class MinigameFlowController : MonoBehaviour
     [Header("Data")]
     public MinigameInfo info;
 
-    private bool isGameStarted = false;
+    public bool isGameStarted = false;
     private bool isResultShown = false;
 
     public List<string> names;
@@ -63,11 +63,11 @@ public class MinigameFlowController : MonoBehaviour
         RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
         RoomModel.I.OnGameStartAction += StartGameFlow;
         InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position = Vector3.zero;
-        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)
-        {
-            if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
-            player.playerObj.SetActive(false);
-        }
+        //foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)
+        //{
+        //    if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
+        //    player.playerObj.SetActive(false);
+        //}
         
 
         //StartCoroutine(GameFlow());
@@ -234,7 +234,7 @@ public class MinigameFlowController : MonoBehaviour
 
     void StartGameFlow()
     {
-        isGameStarted = true;
+
         StartButton.gameObject.SetActive(false);
         descriptionPanel.SetActive(false);
         readyPanel.SetActive(false);
@@ -278,12 +278,13 @@ public class MinigameFlowController : MonoBehaviour
 
         gameUI.SetActive(true);
 
-        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)
-        {
-            if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
-            player.playerObj.SetActive(true);
-        }
+        //foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)
+        //{
+        //    if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
+        //    player.playerObj.SetActive(true);
+        //}
 
+        isGameStarted = true;
         // 必要ならシーン遷移
         // SceneManager.LoadScene("GameScene");
     }

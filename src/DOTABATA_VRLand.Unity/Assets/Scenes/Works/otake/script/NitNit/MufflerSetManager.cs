@@ -60,6 +60,8 @@ public class MufflerSetManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        if (!nitManager.FlowController.isGameStarted) return;
    
 
         if (!RightInteractable.attachedToHand || !LeftInteractable.attachedToHand)
