@@ -7,6 +7,18 @@ public class AutoMove : MonoBehaviour
     public float speed = 1f;
     public float stopDistance = 10f;
 
+    void Start()
+    {
+        //if (InRoomPlayerData.I.MySelf == null)
+        //{
+        //    Debug.LogError("‚Ü‚¾ƒ‹[ƒ€Q‰Á‚Å‚«‚Ä‚È‚¢");
+        //    return;
+        //}
+
+        //int lane =
+        //    InRoomPlayerData.I.MySelf.JoinOrder;
+    }
+
     void Update()
     {
         if (shuttergameManager.isGameOver)
