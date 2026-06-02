@@ -112,10 +112,21 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             // ルームに参加 ＆ ルームを保持
             this._roomContext.Group.Add(this.ConnectionId, Client);
-
-            /*
+         /*
             // DBからユーザー情報取得
             User user = await _dbContext.Users.FirstAsync(user => user.Name == userName);
+
+            // ゲーム初回ログインならUsersテーブルに登録
+            if (user == null)
+            {
+                user = new User
+                {
+                    Name = userName, 
+                };
+                _dbContext.Users.Add(user);
+                await _dbContext.SaveChangesAsync();
+                Console.WriteLine($"[DB] {userName} の初回ログインを登録");
+            }
 
             // 今日すでにアクティブ記録があるか確認
             var today = DateTime.Today;
