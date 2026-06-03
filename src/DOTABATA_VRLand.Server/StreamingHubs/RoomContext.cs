@@ -139,6 +139,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 return null;
             }
 
+            Console.WriteLine($"[RoomContext]GetScore{userData.joinedUser.Name}:{result}");
+
             //クリアした順番に追加
             rankOrder.Add((userData.joinedUser, result));
 
@@ -163,6 +165,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
              
                 }
 
+
+
                 return ranked;//joinedUser型の順位リストを返す
             }
             return null;
@@ -173,6 +177,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public List<(JoinedUser user, int winCount)> SortAllRoundRanking()
         {
+            foreach(var user in RoomUserDataList)
+            {
+                user.Value.IsReady = false;
+            }
+
+
             var ranked = RoomUserDataList
                 .OrderByDescending(u => u.Value.miniGameResultData.winCount)
                 .ThenBy(u => u.Key)
@@ -184,13 +194,13 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 準備完了状態の変更
         /// </summary>
-        public (JoinedUser user, bool readyState) UpdateReadyState(Guid connectionId, bool isReady)
+        public List<(JoinedUser User, bool IsReady)> UpdateReadyState(Guid connectionId, bool isReady)
         {
             // 対象ユーザーが存在しない場合は何もしない
             if (!RoomUserDataList.TryGetValue(connectionId, out var user))
             {
                 Console.WriteLine($"[RoomContext]対象プレイヤーはルームに存在しません");
-                return (null,false);
+                return null;
             }
 
             // Ready状態を更新
@@ -204,9 +214,11 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             {
                 Console.WriteLine($"[RoomContext]{user.joinedUser.Name}の準備完了が取り消されました");
             }
-               
-            return (user.joinedUser, user.IsReady);
 
+            // 全プレイヤーの準備状況をリストで返す
+            return RoomUserDataList.Values
+                .Select(u => (u.joinedUser, u.IsReady))
+                .ToList();
         }
      
         /// <summary>

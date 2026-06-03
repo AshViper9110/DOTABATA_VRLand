@@ -12,7 +12,6 @@ public class NetworkManager : Singleton<NetworkManager>
     public GameObject player;
     public Guid myConnectionId;
     public bool isJoin = false;
-    public Dictionary<Guid, GameObject> playerList = new Dictionary<Guid, GameObject>();
 
     /// <summary>
     /// TextにLogを表示
@@ -36,6 +35,7 @@ public class NetworkManager : Singleton<NetworkManager>
         RoomModel.I.OnGetMiniGameRanking += OnGetMiniGameRanking;
         RoomModel.I.OnGetRanking += OnGetRanking;
         RoomModel.I.OnHostProgressed += OnHostProgress;
+        RoomModel.I.onUpdateNit += OnUpdateNit;
     }
 
     private void OnDisable()
@@ -97,8 +97,6 @@ public class NetworkManager : Singleton<NetworkManager>
         if (user.ConnectionId != myConnectionId)
         {
             GameObject player = Instantiate(SyncPlayerPrefab);
-            playerList.Add(user.ConnectionId, player);
-
             SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
             PlayerData data = new PlayerData()
             {
@@ -110,7 +108,7 @@ public class NetworkManager : Singleton<NetworkManager>
         }
         else
         {
-            PlayerData data = new PlayerData() 
+            PlayerData data = new PlayerData()
             {
                 playerObj = player,
                 joinedUser = user,
@@ -124,9 +122,9 @@ public class NetworkManager : Singleton<NetworkManager>
     /// </summary>
     private void OnSyncPlayer(Guid connectionId, PlayerTransformDTO data)
     {
-        if (!playerList.ContainsKey(connectionId)) return;
+        if (!InRoomPlayerData.I.PlayerList.ContainsKey(connectionId)) return;
 
-        SyncPlayer player = playerList[connectionId].GetComponent<SyncPlayer>();
+        SyncPlayer player = InRoomPlayerData.I.PlayerList[connectionId].playerObj.GetComponent<SyncPlayer>();
         player.ApplyTransform(data);
     }
 
@@ -208,10 +206,35 @@ public class NetworkManager : Singleton<NetworkManager>
     /// [サーバー通知]
     /// ミニゲームの順位取得通知
     /// </summary>
-    public void OnHostProgress(Task task)
+    public void OnHostProgress()
     {
 
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         gameManager.MoveText();
+    }
+
+    ///<summary>
+    ///ニットの更新
+    /// </summary>
+    public void UpdateNit(Guid id,float point)
+    {
+        RoomModel.I.UpdateNit(id,point);
+    }
+
+    ///<summary>
+    ///[サーバー通知]
+    ///ニットの更新
+    /// </summary>
+    public void OnUpdateNit(Guid id,float point)
+    {
+        
+        NitnitManager nitnitManager = GameObject.Find("GameManager").GetComponent<NitnitManager>();
+        MufflerSetManager mufflerSet = nitnitManager.mufflerSets[InRoomPlayerData.I.PlayerList[id].joinedUser.JoinOrder-1];
+     
+
+       
+            mufflerSet.addNit(point);
+        
+       
     }
 }
