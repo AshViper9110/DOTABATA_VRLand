@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
@@ -16,6 +17,9 @@ public class NitnitManager : MonoBehaviour
     [SerializeField] List<Material> materials = new List<Material>();
 
     [SerializeField] public List<MufflerSetManager> mufflerSets = new List<MufflerSetManager>();
+    [SerializeField] List<Text> pointTexts = new List<Text>();
+
+    [SerializeField] List<Transform> startPos = new List<Transform>();
 
    public MinigameFlowController FlowController;
 
@@ -29,6 +33,14 @@ public class NitnitManager : MonoBehaviour
      timer = maxTimer;
 
         FlowController = GetComponent<MinigameFlowController>();
+
+       
+
+        foreach(var f in InRoomPlayerData.I.PlayerList.Values)
+        {
+            f.playerObj.transform.position = startPos[f.joinedUser.JoinOrder-1].position;
+           
+        }
        
     }
 
@@ -45,12 +57,12 @@ public class NitnitManager : MonoBehaviour
             }
         }
 
-       
+        for (int i = 0; i < pointTexts.Count; i++)
+        {
+            pointTexts[i].text = (Mathf.Floor(mufflerSets[i].point*10)/10).ToString();
+        }
 
     }
 
-    public void addNit()
-    {
-       
-    }
+ 
 }

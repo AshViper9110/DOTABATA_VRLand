@@ -30,6 +30,8 @@ public class MiniGameCanvasContoroller : MonoBehaviour
         if (isLockZ) rot.z = 0;
         if (rotDif.w < rotateSpeedThreshold) transform.rotation = Quaternion.Lerp(transform.rotation, rot, followRotateSpeed * 4);
         else transform.rotation = Quaternion.Lerp(transform.rotation, rot, followRotateSpeed);
+
+        transform.rotation = new Quaternion(transform.rotation.x,-Camera.main.transform.rotation.y,transform.rotation.z,transform.rotation.w);
     }
 
     //‹­§“I‚É“¯Šú‚³‚¹‚½‚¢Žž
