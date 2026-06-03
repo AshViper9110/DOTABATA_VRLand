@@ -120,5 +120,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         Task UpdateNit(Guid connectionId,float point);
 
 
+
+        /// <summary>
+        /// シーン移行が完了したことを他プレイヤーに伝える
+        /// </summary>
+        Task CompleteSceneTransition();
     }
 }

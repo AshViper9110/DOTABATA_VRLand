@@ -9,6 +9,11 @@ namespace DOTABATA_VRLand.Server.Models.Entities {
         public JoinedUser joinedUser = new JoinedUser();
 
         /// <summary>
+        /// シーン移行状態
+        /// </summary>
+        public bool IsCompleteSceneTransition = false;
+
+        /// <summary>
         /// ミニゲーム準備完了情報
         /// </summary>
         public bool IsReady;
