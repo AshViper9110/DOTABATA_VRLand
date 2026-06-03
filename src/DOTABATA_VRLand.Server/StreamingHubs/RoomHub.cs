@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
+using System.Xml.Linq;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub : StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub
@@ -36,6 +37,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             return CompletedTask;
         }
+
 
         /// <summary>
         /// ルームを全取得
@@ -569,6 +571,23 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
            
             // 全員（自分も含む）に通知
             this._roomContext.Group.All.OnUpdateNit(connectionId,point);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// シーン移行が完了したことを他プレイヤーに伝える
+        /// </summary>
+        public Task CompleteSceneTransition() {
+            bool allComplete = this._roomContext.ChangeIsCompleteSceneTransition(this.ConnectionId);
+
+            // 自分以外に完了通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnCompleteSceneTransition(this.ConnectionId);
+            // もし全員が完了してたら
+            if (allComplete) {
+                // 全員に通知
+                this._roomContext.Group.All.OnAllCompleteSceneTransition();
+            }
+
             return Task.CompletedTask;
         }
     }

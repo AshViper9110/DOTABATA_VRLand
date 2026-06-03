@@ -1,5 +1,6 @@
 ﻿using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
+using Steamworks;
 using System;
 using UnityEngine;
 
@@ -26,6 +27,7 @@ public class ConnectionTest : MonoBehaviour {
 
         await RoomModel.I.JoinRoomAsync("TestUser", new RoomConfig() { GameModeId = 0, Name = "TestRoom"});
         //await UserModel.I.RegistUserAsync("YamagamiSecond");
+       
 
     }
 

@@ -11,6 +11,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
     /// </summary>
     public interface IRoomHub : IStreamingHub<IRoomHub, IRoomHubReceiver> {
 
+       
         /// <summary>
         /// ルームを全取得
         /// </summary>
@@ -119,5 +120,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         Task UpdateNit(Guid connectionId,float point);
 
 
+
+        /// <summary>
+        /// シーン移行が完了したことを他プレイヤーに伝える
+        /// </summary>
+        Task CompleteSceneTransition();
     }
 }

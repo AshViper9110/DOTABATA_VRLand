@@ -56,28 +56,45 @@ namespace DOTABATA_VRLand.Server.Services {
         /// <summary>
         /// ユーザー登録
         /// </summary>
-        public async UnaryResult<bool> RegistUserAsync(string name) {
+        public async UnaryResult<bool> RegistUserAsync(string name, ulong steamId)
+        {
             await _semaphore.WaitAsync();
 
-            try {
-                // レコード追加
-                User user = new User() {
-                    Name = name,
-                };
-                _context.Users.Add(user);
+            try
+            {
+                User? user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.SteamId == steamId);//steamIDからユーザー取得
 
-                AddServerLogs($"Add User Name:{name}");
+                if (user == null)//// 未登録ユーザーの場合
+                {
+                    user = new User()
+                    {
+                        Name = name,
+                        SteamId = steamId,
+                    };
 
-                await _context.SaveChangesAsync();
+                    _context.Users.Add(user);
+
+                    //AddServerLogs($"Add User SteamId:{steamId} Name:{name}");
+                }
+                else  // 既存ユーザーの場合は最新のSteam名で更新
+                {
+                    
+                    user.Name = name;
+                }
+
+                await _context.SaveChangesAsync();//DBに保存
 
                 return true;
-
-            }catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 Console.WriteLine(e);
                 return false;
             }
-            finally {
-                _semaphore.Release();
+            finally
+            {
+                _semaphore.Release();//同時実行対策
             }
         }
     }

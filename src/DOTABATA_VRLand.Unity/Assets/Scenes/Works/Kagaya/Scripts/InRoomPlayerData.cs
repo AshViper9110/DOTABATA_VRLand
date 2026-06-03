@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class InRoomPlayerData : Singleton<InRoomPlayerData> {
     // 自分
-    private JoinedUser mySelf;
-    public JoinedUser MySelf { get { return mySelf; } }
+    private PlayerData mySelf;
+    public PlayerData MySelf { get { return mySelf; } }
     // プレイヤーリスト
     private Dictionary<Guid, PlayerData> playerList;
     public Dictionary<Guid, PlayerData> PlayerList { get { return playerList; } }
@@ -27,8 +27,8 @@ public class InRoomPlayerData : Singleton<InRoomPlayerData> {
     /// <summary>
     /// 自分の情報を追加
     /// </summary>
-    public void SetMySelf(JoinedUser joinedUser) {
-        mySelf = joinedUser;
+    public void SetMySelf(PlayerData self) {
+        mySelf = self;
     }
 
     /// <summary>

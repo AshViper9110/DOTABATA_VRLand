@@ -1,4 +1,4 @@
-using DOTABATA_VRLand.Shared.Models.Entities;
+ï»¿using DOTABATA_VRLand.Shared.Models.Entities;
 using UnityEngine;
 using Steamworks;
 using Valve.VR;
@@ -10,17 +10,25 @@ public class TitleMana : MonoBehaviour
     public int gameModeId = 1;
     public GameObject player;
 
-    private void Start()
+    private async void Start()
     {
         if (SteamManager.Initialized)
         {
             playerName = SteamFriends.GetPersonaName();
-            Debug.Log(playerName);
+            ulong steamId = SteamUser.GetSteamID().m_SteamID;//steam‚ÌID‚àæ“¾
+            Debug.Log($"name:{playerName} SteamID:{steamId}");
+            await UserModel.I.CreateUserModel();
+            bool result = await UserModel.I.RegistUserAsync(
+            playerName,
+            steamId
+            );
         }
         else
         {
             Debug.LogError("Steam is not initialized.");
         }
+
+        InRoomPlayerData.I.SetMySelf(new PlayerData() { playerObj = player });
     }
     public RoomConfig SetNames()
     {
@@ -34,7 +42,7 @@ public class TitleMana : MonoBehaviour
     }
 
     /// <summary>
-    /// GameƒV[ƒ“‚ÉˆÚ“®ƒ{ƒ^ƒ“
+    /// Gameã‚·ãƒ¼ãƒ³ã«ç§»å‹•ãƒœã‚¿ãƒ³
     /// </summary>
     /// 
     public void JoinLobby()
@@ -44,19 +52,19 @@ public class TitleMana : MonoBehaviour
 
     private IEnumerator MoveWithFade()
     {
-        // ”’ƒtƒF[ƒhƒAƒEƒg
+        // ç™½ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ
         SteamVR_Fade.Start(Color.white, 0.5f);
 
-        // ƒtƒF[ƒhŠ®—¹‘Ò‚¿
+        // ãƒ•ã‚§ãƒ¼ãƒ‰å®Œäº†å¾…ã¡
         yield return new WaitForSeconds(0.5f);
 
-        // ˆÚ“®
+        // ç§»å‹•
         player.transform.position = Vector3.zero;
 
-        // 1ƒtƒŒ[ƒ€‘Ò‚Â‚ÆˆÀ’è‚µ‚â‚·‚¢
+        // 1ãƒ•ãƒ¬ãƒ¼ãƒ å¾…ã¤ã¨å®‰å®šã—ã‚„ã™ã„
         yield return null;
 
-        // ƒtƒF[ƒhƒCƒ“
+        // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³
         SteamVR_Fade.Start(Color.clear, 0.5f);
     }
     public async void JointoNextScene(string name)
