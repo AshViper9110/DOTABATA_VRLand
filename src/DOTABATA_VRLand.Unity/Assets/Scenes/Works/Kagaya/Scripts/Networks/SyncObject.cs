@@ -120,7 +120,7 @@ public class SyncObject : MonoBehaviour {
             Debug.Log(stringObjectId);
             objectId = Guid.Parse(stringObjectId);
 
-            if (InRoomPlayerData.I.MySelf.JoinOrder == 1) {
+            if (InRoomPlayerData.I.MySelf.joinedUser.JoinOrder == 1) {
                 CreaterId = RoomModel.I.ConnectionId;
                 IsOwner = true;
                 await RoomModel.I.AddObjectListAsync(objectId, objectListId, this.transform.ToSimpleTransform());

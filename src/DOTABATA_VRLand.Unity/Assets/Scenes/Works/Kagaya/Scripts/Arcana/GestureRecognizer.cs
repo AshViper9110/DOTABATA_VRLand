@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using PDollarGestureRecognizer;
 using TMPro;
+using System;
 
 public class GestureRecognizer : MonoBehaviour {
     private LineRenderer lineRenderer;
@@ -15,6 +16,18 @@ public class GestureRecognizer : MonoBehaviour {
 
     private int strokeId = -1;
     private Camera cam;
+
+    public enum GestureClass {
+        Circle,
+        Star,
+        Diamond,
+        Square,
+        Triangle,
+        Heart,
+    }
+
+    // 図形判定後
+    public Action<GestureClass, float> CompleteRecognize;
 
     private void Start() {
         lineRenderer = GetComponent<LineRenderer>();
@@ -135,6 +148,11 @@ public class GestureRecognizer : MonoBehaviour {
             Debug.Log("成功: " + result.GestureClass);
             resultText.text = $"{result.GestureClass}\n" +
                 $"Score:{result.Score}";
+
+            GestureClass gestureClass = (GestureClass)Enum.Parse(typeof(GestureClass), result.GestureClass, true);
+            if (CompleteRecognize != null) {
+                CompleteRecognize(gestureClass, result.Score);
+            }
         }
         else {
             Debug.Log("失敗");

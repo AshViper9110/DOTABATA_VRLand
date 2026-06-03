@@ -191,7 +191,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         try {
             JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync(userName, roomConfig);
             isJoinRoom = true;
-            InRoomPlayerData.I.SetMySelf(joinedUsers.First(_=>_.ConnectionId == ConnectionId));
+            InRoomPlayerData.I.SetMySelf(new PlayerData() { joinedUser = joinedUsers.First(_ => _.ConnectionId == ConnectionId) });
             if (joinedUsers != null) {
                 foreach (var user in joinedUsers) {
                     // 自分自身はスキップ
