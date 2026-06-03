@@ -90,6 +90,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] List<Sprite> miniGameTitleImages = new List<Sprite>();
 
     bool isSpin;
+    bool EndProgress;
 
     //ランキングUI
     public List<RectTransform> rankingPosList;
@@ -136,6 +137,7 @@ public class GameManager : MonoBehaviour
     {
         audioManager = GetComponent<AudioManager>();
         SteamVR_Fade.Start(new Color(0,0,0,0),2);
+        EndProgress = false;
         //List<GameObject> crowns = new List<GameObject>();
 
         ////Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
@@ -427,6 +429,8 @@ public class GameManager : MonoBehaviour
 
     public void MoveText()
     {
+
+        if (EndProgress) return;
         if (!isSpin)
         {
             textIndex++;
@@ -442,6 +446,7 @@ public class GameManager : MonoBehaviour
                 onSelect = true;
                 onResult = false;
                 onEnd = false;
+               
 
             }
         }
@@ -454,6 +459,7 @@ public class GameManager : MonoBehaviour
             if (textIndex >= AfterText.Count && !isSpin)
             {
                 SelectMiniGame();
+              
                 return;
             }
 
@@ -486,6 +492,7 @@ public class GameManager : MonoBehaviour
             {
                 //タイトルに戻る
                 MoveScene("TitleScene");
+                EndProgress = true;
                 return;
             }
 
@@ -503,12 +510,14 @@ public class GameManager : MonoBehaviour
         else if (onSelect)
         {
             MoveScene(miniGames[selPointManager.SelectId]);
+            EndProgress = true;
         }
         else
         {
             if (textIndex >= StartText.Count && !isSpin)
             {
                 SelectMiniGame();
+               
                 return;
             }
             else if(textIndex < StartText.Count) 

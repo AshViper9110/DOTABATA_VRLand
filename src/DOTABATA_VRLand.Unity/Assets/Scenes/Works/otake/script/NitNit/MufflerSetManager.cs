@@ -38,6 +38,8 @@ public class MufflerSetManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+
+
         TempRightPos = RightRod.transform.position;
         TempLeftPos = LeftRod.transform.position;
         RightInteractable = RightRod.GetComponent<Interactable>();
@@ -55,11 +57,16 @@ public class MufflerSetManager : MonoBehaviour
 
         tempPoint = 0;
         point = 0;
+
+        RightEffect.Stop();
+        LeftEffect.Stop();
     }
 
     // Update is called once per frame
     void Update()
     {
+
+       // if (!nitManager.FlowController.isGameStarted) return;
    
 
         if (!RightInteractable.attachedToHand || !LeftInteractable.attachedToHand)
@@ -125,7 +132,7 @@ public class MufflerSetManager : MonoBehaviour
         {
            
             GameObject nit = Instantiate(nitPrefabs[nitIndex], nitsParent);
-            nit.transform.position = new Vector3(nit.transform.position.x + (distans * nitCount), nit.transform.position.y, nit.transform.position.z);
+            nit.transform.position = new Vector3(nit.transform.position.x , nit.transform.position.y, nit.transform.position.z - (distans * nitCount));
             if (indexVector == -1)
             {
                 nit.transform.Rotate(0, 180, 0);
@@ -135,7 +142,8 @@ public class MufflerSetManager : MonoBehaviour
             {
                 nit.GetComponent<MeshRenderer>().material = materials[0];
             }
-            nitsParent.position = new Vector3(nitsParent.transform.position.x - (distans), nitsParent.transform.position.y, nitsParent.gameObject.transform.position.z);
+            //‰œ‚ÉˆÚ“®‚³‚¹‚é
+            nitsParent.position = new Vector3(nitsParent.transform.position.x , nitsParent.transform.position.y, nitsParent.gameObject.transform.position.z + (distans));
             nitCount++;
             nitIndex += indexVector;
 
