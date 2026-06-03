@@ -10,12 +10,18 @@ public class TitleMana : MonoBehaviour
     public int gameModeId = 1;
     public GameObject player;
 
-    private void Start()
+    private async void Start()
     {
         if (SteamManager.Initialized)
         {
             playerName = SteamFriends.GetPersonaName();
-            Debug.Log(playerName);
+            ulong steamId = SteamUser.GetSteamID().m_SteamID;//steam‚ÌID‚àŽæ“¾
+            Debug.Log($"name:{playerName} SteamID:{steamId}");
+            await UserModel.I.CreateUserModel();
+            bool result = await UserModel.I.RegistUserAsync(
+            playerName,
+            steamId
+            );
         }
         else
         {

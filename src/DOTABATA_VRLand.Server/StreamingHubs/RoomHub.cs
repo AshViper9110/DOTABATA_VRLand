@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
+using System.Xml.Linq;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub : StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub
@@ -36,6 +37,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             return CompletedTask;
         }
+
 
         /// <summary>
         /// ルームを全取得
