@@ -55,9 +55,9 @@ public class UserModel : Singleton<UserModel> {
     /// <summary>
     /// ユーザー登録
     /// </summary>
-    public async UniTask<bool> RegistUserAsync(string name) {
+    public async UniTask<bool> RegistUserAsync(string name,ulong steamID) {
         try {
-            return await client.RegistUserAsync(name);
+            return await client.RegistUserAsync(name, steamID);
         }catch(Exception e) {
             Debug.LogException(e);
             throw;

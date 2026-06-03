@@ -20,6 +20,6 @@ namespace DOTABATA_VRLand.Shared.Interfaces.Services {
         /// <summary>
         /// ユーザー登録
         /// </summary>
-        UnaryResult<bool> RegistUserAsync(string name);
+        UnaryResult<bool> RegistUserAsync(string name, ulong steamId);
     }
 }
