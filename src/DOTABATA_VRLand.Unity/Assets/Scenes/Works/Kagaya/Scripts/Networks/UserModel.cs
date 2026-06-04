@@ -43,9 +43,9 @@ public class UserModel : Singleton<UserModel> {
     /// <summary>
     /// Idからユーザー情報取得
     /// </summary>
-    public async UniTask<User> GetUserFromIdAsync(int id) {
+    public async UniTask<User> GetUserFromIdAsync(ulong steamID) {
         try {
-            return await client.GetUserFromIdAsync(id);
+            return await client.GetUserFromIdAsync(steamID);
         }catch (Exception e) {
             Debug.LogException(e);
             throw;

@@ -125,9 +125,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action OnAllCompletedSceneTransition { get; set; }
 
-    ///<summary>
-    ///ニットの更新
-    /// </summary>
     public Action<Guid, float> onUpdateNit { get; set; }
     public Action OnGameStartAction { get; set; }
 
@@ -190,13 +187,13 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ルームに入室
     /// </summary>
-    public async UniTask JoinRoomAsync(string userName, RoomConfig roomConfig) {
+    public async UniTask JoinRoomAsync(ulong steamID, RoomConfig roomConfig) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
 
         try {
-            JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync(userName, roomConfig);
+            JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync(steamID, roomConfig);
             isJoinRoom = true;
             InRoomPlayerData.I.SetMySelf(new PlayerData() { joinedUser = joinedUsers.First(_ => _.ConnectionId == ConnectionId) });
             if (joinedUsers != null) {
@@ -466,9 +463,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     {
         Debug.Log($"{user.Name} の勝利数: {winCount}");
         // UIの更新など
-        GameManager manager = GameObject.Find("GameManager").GetComponent<GameManager>();
-
-        manager.SetRanking();
     }
     /*
      * オブジェクト

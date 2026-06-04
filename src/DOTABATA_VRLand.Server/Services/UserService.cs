@@ -2,6 +2,7 @@
 using DOTABATA_VRLand.Server.Models.Entities;
 using DOTABATA_VRLand.Shared.Interfaces.Services;
 using DOTABATA_VRLand.Shared.Models.Entities;
+using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
 using Microsoft.EntityFrameworkCore;
@@ -41,36 +42,45 @@ namespace DOTABATA_VRLand.Server.Services {
         /// Idからユーザー情報取得
         /// </summary>
         /// <returns></returns>
-        public async UnaryResult<User> GetUserFromIdAsync(int id) {
-            if (!_context.Users.Any(user=> user.Id == id)){
-                throw new Exception();
+        public async UnaryResult<User> GetUserFromIdAsync(ulong steamId)
+        {
+
+            var hash = HashSteamId(steamId);//ハッシュ
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.SteamId == hash);//ユーザー検索
+
+            if (user is null)
+            {
+                throw new ReturnStatusException(StatusCode.NotFound, $"User not found. SteamId:{steamId}");
             }
 
-            AddServerLogs($"User Search ID:{id}");
-            await _context.SaveChangesAsync();
+            AddServerLogs($"User Search SteamId:{steamId}");
 
-            return await _context.Users.FirstAsync(user => user.Id == id);
+            return user;
         }
-
 
         /// <summary>
         /// ユーザー登録
         /// </summary>
         public async UnaryResult<bool> RegistUserAsync(string name, ulong steamId)
         {
+           
             await _semaphore.WaitAsync();
-
+            Console.WriteLine("RegistUserAsync Start");
             try
             {
+                var hash = HashSteamId(steamId);///ハッシュ
+
                 User? user = await _context.Users
-                    .FirstOrDefaultAsync(u => u.SteamId == steamId);//steamIDからユーザー取得
+                    .FirstOrDefaultAsync(u => u.SteamId == hash);//steamIDからユーザー取得
 
                 if (user == null)//// 未登録ユーザーの場合
                 {
                     user = new User()
                     {
                         Name = name,
-                        SteamId = steamId,
+                        SteamId = hash,
                     };
 
                     _context.Users.Add(user);
@@ -78,24 +88,35 @@ namespace DOTABATA_VRLand.Server.Services {
                     //AddServerLogs($"Add User SteamId:{steamId} Name:{name}");
                 }
                 else  // 既存ユーザーの場合は最新のSteam名で更新
-                {
-                    
+                {                   
                     user.Name = name;
                 }
 
                 await _context.SaveChangesAsync();//DBに保存
+               
 
+                Console.WriteLine($"fnish:user:{user.Name}");
+                Console.WriteLine($"ID:{user.Id}");
                 return true;
+              
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine($"RegistUserAsync Error:{e}");
                 return false;
             }
             finally
             {
                 _semaphore.Release();//同時実行対策
             }
+        }
+
+        //steamIDのハッシュ化
+        private static string HashSteamId(ulong steamId)
+        {
+            var bytes = System.Text.Encoding.UTF8.GetBytes(steamId.ToString());
+            var hash = System.Security.Cryptography.SHA256.HashData(bytes);
+            return Convert.ToHexString(hash);
         }
     }
 }

@@ -7,6 +7,7 @@ using Valve.VR;
 public class TestManager : MonoBehaviour
 {
     private string playerName;
+    private ulong steamId;
     public int gameModeId = 1;
     public GameObject player;
 
@@ -15,6 +16,7 @@ public class TestManager : MonoBehaviour
         if (SteamManager.Initialized)
         {
             playerName = SteamFriends.GetPersonaName();
+            steamId = SteamUser.GetSteamID().m_SteamID;//steamId‚ðŽæ“¾
             Debug.Log(playerName);
         }
         else
@@ -61,6 +63,6 @@ public class TestManager : MonoBehaviour
     }
     public async void JointoNextScene(string name)
     {
-        await NetworkManager.I.JointoNextScene(name, playerName, SetNames());
+        await NetworkManager.I.JointoNextScene(name, steamId, SetNames());
     }
 }
