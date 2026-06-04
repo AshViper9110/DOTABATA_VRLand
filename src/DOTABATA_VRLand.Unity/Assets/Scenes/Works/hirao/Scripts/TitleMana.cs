@@ -7,6 +7,7 @@ using System.Collections;
 public class TitleMana : MonoBehaviour
 {
     private string playerName;
+    private ulong steamId;
     public int gameModeId = 1;
     public GameObject player;
 
@@ -15,13 +16,15 @@ public class TitleMana : MonoBehaviour
         if (SteamManager.Initialized)
         {
             playerName = SteamFriends.GetPersonaName();
-            ulong steamId = SteamUser.GetSteamID().m_SteamID;//steamÇÃIDÇ‡éÊìæ
+            steamId = SteamUser.GetSteamID().m_SteamID;//steamId„ÇíÂèñÂæó
             Debug.Log($"name:{playerName} SteamID:{steamId}");
             await UserModel.I.CreateUserModel();
             bool result = await UserModel.I.RegistUserAsync(
             playerName,
             steamId
             );
+            Debug.Log($"result:{result}");
+            
         }
         else
         {
@@ -68,7 +71,7 @@ public class TitleMana : MonoBehaviour
         SteamVR_Fade.Start(Color.clear, 0.5f);
     }
     public async void JointoNextScene(string name)
-    {
-        await NetworkManager.I.JointoNextScene(name, playerName, SetNames());
+    {     
+        await NetworkManager.I.JointoNextScene(name, steamId, SetNames());
     }
 }

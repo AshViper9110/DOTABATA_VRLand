@@ -8,10 +8,19 @@ namespace DOTABATA_VRLand.Server.Models.Entities
     public class DailyActiveUser
     {
         [Key]
+        [Column("id")]
         public int Id { get; set; }
+
+        [Column("activity_date")]
         public DateTime ActivityDate { get; set; }
+
+        [Column("user_id")]
         public int UserId { get; set; }
-        public DateTime CreatedDay { get; set; }
+
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; }
+
+        [Column("updated_at")]
         public DateTime UpdatedAt { get; set; }
     }
 

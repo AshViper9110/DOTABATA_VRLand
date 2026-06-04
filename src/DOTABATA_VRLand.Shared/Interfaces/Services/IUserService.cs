@@ -14,7 +14,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.Services {
         /// <summary>
         /// idからユーザー情報取得
         /// </summary>
-        UnaryResult<User> GetUserFromIdAsync(int id);
+        UnaryResult<User> GetUserFromIdAsync(ulong steamId);
 
 
         /// <summary>

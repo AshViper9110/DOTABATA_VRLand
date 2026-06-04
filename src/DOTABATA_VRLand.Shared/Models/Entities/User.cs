@@ -16,7 +16,9 @@ namespace DOTABATA_VRLand.Shared.Models.Entities {
         public string Name { get; set; }
         [Key(2)]
         [Column("steam_id")]
-        public ulong SteamId { get; set; }
+        public string SteamId { get; set; }
+
+     
     }
 }
 
