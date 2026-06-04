@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Valve.VR;
 
@@ -240,8 +238,8 @@ public class RoomInfoCanvas : MonoBehaviour {
             Password = passwordString,
             GameModeId = gameModeId,
         };
-
-       
+        SteamVR_Fade.View(Color.white, 0.5f);
+        
         await NetworkManager.I.JointoNextScene("GameScene", steamId, roomConfig);
     }
 
@@ -307,7 +305,7 @@ public class RoomInfoCanvas : MonoBehaviour {
                 Name = roomInfo.Name,
                 Password = passwordString,
             };
-            
+            SteamVR_Fade.View(Color.white, 0.5f); 
             await NetworkManager.I.JointoNextScene("GameScene", steamId, roomConfig);
         });
     }

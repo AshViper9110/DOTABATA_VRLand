@@ -125,13 +125,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action OnAllCompletedSceneTransition { get; set; }
 
-    ///<summary>
-    ///ニットの更新
-    /// </summary>
-    public Action<Guid, float> onUpdateNit;
-
+    public Action<Guid, float> onUpdateNit { get; set; }
     public Action OnGameStartAction { get; set; }
-
 
     /*
      * 処理
