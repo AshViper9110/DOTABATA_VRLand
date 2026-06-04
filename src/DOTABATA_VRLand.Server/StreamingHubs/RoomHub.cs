@@ -16,6 +16,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         private RoomContext? _roomContext;
 
+        /*
+         * ミニゲーム用
+         */
+
+        private ArcanaContext? _arcanaContext;
+
         //public RoomHub(RoomContextRepository roomContextRepository) {
         //    _roomContextRepository = roomContextRepository;
         //}
@@ -584,6 +590,34 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             if (allComplete) {
                 // 全員に通知
                 this._roomContext.Group.All.OnAllCompleteSceneTransition();
+            }
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// アルカナスケッチの初期化
+        /// </summary>
+        public Task ArcanaInitGameAsync() {
+            this._arcanaContext = new ArcanaContext(this._roomContext.RoomUserDataList);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 死亡同期
+        /// </summary>
+        public Task DeathAsync() {
+            // 全員に通知
+            this._roomContext.Group.All.OnDeath(this.ConnectionId);
+
+            lock (this._arcanaContext) {
+                // コンテストからプレイヤーを削除
+                Guid resultConId = this._arcanaContext.DeathPlayerAndIsGameSet(this.ConnectionId);
+                // 一人になったら
+                if (resultConId != Guid.Empty) {
+                    // ゲーム終了と勝者のIdを全員に通知
+                    this._roomContext.Group.All.OnArcanaGameSet(resultConId);
+                }
             }
 
             return Task.CompletedTask;

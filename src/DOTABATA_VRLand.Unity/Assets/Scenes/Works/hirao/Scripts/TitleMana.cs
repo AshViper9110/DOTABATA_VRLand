@@ -22,7 +22,7 @@ public class TitleMana : MonoBehaviour
             Debug.LogError("Steam is not initialized.");
         }
 
-        InRoomPlayerData.I.SetMySelf(new PlayerData() { playerObj = player });
+        //InRoomPlayerData.I.SetMySelf(new PlayerData() { playerObj = player });
     }
     public RoomConfig SetNames()
     {

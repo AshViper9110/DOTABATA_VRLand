@@ -8,7 +8,6 @@ public class MagicController : MonoBehaviour {
     private float attackDamage;
     // ライフ
     [SerializeField] private float life;
-
     private float lifeTimer = 0; 
 
     private bool isAttacked = false;
@@ -26,11 +25,14 @@ public class MagicController : MonoBehaviour {
 
         // プレイヤーに当たったら
         if (!other.gameObject.CompareTag("Player")) return;
+        // 自分自身のオブジェクトだったら
+        if (!other.gameObject.GetComponent<SyncPlayer>().IsOwner()) return;
 
         PlayerStatus otherStatus = other.gameObject.GetComponent<PlayerStatus>();
         if (otherStatus == null) return;
 
         isAttacked = true;
+        // ダメージを付与
         otherStatus.OnDamage(attackDamage);
 
         Destroy(this.gameObject);

@@ -132,6 +132,15 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action OnGameStartAction { get; set; }
 
+    /// <summary>
+    /// アルカナスケッチの死亡通知
+    /// </summary>
+    public Action<Guid> OnDead {  get; set; }
+
+    /// <summary>
+    /// アルカナスケッチのゲーム終了通知
+    /// </summary>
+    public Action<Guid> OnArcanaGameSeted { get; set; }
 
     /*
      * 処理
@@ -200,7 +209,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         try {
             JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync(userName, roomConfig);
             isJoinRoom = true;
-            InRoomPlayerData.I.SetMySelf(new PlayerData() { joinedUser = joinedUsers.First(_ => _.ConnectionId == ConnectionId) });
             if (joinedUsers != null) {
                 foreach (var user in joinedUsers) {
                     // 自分自身はスキップ
@@ -642,6 +650,48 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnAllCompleteSceneTransition() {
         if (OnAllCompletedSceneTransition  != null) {
             OnAllCompletedSceneTransition();
+        }
+    }
+
+    /// <summary>
+    /// アルカナスケッチの初期化
+    /// </summary>
+    public async UniTask ArcanaInitGameAsync() {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.ArcanaInitGameAsync();
+    }
+
+    /// <summary>
+    /// 死亡同期
+    /// </summary>
+    public async UniTask DeathAsync() {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.DeathAsync();
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 死亡通知
+    /// </summary>
+    public void OnDeath(Guid connectionId) {
+        if (OnDead != null) {
+            OnDead(connectionId);
+        }
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// アルカナスケッチのゲーム終了通知
+    /// </summary>
+    public void OnArcanaGameSet(Guid winnerConId) {
+        if (OnArcanaGameSeted != null) {
+            OnArcanaGameSeted(winnerConId);
         }
     }
 }

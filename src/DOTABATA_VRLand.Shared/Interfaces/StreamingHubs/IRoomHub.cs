@@ -124,5 +124,15 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// シーン移行が完了したことを他プレイヤーに伝える
         /// </summary>
         Task CompleteSceneTransition();
+
+        /// <summary>
+        /// アルカナスケッチの初期化
+        /// </summary>
+        Task ArcanaInitGameAsync();
+
+        /// <summary>
+        /// 死亡同期
+        /// </summary>
+        Task DeathAsync();
     }
 }

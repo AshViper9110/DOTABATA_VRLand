@@ -111,6 +111,16 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ニットの更新
         /// </summary>
         public void OnUpdateNit(Guid id,float point);
+
+        /// <summary>
+        /// 死亡通知
+        /// </summary>
+        public void OnDeath(Guid connectionId);
+
+        /// <summary>
+        /// アルカナスケッチのゲーム終了通知
+        /// </summary>
+        public void OnArcanaGameSet(Guid winnerConId);
     }
 
 }
