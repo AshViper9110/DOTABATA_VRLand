@@ -136,7 +136,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         audioManager = GetComponent<AudioManager>();
-        SteamVR_Fade.Start(new Color(0,0,0,0),2);
+        SteamVR_Fade.View(new Color(0,0,0,0),2);
         EndProgress = false;
         //List<GameObject> crowns = new List<GameObject>();
 
@@ -301,7 +301,7 @@ public class GameManager : MonoBehaviour
         {
             AddCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
         }
-        SteamVR_Fade.Start(new Color(1,1,1,1), 2);
+        SteamVR_Fade.View(new Color(1,1,1,1), 2);
         Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
     }
 

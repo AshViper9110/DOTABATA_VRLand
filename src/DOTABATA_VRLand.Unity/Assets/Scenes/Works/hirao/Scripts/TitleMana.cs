@@ -15,7 +15,7 @@ public class TitleMana : MonoBehaviour
         if (SteamManager.Initialized)
         {
             playerName = SteamFriends.GetPersonaName();
-            ulong steamId = SteamUser.GetSteamID().m_SteamID;//steam��ID���擾
+            ulong steamId = SteamUser.GetSteamID().m_SteamID;//steam��ID��擾
             Debug.Log($"name:{playerName} SteamID:{steamId}");
             await UserModel.I.CreateUserModel();
             bool result = await UserModel.I.RegistUserAsync(
@@ -53,7 +53,7 @@ public class TitleMana : MonoBehaviour
     private IEnumerator MoveWithFade()
     {
         // 白フェードアウト
-        SteamVR_Fade.Start(Color.white, 0.5f);
+        SteamVR_Fade.View(Color.white, 0.5f);
 
         // フェード完了待ち
         yield return new WaitForSeconds(0.5f);
@@ -65,10 +65,6 @@ public class TitleMana : MonoBehaviour
         yield return null;
 
         // フェードイン
-        SteamVR_Fade.Start(Color.clear, 0.5f);
-    }
-    public async void JointoNextScene(string name)
-    {
-        await NetworkManager.I.JointoNextScene(name, playerName, SetNames());
+        SteamVR_Fade.View(Color.clear, 0.5f);
     }
 }
