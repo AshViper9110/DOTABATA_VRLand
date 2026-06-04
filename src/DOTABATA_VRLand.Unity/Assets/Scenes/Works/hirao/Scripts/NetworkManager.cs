@@ -64,9 +64,9 @@ public class NetworkManager : Singleton<NetworkManager>
     /// <summary>
     /// Gameシーンに移動ボタン
     /// </summary>
-    public async Task JointoNextScene(string scene, string name, RoomConfig roomConfig)
+    public async Task JointoNextScene(string scene, ulong steamID, RoomConfig roomConfig)
     {
-        await RoomModel.I.JoinRoomAsync(name, roomConfig);
+        await RoomModel.I.JoinRoomAsync(steamID, roomConfig);
 
         await Cysharp.Threading.Tasks.UniTask.WaitUntil(() =>
             InRoomPlayerData.I.PlayerList.ContainsKey(myConnectionId)

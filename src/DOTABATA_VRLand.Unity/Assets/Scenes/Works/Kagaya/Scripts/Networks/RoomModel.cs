@@ -187,13 +187,13 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ルームに入室
     /// </summary>
-    public async UniTask JoinRoomAsync(string userName, RoomConfig roomConfig) {
+    public async UniTask JoinRoomAsync(ulong steamID, RoomConfig roomConfig) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
 
         try {
-            JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync(userName, roomConfig);
+            JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync(steamID, roomConfig);
             isJoinRoom = true;
             InRoomPlayerData.I.SetMySelf(new PlayerData() { joinedUser = joinedUsers.First(_ => _.ConnectionId == ConnectionId) });
             if (joinedUsers != null) {

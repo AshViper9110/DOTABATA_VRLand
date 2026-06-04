@@ -15,6 +15,7 @@ public class RoomInfoCanvas : MonoBehaviour {
 
     private string playerName;
     private int gameModeId = 0;
+    private ulong steamId;
 
     // ルーム作成UI
     [SerializeField] private GameObject createRoomUI;
@@ -66,6 +67,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     private void Start() {
         if (SteamManager.Initialized) {
             playerName = SteamFriends.GetPersonaName();
+            steamId = SteamUser.GetSteamID().m_SteamID;//steamIdを取得
             Debug.Log(playerName);
         }
         else {
@@ -237,7 +239,8 @@ public class RoomInfoCanvas : MonoBehaviour {
             GameModeId = gameModeId,
         };
         SteamVR_Fade.View(Color.white, 0.5f);
-        await NetworkManager.I.JointoNextScene("GameScene", playerName, roomConfig);
+        
+        await NetworkManager.I.JointoNextScene("GameScene", steamId, roomConfig);
     }
 
     /// <summary>
@@ -302,8 +305,8 @@ public class RoomInfoCanvas : MonoBehaviour {
                 Name = roomInfo.Name,
                 Password = passwordString,
             };
-            SteamVR_Fade.View(Color.white, 0.5f);
-            await NetworkManager.I.JointoNextScene("GameScene", playerName, roomConfig);
+            SteamVR_Fade.View(Color.white, 0.5f); 
+            await NetworkManager.I.JointoNextScene("GameScene", steamId, roomConfig);
         });
     }
 }

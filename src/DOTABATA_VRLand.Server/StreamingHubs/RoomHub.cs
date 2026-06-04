@@ -91,7 +91,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ルームに接続
         /// </summary>
-        public async Task<JoinedUser[]> JoinRoomAsync(string userName, RoomConfig roomConfig)
+        public async Task<JoinedUser[]> JoinRoomAsync(ulong steamId, RoomConfig roomConfig)
         {
             await CreateRoomAsync(roomConfig);
 
@@ -114,21 +114,11 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             // ルームに参加 ＆ ルームを保持
             this._roomContext.Group.Add(this.ConnectionId, Client);
-         /*
-            // DBからユーザー情報取得
-            User user = await _dbContext.Users.FirstAsync(user => user.Name == userName);
 
-            // ゲーム初回ログインならUsersテーブルに登録
-            if (user == null)
-            {
-                user = new User
-                {
-                    Name = userName, 
-                };
-                _dbContext.Users.Add(user);
-                await _dbContext.SaveChangesAsync();
-                Console.WriteLine($"[DB] {userName} の初回ログインを登録");
-            }
+            var hash = HashSteamId(steamId);///ハッシュ
+
+            // DBからユーザー情報取得
+            User user = await _dbContext.Users.FirstAsync(user => user.SteamId == hash);
 
             // 今日すでにアクティブ記録があるか確認
             var today = DateTime.Today;
@@ -143,21 +133,21 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 {
                     UserId = user.Id,
                     ActivityDate = DateTime.Now,
-                    CreatedDay = DateTime.Now,
+                    CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now
                 });
                 await _dbContext.SaveChangesAsync();
-                Console.WriteLine($"[DB] {userName} の本日初回ログインを記録");
+                Console.WriteLine($"[DB] {user.Name} の本日初回ログインを記録");
             }
             else
             {
-                Console.WriteLine($"[DB] {userName} は本日すでにログイン済み");
-            }*/
+                Console.WriteLine($"[DB] {user.Name} は本日すでにログイン済み");
+            }
 
             // 入室済みユーザーのデータを作成
             var joinedUser = new JoinedUser();
             joinedUser.ConnectionId = this.ConnectionId;
-            joinedUser.Name = userName;
+            joinedUser.Name = user.Name;
             joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
 
             // ルームコンテキストにユーザー情報を登録
@@ -589,6 +579,15 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             }
 
             return Task.CompletedTask;
+        }
+
+
+        //steamIDのハッシュ化
+        private static string HashSteamId(ulong steamId)
+        {
+            var bytes = System.Text.Encoding.UTF8.GetBytes(steamId.ToString());
+            var hash = System.Security.Cryptography.SHA256.HashData(bytes);
+            return Convert.ToHexString(hash);
         }
     }
 }
