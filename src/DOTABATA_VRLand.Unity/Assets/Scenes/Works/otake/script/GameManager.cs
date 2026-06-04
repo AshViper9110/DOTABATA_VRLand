@@ -100,22 +100,22 @@ public class GameManager : MonoBehaviour
 
     static public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
-        { 1,2},{2,2 },{3,1},{4,1}
+        { 1,0},{2,0},{3,0},{4,0}
     };//勝利数
 
     public Dictionary<int, int> RankingList = new Dictionary<int, int>()
     {
-        {1,1},
-        {2,2},
-        { 3,3},
-        { 4,4}
+        {1,0},
+        {2,0},
+        { 3,0},
+        { 4,0}
 
     };
 
 
     public Dictionary<int, int> miniRankingList = new Dictionary<int, int>()
     {
-        {1,1},
+        {1,0},
         {2,0},
         { 3,0},
         { 4,0}
@@ -467,7 +467,11 @@ public class GameManager : MonoBehaviour
             {
 
                 MainText.DOText($"プレイヤー{winPlayerId}" + AfterText[textIndex], 1.0f);
-                playerWinlist[winPlayerId]++;
+                // playerWinlist[winPlayerId]++;
+                if (winPlayerId == InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder)
+                {
+                    RoomModel.I.RequestWinCountUp(NetworkManager.I.myConnectionId);
+                        }
 
                 SetRanking();
                 //一旦仮で入れてます。本実装は優勝者のGuidいれてください。

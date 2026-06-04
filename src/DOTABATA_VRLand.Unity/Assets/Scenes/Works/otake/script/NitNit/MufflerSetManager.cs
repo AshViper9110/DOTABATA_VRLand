@@ -5,9 +5,12 @@ using Valve.VR.InteractionSystem;
 
 public class MufflerSetManager : MonoBehaviour
 {
-
+   [SerializeField] int order;
 
     [Header("棒関係")]
+    [SerializeField] GameObject Rodprefab;
+    [SerializeField] Vector3 RightRodPos;
+    [SerializeField] Vector3 LeftRodPos;
     [SerializeField] GameObject RightRod;
     [SerializeField] GameObject LeftRod;
     ParticleSystem RightEffect;
@@ -40,33 +43,31 @@ public class MufflerSetManager : MonoBehaviour
     {
 
 
-        TempRightPos = RightRod.transform.position;
-        TempLeftPos = LeftRod.transform.position;
-        RightInteractable = RightRod.GetComponent<Interactable>();
-        LeftInteractable = LeftRod.GetComponent<Interactable>();
-    
+
         nitCount = 0;
 
         nitIndex = 0;
         indexVector = 1;
 
-        RightEffect = RightRod.GetComponentInChildren<ParticleSystem>();
-        LeftEffect = LeftRod.GetComponentInChildren<ParticleSystem>();
 
         nitManager = GameObject.Find("GameManager").GetComponent<NitnitManager>();
 
         tempPoint = 0;
         point = 0;
 
-        RightEffect.Stop();
-        LeftEffect.Stop();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-
-       // if (!nitManager.FlowController.isGameStarted) return;
+        if(order != InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.JoinOrder)return;
+        if (!nitManager.FlowController.isGameStarted)
+        {
+            RightEffect.Stop();
+            LeftEffect.Stop(); 
+            return;
+        }
    
 
         if (!RightInteractable.attachedToHand || !LeftInteractable.attachedToHand)
@@ -104,7 +105,7 @@ public class MufflerSetManager : MonoBehaviour
 
         if (Mathf.Floor(point - tempPoint) >= 1)
         {
-            Debug.Log(Mathf.Floor(point - tempPoint));
+           
                 //サーバーに自身のマフラー追加を送信、ポイント更新
                 NetworkManager.I.UpdateNit(NetworkManager.I.myConnectionId,point);
                 
@@ -128,7 +129,9 @@ public class MufflerSetManager : MonoBehaviour
 
     public void addNit(float point)
     {
-        for (int i = 0; i < (int)this.point - point; i++)
+
+        Debug.Log(((int)point - this.tempPoint).ToString());
+        for (int i = 0; i < (int)point - this.tempPoint; i++)
         {
            
             GameObject nit = Instantiate(nitPrefabs[nitIndex], nitsParent);
@@ -158,8 +161,37 @@ public class MufflerSetManager : MonoBehaviour
                 indexVector = -indexVector;
                 nitIndex = 0;
             }
+            this.point = point;
+            tempPoint = point;
         }
-        this.point = point;
-        tempPoint = point;
+
+    }
+
+    public void CreateRod()
+    {
+        Debug.Log("create Rod");
+        GameObject right = Instantiate(Rodprefab
+            ,transform.position + RightRodPos,
+            new Quaternion(0, 0, 0, 0),
+            transform);
+        RightRod = right;
+       
+
+        GameObject left = Instantiate(Rodprefab
+          , transform.position + LeftRodPos,
+          new Quaternion(0,0,0,0),
+          transform);
+        LeftRod = left;
+       
+
+        TempRightPos = RightRod.transform.position;
+        TempLeftPos = LeftRod.transform.position;
+        RightInteractable = RightRod.GetComponent<Interactable>();
+        LeftInteractable = LeftRod.GetComponent<Interactable>();
+
+        RightEffect = RightRod.GetComponentInChildren<ParticleSystem>();
+        LeftEffect = LeftRod.GetComponentInChildren<ParticleSystem>();
+        RightEffect.Stop();
+        LeftEffect.Stop();
     }
 }

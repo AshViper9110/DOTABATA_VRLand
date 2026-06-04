@@ -481,18 +481,18 @@ MonoBehaviour:
     needsReinit: 0
   handType: 2
   miniGames:
-  - Kinko
-  - Kinko
-  - Kinko
-  - Kinko
-  - Kinko
-  - Kinko
-  - Kinko
-  - Kinko
-  - Kinko
-  - Kinko
-  - Kinko
-  - Kinko
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
+  - nitnit
   miniGameNames:
   - "\u30CB\u30C3\u30C8\u30CB\u30C3\u30C8"
   - "\u30AC\u30EC\u30FC\u30B8\u30AA\u30FC\u30D7\u30CA\u30FC"
@@ -744,7 +744,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4995ed70f0d3da0489824ddfc7827caf, type: 2}
+  - {fileID: 2100000, guid: 4964bf8aa92cf77409cad093a6ea701c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

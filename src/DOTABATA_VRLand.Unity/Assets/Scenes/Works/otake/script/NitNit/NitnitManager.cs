@@ -38,7 +38,11 @@ public class NitnitManager : MonoBehaviour
 
         foreach(var f in InRoomPlayerData.I.PlayerList.Values)
         {
-            f.playerObj.transform.position = startPos[f.joinedUser.JoinOrder-1].position;
+            if (f.joinedUser.ConnectionId == NetworkManager.I.myConnectionId)
+            {
+                f.playerObj.transform.position = startPos[f.joinedUser.JoinOrder - 1].position;
+                mufflerSets[f.joinedUser.JoinOrder - 1].CreateRod();
+            }
            
         }
        
@@ -54,6 +58,9 @@ public class NitnitManager : MonoBehaviour
             if (timer < 0)
             {
                 FlowController.isGameStarted = false;
+                RoomModel.I.SendScore((int)(mufflerSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder-1].point*10));
+                enabled = false;
+                return;
             }
         }
 
