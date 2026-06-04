@@ -15,7 +15,7 @@ public class TitleMana : MonoBehaviour
         if (SteamManager.Initialized)
         {
             playerName = SteamFriends.GetPersonaName();
-            ulong steamId = SteamUser.GetSteamID().m_SteamID;//steam‚ÌID‚àŽæ“¾
+            ulong steamId = SteamUser.GetSteamID().m_SteamID;//steamï¿½ï¿½IDï¿½ï¿½æ“¾
             Debug.Log($"name:{playerName} SteamID:{steamId}");
             await UserModel.I.CreateUserModel();
             bool result = await UserModel.I.RegistUserAsync(

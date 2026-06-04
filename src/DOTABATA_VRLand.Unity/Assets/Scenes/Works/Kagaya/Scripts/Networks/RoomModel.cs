@@ -115,8 +115,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<List<JoinedUser>> OnRegisterScoreAction { get; set; }
 
-<<<<<<< HEAD:src/DOTABATA_VRLand.Unity/Assets/Scenes/Works/Kagaya/Scripts/RoomModel.cs
-=======
     /// <summary>
     /// シーン移行完了通知
     /// </summary>
@@ -127,7 +125,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action OnAllCompletedSceneTransition { get; set; }
 
->>>>>>> main:src/DOTABATA_VRLand.Unity/Assets/Scenes/Works/Kagaya/Scripts/Networks/RoomModel.cs
     ///<summary>
     ///ニットの更新
     /// </summary>
@@ -469,6 +466,9 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     {
         Debug.Log($"{user.Name} の勝利数: {winCount}");
         // UIの更新など
+        GameManager manager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+        manager.SetRanking();
     }
     /*
      * オブジェクト
