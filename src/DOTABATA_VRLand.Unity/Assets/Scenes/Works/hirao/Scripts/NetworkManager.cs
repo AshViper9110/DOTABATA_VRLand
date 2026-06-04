@@ -204,7 +204,7 @@ public class NetworkManager : Singleton<NetworkManager>
 
     /// <summary>
     /// [サーバー通知]
-    /// ミニゲームの順位取得通知
+    /// ミニゲーム大会の司会進行通知送信
     /// </summary>
     public void OnHostProgress()
     {
