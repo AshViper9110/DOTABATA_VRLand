@@ -319,7 +319,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             //ミニゲーム順位リストの初期化
             _roomContext.InitializeScoreOrder();
-            _roomContext.InitializeMiniGameResultData(); 
+           // _roomContext.InitializeMiniGameResultData(); 
             // 全員に通知
             _roomContext.Group.All.OnGameStart();
             Console.WriteLine("[RoomHub]ゲーム開始");
