@@ -23,11 +23,11 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         //    _roomContextRepository = roomContextRepository;
         //}
 
-        public RoomHub(RoomContextRepository roomContextRepository, GameDbContext dbContext)
+        public RoomHub(RoomContextRepository roomContextRepository, GameDbContext dbContext, IServiceScopeFactory serviceScopeFactory)
         {
             _roomContextRepository = roomContextRepository;
             _dbContext = dbContext;
-           
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         /// <summary>
