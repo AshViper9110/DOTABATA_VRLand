@@ -463,6 +463,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     {
         Debug.Log($"{user.Name} の勝利数: {winCount}");
         // UIの更新など
+        GameManager manager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        manager.AddCrown(user.ConnectionId, user.JoinOrder);
     }
     /*
      * オブジェクト

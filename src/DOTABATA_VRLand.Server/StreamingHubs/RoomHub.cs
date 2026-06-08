@@ -14,7 +14,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub : StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub
     {
         private readonly RoomContextRepository _roomContextRepository;
-        private readonly GameDbContext _dbContext;
+        private readonly GameDbContext _dbContext;                                                                  
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
         private RoomContext? _roomContext;
@@ -23,11 +23,11 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         //    _roomContextRepository = roomContextRepository;
         //}
 
-        public RoomHub(RoomContextRepository roomContextRepository, GameDbContext dbContext, IServiceScopeFactory serviceScopeFactory)
+        public RoomHub(RoomContextRepository roomContextRepository, GameDbContext dbContext)
         {
             _roomContextRepository = roomContextRepository;
             _dbContext = dbContext;
-            _serviceScopeFactory = serviceScopeFactory;
+           
         }
 
         /// <summary>
