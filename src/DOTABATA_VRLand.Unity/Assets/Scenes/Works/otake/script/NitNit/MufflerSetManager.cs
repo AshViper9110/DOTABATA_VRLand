@@ -30,6 +30,9 @@ public class MufflerSetManager : MonoBehaviour
     public int nitCount;
     public int nitLate = 3;//êLÇ—ó¶
 
+    [Header("SEä÷åW")]
+    [SerializeField] AudioSource nitsAudioSource;
+
 
     public float point;
     public float tempPoint = 0;
@@ -42,7 +45,7 @@ public class MufflerSetManager : MonoBehaviour
     void Start()
     {
 
-
+        nitsAudioSource = GetComponent<AudioSource>();
 
         nitCount = 0;
 
@@ -66,6 +69,7 @@ public class MufflerSetManager : MonoBehaviour
         {
             RightEffect.Stop();
             LeftEffect.Stop(); 
+            nitsAudioSource.Stop();
             return;
         }
    
@@ -75,6 +79,7 @@ public class MufflerSetManager : MonoBehaviour
         {
             RightEffect.Stop();
             LeftEffect.Stop();
+            nitsAudioSource.Stop();
             return;
         }
         Vector3 RightVector = (RightRod.transform.position - TempRightPos);
@@ -99,6 +104,7 @@ public class MufflerSetManager : MonoBehaviour
             point = nitManager.MaxPoint;
             RightEffect.Stop();
             LeftEffect.Stop();
+            nitsAudioSource.Stop();
         }
 
 
@@ -114,11 +120,13 @@ public class MufflerSetManager : MonoBehaviour
 
             RightEffect.Play();
             LeftEffect.Play();
+            nitsAudioSource.Play();
         }
         else
         {
             RightEffect.Stop();
             LeftEffect.Stop();
+            nitsAudioSource.Stop();
         }
 
 

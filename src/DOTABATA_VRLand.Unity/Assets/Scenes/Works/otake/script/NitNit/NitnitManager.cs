@@ -34,6 +34,7 @@ public class NitnitManager : MonoBehaviour
 
         FlowController = GetComponent<MinigameFlowController>();
 
+        AudioManager.StopBgm();
        
 
         foreach(var f in InRoomPlayerData.I.PlayerList.Values)
@@ -53,6 +54,10 @@ public class NitnitManager : MonoBehaviour
     {
        if(FlowController.isGameStarted)
         {
+            if(!AudioManager.isStartBgm)
+            {
+                AudioManager.ChangeBGM(AudioManager.BGM.Nit_Nit);
+            }
             timer -= Time.deltaTime;
 
             if (timer < 0)
@@ -60,6 +65,7 @@ public class NitnitManager : MonoBehaviour
                 FlowController.isGameStarted = false;
                 RoomModel.I.SendScore((int)(mufflerSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder-1].point*10));
                 enabled = false;
+                AudioManager.StopBgm();
                 return;
             }
         }
