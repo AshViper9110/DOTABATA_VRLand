@@ -12,9 +12,10 @@ CREATE TABLE `users` (
 -- 2. rooms
 CREATE TABLE `rooms` (
  `id`          INT NOT NULL AUTO_INCREMENT,
+ `name`        VARCHAR(255) NOT NULL,
  `pass`        VARCHAR(255),
- `type`        INT NOT NULL,
- `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `game_mode_id`    INT NOT NULL,
+ `created_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  PRIMARY KEY (`id`)
 ) ;
