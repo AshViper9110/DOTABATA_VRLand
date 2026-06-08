@@ -7,6 +7,7 @@ namespace DOTABATA_VRLand.Server.Models.Contexts {
         public DbSet<User> Users { get; set; }//userクラス
         public DbSet<ServerLogs> serverLogs { get; set; }//サーバーログ、たぶん使わない
         public DbSet<DailyActiveUser> DailyActiveUsers { get; set; }//デイリーアクティブユーザー
+        public DbSet<Rooms> Rooms { get; set; }//ルーム情報
 
         public GameDbContext(DbContextOptions<GameDbContext> options) : base(options) { }
     }

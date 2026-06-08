@@ -4,6 +4,7 @@ using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion.Server.Hubs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
@@ -13,7 +14,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub : StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub
     {
         private readonly RoomContextRepository _roomContextRepository;
-        private readonly GameDbContext _dbContext;
+        private readonly GameDbContext _dbContext;                                                                  
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         private RoomContext? _roomContext;
 
@@ -25,6 +27,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         {
             _roomContextRepository = roomContextRepository;
             _dbContext = dbContext;
+           
         }
 
         /// <summary>
@@ -61,7 +64,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ルーム作成
         /// </summary>
-        public Task CreateRoomAsync(RoomConfig roomConfig)
+        public async Task CreateRoomAsync(RoomConfig roomConfig)
         {
             // 同時に生成しない用に排他制御
             lock (_roomContextRepository)
@@ -72,20 +75,49 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 {
                     // なかったら生成
                     this._roomContext = _roomContextRepository.CreateContext(roomConfig);
+                    
                 }
             }
 
-            return Task.CompletedTask;
+            var exists = await _dbContext.Rooms
+                     .AnyAsync(r => r.Name == roomConfig.Name);//DBにルームが存在するかチェック
+
+            if (!exists)//新規
+            {
+                var room = new Rooms()
+                {
+                    Name = roomConfig.Name,
+                    Pass = roomConfig.Password,
+                    GameModeId = roomConfig.GameModeId
+                };
+
+                _dbContext.Rooms.Add(room);
+                await _dbContext.SaveChangesAsync();//保存
+
+                Console.WriteLine($"[DB] Room Created Id:{room.Id} Name:{room.Name}");
+            }           
         }
 
         /// <summary>
         /// ルーム削除
         /// </summary>
-        public Task DeleteRoomAsync()
+        public　async Task DeleteRoomAsync()
         {
             _roomContextRepository.RemoveContext(_roomContext.Id);
 
-            return Task.CompletedTask;
+            using var scope = _serviceScopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<GameDbContext>();
+
+            var room = await db.Rooms
+                .FirstOrDefaultAsync(r => r.Name == _roomContext.Name);//データベーステーブル削除
+
+            if (room != null)//削除できていれば
+            {
+                db.Rooms.Remove(room);
+                await db.SaveChangesAsync();
+                Console.WriteLine($"[DB] Room Deleted Id:{room.Id} Name:{room.Name}");
+            }
+
         }
 
         /// <summary>
@@ -319,7 +351,6 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             //ミニゲーム順位リストの初期化
             _roomContext.InitializeScoreOrder();
-           // _roomContext.InitializeMiniGameResultData(); 
             // 全員に通知
             _roomContext.Group.All.OnGameStart();
             Console.WriteLine("[RoomHub]ゲーム開始");
