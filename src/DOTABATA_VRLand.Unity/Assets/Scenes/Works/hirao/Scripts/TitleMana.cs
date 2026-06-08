@@ -7,20 +7,31 @@ using System.Collections;
 public class TitleMana : MonoBehaviour
 {
     private string playerName;
+    private ulong steamId;
     public int gameModeId = 1;
     public GameObject player;
 
-    private void Start()
+    private async void Start()
     {
         if (SteamManager.Initialized)
         {
             playerName = SteamFriends.GetPersonaName();
-            Debug.Log(playerName);
+            steamId = SteamUser.GetSteamID().m_SteamID;//steamId‚ðŽæ“¾
+            Debug.Log($"name:{playerName} SteamID:{steamId}");
+            await UserModel.I.CreateUserModel();
+            bool result = await UserModel.I.RegistUserAsync(
+            playerName,
+            steamId
+            );
+            Debug.Log($"result:{result}");
+
         }
         else
         {
             Debug.LogError("Steam is not initialized.");
         }
+
+        InRoomPlayerData.I.SetMySelf(new PlayerData() { playerObj = player });
     }
     public RoomConfig SetNames()
     {
@@ -61,6 +72,6 @@ public class TitleMana : MonoBehaviour
     }
     public async void JointoNextScene(string name)
     {
-        await NetworkManager.I.JointoNextScene(name, playerName, SetNames());
+        await NetworkManager.I.JointoNextScene(name, steamId, SetNames());
     }
 }

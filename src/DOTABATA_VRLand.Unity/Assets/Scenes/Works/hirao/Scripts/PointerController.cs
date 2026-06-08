@@ -45,7 +45,7 @@ public class PointerController : MonoBehaviour
             lineRenderer.startWidth = 0.005f;
             lineRenderer.endWidth = 0.005f;
 
-            lineRenderer.enabled = false;
+            //lineRenderer.enabled = false;
 
             lineRenderer.alignment =
                 LineAlignment.View;

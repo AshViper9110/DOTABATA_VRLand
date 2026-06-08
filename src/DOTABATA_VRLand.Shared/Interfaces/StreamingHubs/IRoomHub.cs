@@ -11,6 +11,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
     /// </summary>
     public interface IRoomHub : IStreamingHub<IRoomHub, IRoomHubReceiver> {
 
+       
         /// <summary>
         /// ルームを全取得
         /// </summary>
@@ -19,7 +20,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// ルームに接続
         /// </summary>
-        Task<JoinedUser[]> JoinRoomAsync(string userName, RoomConfig roomConfig);
+        Task<JoinedUser[]> JoinRoomAsync(ulong steamId, RoomConfig roomConfig);
 
         /// <summary>
         /// 退出処理
@@ -112,5 +113,17 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// 勝利カウントUP
         /// </summary>
         Task WinCountUpAsync(Guid connectionId);
+
+        ///<summary>
+        ///ニットとポイントの更新
+        ///</summary>
+        Task UpdateNit(Guid connectionId,float point);
+
+
+
+        /// <summary>
+        /// シーン移行が完了したことを他プレイヤーに伝える
+        /// </summary>
+        Task CompleteSceneTransition();
     }
 }

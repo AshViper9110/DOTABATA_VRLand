@@ -1,113 +1,90 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
+using Valve.VR;
 using Valve.VR.InteractionSystem;
 
 public class NitnitManager : MonoBehaviour
 {
-    float MaxPoint = 999;
-    float point;
-    float tempPoint = 0;
-    [SerializeField] GameObject RightRod;
-    [SerializeField] GameObject LeftRod;
-    Interactable RightInteractable;
-    Interactable LeftInteractable;
-    Vector3 TempRightPos;
-    Vector3 TempLeftPos;
+    public float MaxPoint = 999;
 
+    [SerializeField] float maxTimer;
+    float timer;
+    [SerializeField] Text TimerText;
+    
     [SerializeField] List<GameObject> nitPrefabs = new List<GameObject>();
     [SerializeField] List<Material> materials = new List<Material>();
-    int nitIndex;
-    int indexVector;
-    [SerializeField] Transform nitsParent;
-    public float distans;
-    public int nitCount;
-    public int nitLate;//伸び率
-     // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    [SerializeField] public List<MufflerSetManager> mufflerSets = new List<MufflerSetManager>();
+    [SerializeField] List<Text> pointTexts = new List<Text>();
+
+    [SerializeField] List<Transform> startPos = new List<Transform>();
+
+   public MinigameFlowController FlowController;
+
+
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        TempRightPos = RightRod.transform.position;
-        TempLeftPos = LeftRod.transform.position;
-        RightInteractable = RightRod.GetComponent<Interactable>();
-        LeftInteractable = LeftRod.GetComponent<Interactable>();
-        point = 0;
-        nitCount = 0;
-        tempPoint = 0;
-        nitIndex = 0;
-        indexVector = 1;
+      
+        SteamVR_Fade.Start(new Color(0,0,0,0),1.0f);
+     timer = maxTimer;
 
+        FlowController = GetComponent<MinigameFlowController>();
+
+       
+
+        foreach(var f in InRoomPlayerData.I.PlayerList.Values)
+        {
+            if (f.joinedUser.ConnectionId == NetworkManager.I.myConnectionId)
+            {
+                f.playerObj.transform.position = startPos[f.joinedUser.JoinOrder - 1].position;
+                mufflerSets[f.joinedUser.JoinOrder - 1].CreateRod();
+            }
+           
+        }
+       
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(!RightInteractable.attachedToHand || !LeftInteractable.attachedToHand) { return; }
-        Vector3 RightVector = (RightRod.transform.position - TempRightPos);
-        Vector3 LeftVector = (LeftRod.transform.position - TempLeftPos);
-
-
-
-        float sqrtRight = Mathf.Sqrt(Mathf.Abs(RightVector.y));
-        sqrtRight = Mathf.Floor(sqrtRight * 10) / 10;
-        float sqrtLeft = Mathf.Sqrt(Mathf.Abs(LeftVector.y));
-        sqrtLeft = Mathf.Floor(sqrtLeft * 10) / 10;
-
-        float temp = Mathf.Abs(sqrtRight + sqrtLeft);
-        temp = Mathf.Floor(temp*10)/10;
-       
-        temp = temp * nitLate;        //Debug.Log(temp);
-         
-        point += temp;
-       
-        if ( point > MaxPoint )
+        if (FlowController.isGameStarted)
         {
-            point = MaxPoint;
-        }
-       
-       
-
-        if (Mathf.Floor(point -tempPoint) >= 1)
-        {
-           // Debug.Log(Mathf.Floor(point - tempPoint));
-            for (int i = 0; i < (int)(point - tempPoint); i++)
+            timer -= Time.deltaTime;
+            if(!TimerText.gameObject.activeSelf)
             {
-                addNit();
+                TimerText.gameObject.SetActive(true);
             }
-            tempPoint = point;
+            TimerText.text = (Mathf.Floor(timer*10)/10).ToString();
+
+            if (timer < 0)
+            {
+                FlowController.isGameStarted = false;
+                RoomModel.I.SendScore((int)(mufflerSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].point * 10));
+                enabled = false;
+                TimerText.text = "フィニッシュ！";
+
+                foreach (MufflerSetManager mufflerSet in mufflerSets)
+                {
+                    mufflerSet.DeleteRod();
+                }
+                return;
+            }
         }
         else
         {
-           
+            TimerText.gameObject.SetActive(false);
         }
-        
 
+        for (int i = 0; i < pointTexts.Count; i++)
+        {
+            pointTexts[i].text = (Mathf.Floor(mufflerSets[i].point*10)/10).ToString();
+        }
 
-        TempRightPos = RightRod.transform.position;
-        TempLeftPos = LeftRod.transform.position;
     }
 
-    public void addNit()
-    {
-        GameObject nit = Instantiate(nitPrefabs[nitIndex],nitsParent);
-        nit.transform.position = new Vector3(nit.transform.position.x + (distans * nitCount), nit.transform.position.y, nit.transform.position.z);
-        if(indexVector == -1)
-        {
-            nit.transform.Rotate(0, 180, 0);
-            nit.GetComponent<MeshRenderer>().material = materials[1];
-        }
-        nitsParent.position = new Vector3(nitsParent.transform.position.x - (distans), nitsParent.transform.position.y, nitsParent.gameObject.transform.position.z);
-        nitCount++;
-        nitIndex += indexVector;
-
-        Debug.Log(nitIndex);
-        if (nitIndex >= nitPrefabs.Count)
-        {
-           indexVector = -indexVector;
-            nitIndex = nitPrefabs.Count - 1;
-        }
-        else if(nitIndex < 0)
-        {
-            indexVector = -indexVector;
-            nitIndex = 0;
-        }
-    }
+ 
 }

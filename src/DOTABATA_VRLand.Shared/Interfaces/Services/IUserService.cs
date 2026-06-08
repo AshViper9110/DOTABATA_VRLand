@@ -14,12 +14,12 @@ namespace DOTABATA_VRLand.Shared.Interfaces.Services {
         /// <summary>
         /// idからユーザー情報取得
         /// </summary>
-        UnaryResult<User> GetUserFromIdAsync(int id);
+        UnaryResult<User> GetUserFromIdAsync(ulong steamId);
 
 
         /// <summary>
         /// ユーザー登録
         /// </summary>
-        UnaryResult<bool> RegistUserAsync(string name);
+        UnaryResult<bool> RegistUserAsync(string name, ulong steamId);
     }
 }

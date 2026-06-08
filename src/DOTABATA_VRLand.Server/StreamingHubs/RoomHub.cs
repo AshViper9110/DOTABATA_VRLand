@@ -4,8 +4,10 @@ using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion.Server.Hubs;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
+using System.Xml.Linq;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub : StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub
@@ -35,6 +37,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             return CompletedTask;
         }
+
 
         /// <summary>
         /// ルームを全取得
@@ -88,7 +91,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ルームに接続
         /// </summary>
-        public async Task<JoinedUser[]> JoinRoomAsync(string userName, RoomConfig roomConfig)
+        public async Task<JoinedUser[]> JoinRoomAsync(ulong steamId, RoomConfig roomConfig)
         {
             await CreateRoomAsync(roomConfig);
 
@@ -112,9 +115,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             // ルームに参加 ＆ ルームを保持
             this._roomContext.Group.Add(this.ConnectionId, Client);
 
-            /*
+            var hash = HashSteamId(steamId);///ハッシュ
+
             // DBからユーザー情報取得
-            User user = await _dbContext.Users.FirstAsync(user => user.Name == userName);
+            User user = await _dbContext.Users.FirstAsync(user => user.SteamId == hash);
 
             // 今日すでにアクティブ記録があるか確認
             var today = DateTime.Today;
@@ -129,21 +133,21 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 {
                     UserId = user.Id,
                     ActivityDate = DateTime.Now,
-                    CreatedDay = DateTime.Now,
+                    CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now
                 });
                 await _dbContext.SaveChangesAsync();
-                Console.WriteLine($"[DB] {userName} の本日初回ログインを記録");
+                Console.WriteLine($"[DB] {user.Name} の本日初回ログインを記録");
             }
             else
             {
-                Console.WriteLine($"[DB] {userName} は本日すでにログイン済み");
-            }*/
+                Console.WriteLine($"[DB] {user.Name} は本日すでにログイン済み");
+            }
 
             // 入室済みユーザーのデータを作成
             var joinedUser = new JoinedUser();
             joinedUser.ConnectionId = this.ConnectionId;
-            joinedUser.Name = userName;
+            joinedUser.Name = user.Name;
             joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
 
             // ルームコンテキストにユーザー情報を登録
@@ -315,8 +319,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             //ミニゲーム順位リストの初期化
             _roomContext.InitializeScoreOrder();
+           // _roomContext.InitializeMiniGameResultData(); 
             // 全員に通知
             _roomContext.Group.All.OnGameStart();
+            Console.WriteLine("[RoomHub]ゲーム開始");
 
             return Task.CompletedTask;
         }
@@ -542,9 +548,46 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public Task HostProgress()
         {
-            // 自分以外に通知
+            // 全員（自分も含む）に通知
             this._roomContext.Group.All.OnHostProgress();
             return Task.CompletedTask;
+        }
+
+        ///<summary>
+        ///ニットの更新
+        /// </summary>
+        public Task UpdateNit(Guid connectionId,float point)
+        {
+           
+            // 全員（自分も含む）に通知
+            this._roomContext.Group.All.OnUpdateNit(connectionId,point);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// シーン移行が完了したことを他プレイヤーに伝える
+        /// </summary>
+        public Task CompleteSceneTransition() {
+            bool allComplete = this._roomContext.ChangeIsCompleteSceneTransition(this.ConnectionId);
+
+            // 自分以外に完了通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnCompleteSceneTransition(this.ConnectionId);
+            // もし全員が完了してたら
+            if (allComplete) {
+                // 全員に通知
+                this._roomContext.Group.All.OnAllCompleteSceneTransition();
+            }
+
+            return Task.CompletedTask;
+        }
+
+
+        //steamIDのハッシュ化
+        private static string HashSteamId(ulong steamId)
+        {
+            var bytes = System.Text.Encoding.UTF8.GetBytes(steamId.ToString());
+            var hash = System.Security.Cryptography.SHA256.HashData(bytes);
+            return Convert.ToHexString(hash);
         }
     }
 }

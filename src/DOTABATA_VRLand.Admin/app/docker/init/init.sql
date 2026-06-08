@@ -2,8 +2,11 @@
 CREATE TABLE `users` (
  `id`          INT NOT NULL AUTO_INCREMENT,
  `name`        VARCHAR(255) NOT NULL,
- `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
- PRIMARY KEY (`id`)
+ `steam_id`    VARCHAR(255) NOT NULL,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ PRIMARY KEY (`id`),
+ UNIQUE KEY uk_users_steam_id (steam_id)
 );
 
 -- 2. rooms
@@ -11,7 +14,8 @@ CREATE TABLE `rooms` (
  `id`          INT NOT NULL AUTO_INCREMENT,
  `pass`        VARCHAR(255),
  `type`        INT NOT NULL,
- `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  PRIMARY KEY (`id`)
 ) ;
 
@@ -23,6 +27,8 @@ CREATE TABLE `miniGames` (
  `type`         INT NOT NULL,
  `scene_number` INT NOT NULL,
  `playable`     TINYINT(1) NOT NULL DEFAULT 1,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  PRIMARY KEY (`id`)
 ) ;
 
@@ -31,7 +37,7 @@ CREATE TABLE `daily_active_users` (
   `id`            INT NOT NULL AUTO_INCREMENT,
   `user_id`       INT NOT NULL,
   `activity_date` DATE NOT NULL,
-  `created_day`   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at`   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_user_date` (`user_id`, `activity_date`),
@@ -43,7 +49,8 @@ CREATE TABLE `room_users` (
   `id`          INT NOT NULL AUTO_INCREMENT,
   `room_id`     INT NOT NULL,
   `user_id`     INT NOT NULL,
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_room_user` (`room_id`, `user_id`),
   CONSTRAINT `fk_ru_room` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`id`),
@@ -58,7 +65,8 @@ CREATE TABLE `miniGame_logs` (
  `user_id`     INT NOT NULL,
  `rank`        INT,
  `score`       INT,
- `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  PRIMARY KEY (`id`),
  CONSTRAINT `fk_ml_room`     FOREIGN KEY (`room_id`)     REFERENCES `rooms` (`id`),
  CONSTRAINT `fk_ml_miniGame` FOREIGN KEY (`miniGame_id`) REFERENCES `miniGames` (`id`),

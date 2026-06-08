@@ -139,6 +139,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 return null;
             }
 
+            Console.WriteLine($"[RoomContext]GetScore{userData.joinedUser.Name}:{result}");
+
             //クリアした順番に追加
             rankOrder.Add((userData.joinedUser, result));
 
@@ -163,6 +165,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
              
                 }
 
+
+
                 return ranked;//joinedUser型の順位リストを返す
             }
             return null;
@@ -173,6 +177,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public List<(JoinedUser user, int winCount)> SortAllRoundRanking()
         {
+            foreach(var user in RoomUserDataList)
+            {
+                user.Value.IsReady = false;
+            }
+
+
             var ranked = RoomUserDataList
                 .OrderByDescending(u => u.Value.miniGameResultData.winCount)
                 .ThenBy(u => u.Key)
@@ -290,9 +300,33 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             }
 
             user.miniGameResultData.winCount++;
+            Console.WriteLine(""+user.miniGameResultData.winCount);
             return (user.joinedUser, user.miniGameResultData.winCount);
 
         }
 
+        /// <summary>
+        /// シーン移行状態変更
+        /// 全員が完了したらTrue返す
+        /// </summary>
+        public bool ChangeIsCompleteSceneTransition(Guid connectionId) {
+            // いるか
+            if (!RoomUserDataList.Any(_=>_.Key == connectionId)) {
+                return false;
+            }
+
+            RoomUserDataList[connectionId].IsCompleteSceneTransition = true;
+
+            // 全員完了していたらfalseにもどしてTrue返す
+            if (RoomUserDataList.Count(_=>_.Value.IsCompleteSceneTransition == true) == RoomUserDataList.Count()) {
+                foreach (var user in RoomUserDataList.Values) {
+                    user.IsCompleteSceneTransition = false;
+                }
+
+                return true;
+            }
+            
+            return false;
+        }
     }
 }
