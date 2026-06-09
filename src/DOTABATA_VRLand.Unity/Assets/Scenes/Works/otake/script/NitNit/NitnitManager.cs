@@ -11,8 +11,8 @@ public class NitnitManager : MonoBehaviour
 
     [SerializeField] float maxTimer;
     float timer;
-    [SerializeField] Text TimerText;
-    
+
+
     [SerializeField] List<GameObject> nitPrefabs = new List<GameObject>();
     [SerializeField] List<Material> materials = new List<Material>();
 
@@ -34,6 +34,7 @@ public class NitnitManager : MonoBehaviour
 
         FlowController = GetComponent<MinigameFlowController>();
 
+        AudioManager.StopBgm();
        
 
         foreach(var f in InRoomPlayerData.I.PlayerList.Values)
@@ -51,32 +52,22 @@ public class NitnitManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (FlowController.isGameStarted)
+       if(FlowController.isGameStarted)
         {
-            timer -= Time.deltaTime;
-            if(!TimerText.gameObject.activeSelf)
+            if(!AudioManager.isStartBgm)
             {
-                TimerText.gameObject.SetActive(true);
+                AudioManager.ChangeBGM(AudioManager.BGM.Nit_Nit);
             }
-            TimerText.text = (Mathf.Floor(timer*10)/10).ToString();
+            timer -= Time.deltaTime;
 
             if (timer < 0)
             {
                 FlowController.isGameStarted = false;
-                RoomModel.I.SendScore((int)(mufflerSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].point * 10));
+                RoomModel.I.SendScore((int)(mufflerSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder-1].point*10));
                 enabled = false;
-                TimerText.text = "フィニッシュ！";
-
-                foreach (MufflerSetManager mufflerSet in mufflerSets)
-                {
-                    mufflerSet.DeleteRod();
-                }
+                AudioManager.StopBgm();
                 return;
             }
-        }
-        else
-        {
-            TimerText.gameObject.SetActive(false);
         }
 
         for (int i = 0; i < pointTexts.Count; i++)

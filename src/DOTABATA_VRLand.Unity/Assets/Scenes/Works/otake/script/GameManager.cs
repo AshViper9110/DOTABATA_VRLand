@@ -256,8 +256,10 @@ public class GameManager : MonoBehaviour
         {
             NetworkManager.I.ReqestMinigameRanking(guid);
 
-            
+            SetRankText(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
         }
+
+
 
 
      
@@ -279,6 +281,11 @@ public class GameManager : MonoBehaviour
 
         MainText.DOText(AfterText[textIndex], 1.0f);
         SetResult();
+    }
+
+    public void SetRankText(Guid guid,int Id)
+    {
+        rankingUis[Id - 1].GetComponent<Text>().text = InRoomPlayerData.I.PlayerList[guid].joinedUser.Name;
     }
 
     //ミニゲーム抽選開始(ホストのみ実行)
