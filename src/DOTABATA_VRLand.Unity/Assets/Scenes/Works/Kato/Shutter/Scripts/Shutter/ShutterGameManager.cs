@@ -9,6 +9,8 @@ public class ShutterGameManager : MonoBehaviour
 
     public GameObject finishText;
 
+    public bool isGameOver = false;
+
     void Start()
     {
         UpdateShutters();
