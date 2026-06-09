@@ -154,7 +154,7 @@ public class NetworkManager : Singleton<NetworkManager>
     {
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-        gameManager.miniRankingList[user.JoinOrder + 1]= rank;
+        gameManager.miniRankingList[user.ConnectionId]= rank;
         Debug.Log($"{user.JoinOrder}:::{rank}");
         
         if (rank != 0)
@@ -181,12 +181,14 @@ public class NetworkManager : Singleton<NetworkManager>
     /// </summary>
     public void OnGetRanking(List<JoinedUser> ranking, List<int> winCount)
     {
+        Debug.Log("らんきんぐしゅとく");
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         int index = 0;
         foreach (JoinedUser user in ranking)
         {
+            Debug.Log(winCount[index]);
             gameManager.RankingList[user.JoinOrder] = index+1;
-            GameManager.playerWinlist[user.JoinOrder] = winCount[index];
+            gameManager.playerWinlist[user.JoinOrder] = winCount[index];
             gameManager.SetCrown(user.ConnectionId,user.JoinOrder);
             index++;
         }

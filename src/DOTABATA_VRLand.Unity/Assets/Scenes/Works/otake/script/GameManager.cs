@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour
 
 
 
-    static public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
+     public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
         { 1,0},{2,0},{3,0},{4,0}
     };//勝利数
@@ -113,16 +113,13 @@ public class GameManager : MonoBehaviour
     };
 
 
-    public Dictionary<int, int> miniRankingList = new Dictionary<int, int>()
+    public Dictionary<Guid, int> miniRankingList = new Dictionary<Guid, int>()
     {
-        {1,0},
-        {2,0},
-        { 3,0},
-        { 4,0}
+        
         
     };
 
-    public int winPlayerId;
+    public Guid winPlayerId;
 
   
 
@@ -306,7 +303,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (Guid guid in InRoomPlayerData.I.PlayerList.Keys)
         {
-            AddCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+            DeleteCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
         }
         SteamVR_Fade.View(new Color(1,1,1,1), 2);
         Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
@@ -345,11 +342,14 @@ public class GameManager : MonoBehaviour
 
     public void SetCrown(Guid guid,int ID)
     {
+       
         List<GameObject> crowns = new List<GameObject>();
         
         Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
-  
-        for (int i = 0; i < playerWinlist[1]; i++)
+
+        Debug.Log(playerWinlist[ID]);
+
+        for (int i = 0; i < playerWinlist[ID]; i++)
         {
             GameObject crown = Instantiate(CrownPrefab,
                 transform);
@@ -368,12 +368,12 @@ public class GameManager : MonoBehaviour
 
     public void AddCrown(Guid guid, int ID)
     {
-        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
-        //GameObject crown = Instantiate(CrownPrefab,
-        //       transform);
-
+        Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
         GameObject crown = Instantiate(CrownPrefab,
-              crowntrans);
+               transform);
+
+        //GameObject crown = Instantiate(CrownPrefab,
+        //      crowntrans);
 
 
         crown.transform.position = new Vector3(crown.transform.position.x, transform.position.y + (crownDistance * playerWinlist[ID])+3f, crown.transform.position.z);
@@ -382,6 +382,12 @@ public class GameManager : MonoBehaviour
         manager.isNew = true;
 
 
+        if (playerWinlist[RankingList[InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.JoinOrder]] >= 3)
+        {
+            onEnd = true;
+            onResult = false;
+            textIndex = -1;
+        }
     }
 
     public void DeleteCrown(Guid guid, int ID)
@@ -397,13 +403,13 @@ public class GameManager : MonoBehaviour
     }
     public void SetResult()
     {
-        for (int i = 0; i < miniRankingList.Count; i++)
+        foreach(Guid guid in miniRankingList.Keys)
         {
 
-            if (miniRankingList[i+1] == 1)
+            if (miniRankingList[guid] == 1)
             {
 
-                winPlayerId = miniRankingList[i + 1];
+                winPlayerId = guid;
                
             }
 
@@ -470,12 +476,17 @@ public class GameManager : MonoBehaviour
                 return;
             }
 
+            if(isSpin)
+            {
+                return;
+            }
+
             if (AfterText[textIndex] == "!!! おめでとう！")
             {
 
-                MainText.DOText($"プレイヤー{winPlayerId}" + AfterText[textIndex], 1.0f);
+                MainText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + AfterText[textIndex], 1.0f);
                 // playerWinlist[winPlayerId]++;
-                if (winPlayerId == InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder)
+                if (winPlayerId == NetworkManager.I.myConnectionId)
                 {
                     RoomModel.I.RequestWinCountUp(NetworkManager.I.myConnectionId);
                         }
@@ -483,14 +494,8 @@ public class GameManager : MonoBehaviour
                 SetRanking();
                 //一旦仮で入れてます。本実装は優勝者のGuidいれてください。
 
-               
 
-                if (playerWinlist[RankingList[winPlayerId]] >= 3)
-                {
-                    onEnd = true;
-                    onResult = false;
-                    textIndex = -1;
-                }
+
             }
             else
             {
@@ -510,7 +515,7 @@ public class GameManager : MonoBehaviour
             if (FinishText[textIndex] == "!!! おめでとう！")
             {
                 AudioManager.ChangeBGM(AudioManager.BGM.Main_End);
-                MainText.DOText($"プレイヤー{winPlayerId}" + FinishText[textIndex], 1.0f);
+                MainText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + FinishText[textIndex], 1.0f);
 
             }
             else

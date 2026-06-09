@@ -300,6 +300,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             }
 
             user.miniGameResultData.winCount++;
+            Console.WriteLine(""+user.miniGameResultData.winCount);
             return (user.joinedUser, user.miniGameResultData.winCount);
 
         }

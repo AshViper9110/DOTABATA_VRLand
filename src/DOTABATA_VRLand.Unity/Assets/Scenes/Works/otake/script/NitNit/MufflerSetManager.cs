@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
+using UnityEngine.XR;
 using Valve.VR.InteractionSystem;
+using static UnityEngine.Rendering.DebugUI.Table;
+using Hand = UnityEngine.XR.Hand;
 
 public class MufflerSetManager : MonoBehaviour
 {
@@ -138,7 +141,7 @@ public class MufflerSetManager : MonoBehaviour
     public void addNit(float point)
     {
 
-        Debug.Log(((int)point - this.tempPoint).ToString());
+  
         for (int i = 0; i < (int)point - this.tempPoint; i++)
         {
            
@@ -177,7 +180,7 @@ public class MufflerSetManager : MonoBehaviour
 
     public void CreateRod()
     {
-        Debug.Log("create Rod");
+       
         GameObject right = Instantiate(Rodprefab
             ,transform.position + RightRodPos,
             new Quaternion(0, 0, 0, 0),
@@ -201,5 +204,31 @@ public class MufflerSetManager : MonoBehaviour
         LeftEffect = LeftRod.GetComponentInChildren<ParticleSystem>();
         RightEffect.Stop();
         LeftEffect.Stop();
+    }
+
+    public void DeleteRod()
+    {
+        if (RightRod != null)
+        {
+            Interactable rightIntara = RightRod.GetComponent<Interactable>();
+            Interactable leftIntara = LeftRod.GetComponent<Interactable>();
+
+            if (rightIntara.attachedToHand != null)
+            {
+               rightIntara.attachedToHand.DetachObject(RightRod);
+            }
+            if (leftIntara.attachedToHand != null)
+            {
+                leftIntara.attachedToHand.DetachObject(LeftRod);
+            }
+
+
+
+
+            Destroy(RightRod);
+            Destroy(LeftRod);
+
+            enabled = false;
+        }
     }
 }
