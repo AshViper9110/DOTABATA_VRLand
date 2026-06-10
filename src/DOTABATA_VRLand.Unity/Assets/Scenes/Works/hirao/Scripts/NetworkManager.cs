@@ -78,6 +78,23 @@ public class NetworkManager : Singleton<NetworkManager>
 
         SceneManager.LoadScene(scene);
     }
+
+    /// <summary>
+    /// Roomに参加ボタン
+    /// </summary>
+    public async Task JointoRoom(ulong steamID, RoomConfig roomConfig)
+    {
+        await RoomModel.I.JoinRoomAsync(steamID, roomConfig);
+
+        await Cysharp.Threading.Tasks.UniTask.WaitUntil(() =>
+            InRoomPlayerData.I.PlayerList.ContainsKey(myConnectionId)
+        );
+
+        isJoin = true;
+        SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
+        syncPlayer.isLocalPlayer = true;
+    }
+
     /// <summary>
     /// ルーム全取得
     /// </summary>
@@ -134,7 +151,8 @@ public class NetworkManager : Singleton<NetworkManager>
     /// </summary>
     private void OnLeavedUser(Guid connectionId, int joinOrder)
     {
-        TextLogs($"ConnectionId：{connectionId} が退室");
+        if (connectionId == myConnectionId) return;
+            TextLogs($"ConnectionId：{connectionId} が退室");
         InRoomPlayerData.I.RemovePlayer(connectionId);
     }
 
