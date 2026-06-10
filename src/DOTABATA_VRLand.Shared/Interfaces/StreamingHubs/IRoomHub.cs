@@ -130,5 +130,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// Roomオーナーがmainのゲームを開始させることを通知する
         /// </summary>
         Task RoomStart();
+
+        /// <summary>
+        /// ボーリングの順番変え
+        /// </summary>
+        Task BallingNext();
     }
 }

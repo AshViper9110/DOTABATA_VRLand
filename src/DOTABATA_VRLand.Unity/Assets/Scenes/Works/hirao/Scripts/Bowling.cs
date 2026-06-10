@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,23 +19,42 @@ public class Bowling : MonoBehaviour
     [SerializeField] private Transform spawnPosPin;
     [SerializeField] private Text defeatedPinText;
     [SerializeField] private Text defeatedPinTextLog;
-    private int defeatedPinCount;
+    private int defeatedPinCount = 0;
+
+    private int currentNextGameTime = -1;
 
     private List<PinStatus> pinList = new List<PinStatus>();
     private GameObject currentBall;
 
-    private void Start()
+    private void OnEnable()
     {
-        if (currentBall != null)
-        {
-            Destroy(currentBall);
-        }
-        currentBall = Instantiate(ball, spawnPosBall);
-        SetPin();
-        defeatedPinCount = 0;
+        if (RoomModel.I == null) return;
+        RoomModel.I.OnBallingNexted += OnBallingNexted;
     }
 
-    private void FixedUpdate()
+    private void OnDisable()
+    {
+        if (RoomModel.I == null) return;
+        RoomModel.I.OnBallingNexted -= OnBallingNexted;
+    }
+
+    private void OnBallingNexted(int order)
+    {
+        if (InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.JoinOrder == order)
+        {
+            SpawnBall();
+        }
+    }
+
+    private void Start()
+    {
+        if (InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.JoinOrder == 1)
+        {
+            SpawnBall();
+        }
+    }
+
+    private async void FixedUpdate()
     {
         if (pinList.Count > 0)
         {
@@ -46,9 +64,47 @@ public class Bowling : MonoBehaviour
                 {
                     defeatedPinCount++;
                     pinStatus.isDefeated = true;
+                    currentNextGameTime = 120;
                 }
             }
             defeatedPinText.text = $"{defeatedPinCount}ñ{";
+        }
+
+        if (currentNextGameTime == 0)
+        {
+            currentNextGameTime = -1;
+            DeletePins();
+            RoomModel.I.SendScore(defeatedPinCount);
+            await RoomModel.I.BallingNext();
+        }
+        else if (currentNextGameTime > 0)
+        {
+            currentNextGameTime -= 1;
+        }
+    }
+
+    private void DeletePins()
+    {
+        if (currentBall != null)
+        {
+            Destroy(currentBall);
+        }
+
+        if (pinList.Count > 0)
+        {
+            foreach (PinStatus pin in pinList)
+            {
+                Destroy(pin.gameObject);
+            }
+            pinList.Clear();
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("projectile") && currentBall != null)
+        {
+            currentNextGameTime = 100;
         }
     }
 
@@ -69,7 +125,7 @@ public class Bowling : MonoBehaviour
         float rowSpacing = 0.2f; // ëOå„ä‘äu
         float colSpacing = 0.2f;   // ç∂âEä‘äu
 
-        int rows = 14; // 1 + 2 + 3 + 4 = 10ñ{
+        int rows = 14;
 
         int pinCount = 0;
 

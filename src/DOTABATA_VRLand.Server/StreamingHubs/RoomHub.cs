@@ -151,6 +151,13 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             if (steamId == null)
             {
+                // 入室済みユーザーのデータを作成
+                joinedUser.ConnectionId = this.ConnectionId;
+                joinedUser.Name = "Guest";
+                joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
+            }
+            else
+            {
                 var hash = HashSteamId(steamId);///ハッシュ
 
                 // DBからユーザー情報取得
@@ -185,15 +192,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 joinedUser.Name = user.Name;
                 joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
             }
-            else
-            {
-                // 入室済みユーザーのデータを作成
-                joinedUser.ConnectionId = this.ConnectionId;
-                joinedUser.Name = "Guest";
-                joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
-            }
 
-            
+
 
             // ルームコンテキストにユーザー情報を登録
             var roomUserData = new RoomUserData() { joinedUser = joinedUser };
@@ -361,7 +361,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public Task GameStartAsync()
         {
-
+            //ボーリングの順番リセット
+            _roomContext.ballingOrder = 1;
             //ミニゲーム順位リストの初期化
             _roomContext.InitializeScoreOrder();
             // 全員に通知
@@ -634,9 +635,18 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             return Convert.ToHexString(hash);
         }
 
+        //ルームの開始
         public Task RoomStart()
         {
             this._roomContext.Group.All.OnRoomStart();
+            return Task.CompletedTask;
+        }
+
+        //ボーリングの順番変え
+        public Task BallingNext()
+        {
+            this._roomContext.ballingOrder++;
+            this._roomContext.Group.All.OnBallingNext(this._roomContext.ballingOrder);
             return Task.CompletedTask;
         }
     }

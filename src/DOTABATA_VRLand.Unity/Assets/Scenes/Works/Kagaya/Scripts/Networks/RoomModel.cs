@@ -130,6 +130,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action OnRoomStarted {  get; set; }
 
+    public Action<int> OnBallingNexted { get; set; }
+
     /*
      * 処理
      */
@@ -657,6 +659,23 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (OnRoomStarted != null)
         {
             OnRoomStarted();
+        }
+    }
+
+    public async UniTask BallingNext()
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.BallingNext();
+    }
+
+    public void OnBallingNext(int order)
+    {
+        if (OnBallingNexted != null)
+        {
+            OnBallingNexted(order);
         }
     }
 }
