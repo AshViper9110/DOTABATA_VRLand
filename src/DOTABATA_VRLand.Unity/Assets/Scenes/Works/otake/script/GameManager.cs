@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 using System;
 using Valve.VR;
 using UnityEditor;
+using TMPro;
 
 
 public class GameManager : MonoBehaviour
@@ -30,12 +31,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject CrownPrefab;
     public float crownDistance;
 
-    AudioManager audioManager;
-
-    ///あとで消す
-    [SerializeField] Transform crowntrans;
 
 
+
+
+    //
 
 
 
@@ -43,7 +43,8 @@ public class GameManager : MonoBehaviour
     /// 進行UI関係
     /// </summary>
 
-    public Text MainText;
+    public Text DummyText;
+    public TextMeshProUGUI MainText;
     public int textIndex;
 
     public bool onSelect;
@@ -95,6 +96,7 @@ public class GameManager : MonoBehaviour
     //ランキングUI
     public List<RectTransform> rankingPosList;
     public List<RectTransform> rankingUis;
+    public List<Material> rankingMaterials;
 
 
 
@@ -121,6 +123,10 @@ public class GameManager : MonoBehaviour
 
     public Guid winPlayerId;
 
+    AudioSource audio;
+    [SerializeField] AudioClip Roll;
+    [SerializeField] AudioClip RollEnd;
+
   
 
     private void Awake()
@@ -132,9 +138,10 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        audioManager = GetComponent<AudioManager>();
+       audio = GetComponent<AudioSource>();
         SteamVR_Fade.View(new Color(0,0,0,0),2);
         EndProgress = false;
+        AudioManager.ChangeBGM(AudioManager.BGM.Main_Normal);
         //List<GameObject> crowns = new List<GameObject>();
 
         ////Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
@@ -185,9 +192,12 @@ public class GameManager : MonoBehaviour
         {
             if (CenterObjRb.angularVelocity.y < 0.01f)
             {
-                MainText.text = "";
+                DummyText.text = "";
                 Debug.Log(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました");
-                MainText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
+                DummyText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
+
+                audio.Stop();
+                audio.PlayOneShot(RollEnd);
 
                 onSelect = true;
                 onResult = false;
@@ -196,8 +206,9 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        MainText.text = DummyText.text;
 
-        //TODO：自身がホストの場合はミニゲーム一覧の回転同期とテキストの遷移
+
         if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
         {
             if (Input.GetMouseButtonDown(0) || grabAction.GetStateDown(handType))
@@ -229,11 +240,11 @@ public class GameManager : MonoBehaviour
 
 
         //onResult = true;
-        //MainText.text = "";
+        //DummyText.text = "";
         //textIndex = 0;
 
 
-        //MainText.DOText(AfterText[textIndex], 1.0f);
+        //DummyText.DOText(AfterText[textIndex], 1.0f);
         //SetResult();
 
         SetRanking();
@@ -263,9 +274,9 @@ public class GameManager : MonoBehaviour
 
 
      
-            MainText.text = "";
+            DummyText.text = "";
             textIndex = 0;
-            MainText.DOText(StartText[textIndex], 1.0f);
+            DummyText.DOText(StartText[textIndex], 1.0f);
         
 
        
@@ -275,24 +286,27 @@ public class GameManager : MonoBehaviour
     public　void InitResult()
     {
         onResult = true;
-        MainText.text = "";
+        DummyText.text = "";
         textIndex = 0;
 
 
-        MainText.DOText(AfterText[textIndex], 1.0f);
+        DummyText.DOText(AfterText[textIndex], 1.0f);
         SetResult();
     }
 
     public void SetRankText(Guid guid,int Id)
     {
-        rankingUis[Id - 1].GetComponent<Text>().text = InRoomPlayerData.I.PlayerList[guid].joinedUser.Name;
+        rankingUis[Id - 1].GetComponent<TextMeshProUGUI>().text = InRoomPlayerData.I.PlayerList[guid].joinedUser.Name;
     }
 
     //ミニゲーム抽選開始(ホストのみ実行)
     public void SelectMiniGame()
     {
         isSpin = true;
-        
+
+        audio.clip = Roll;
+        audio.Play();
+        audio.loop = true;
 
         float spinPower = UnityEngine.Random.Range(3, 6);
 
@@ -436,13 +450,15 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < RankingList.Count; i++)
         {
             rankingUis[i].DOAnchorPosY(rankingPosList[RankingList[i + 1] - 1].anchoredPosition.y, 1f);
+            rankingUis[i].GetComponent<TextMeshProUGUI>().material = rankingMaterials[i];
+            
         }
 
     }
 
     public void MoveText()
     {
-
+        HostManager.I.ChengeFace(HostManager.facial.Normal);
         if (EndProgress) return;
         if (!isSpin)
         {
@@ -452,9 +468,11 @@ public class GameManager : MonoBehaviour
         {
             if (CenterObjRb.angularVelocity.y < 0.01f)
             {
-                MainText.text = "";
+                audio.Stop();
+                audio.PlayOneShot(RollEnd);
+                DummyText.text = "";
                 Debug.Log(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました");
-                MainText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
+                DummyText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
 
                 onSelect = true;
                 onResult = false;
@@ -466,7 +484,7 @@ public class GameManager : MonoBehaviour
 
 
 
-        MainText.text = "";
+        DummyText.text = "";
         if (onResult)
         {
             if (textIndex >= AfterText.Count && !isSpin)
@@ -483,8 +501,8 @@ public class GameManager : MonoBehaviour
 
             if (AfterText[textIndex] == "!!! おめでとう！")
             {
-
-                MainText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + AfterText[textIndex], 1.0f);
+                HostManager.I.ChengeFace(HostManager.facial.Smile);
+                DummyText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + AfterText[textIndex], 1.0f);
                 // playerWinlist[winPlayerId]++;
                 if (winPlayerId == NetworkManager.I.myConnectionId)
                 {
@@ -499,7 +517,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                MainText.DOText(AfterText[textIndex], 1.0f);
+                DummyText.DOText(AfterText[textIndex], 1.0f);
             }
         }
         else if (onEnd)
@@ -514,13 +532,14 @@ public class GameManager : MonoBehaviour
 
             if (FinishText[textIndex] == "!!! おめでとう！")
             {
+                HostManager.I.ChengeFace(HostManager.facial.Smile);
                 AudioManager.ChangeBGM(AudioManager.BGM.Main_End);
-                MainText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + FinishText[textIndex], 1.0f);
+                DummyText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + FinishText[textIndex], 1.0f);
 
             }
             else
             {
-                MainText.DOText(FinishText[textIndex], 1.0f);
+                DummyText.DOText(FinishText[textIndex], 1.0f);
             }
         }
         else if (onSelect)
@@ -538,7 +557,7 @@ public class GameManager : MonoBehaviour
             }
             else if(textIndex < StartText.Count) 
             {
-                MainText.DOText(StartText[textIndex], 1.0f);
+                DummyText.DOText(StartText[textIndex], 1.0f);
             }
         }
 

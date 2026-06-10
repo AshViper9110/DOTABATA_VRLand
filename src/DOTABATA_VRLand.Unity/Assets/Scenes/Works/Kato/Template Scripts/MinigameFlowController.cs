@@ -181,9 +181,11 @@ public class MinigameFlowController : MonoBehaviour
         if (remain > 0)
         {
             countdownText.text = remain.ToString();
+            AudioManager.PlaySE(AudioManager.SE.MiniGame_CountDown);
         }
         else
         {
+            AudioManager.PlaySE(AudioManager.SE.MiniGame_Start);
             countdownText.text = "START!";
             StartCoroutine(BeginGameAfterStart());
         }
@@ -234,6 +236,7 @@ public class MinigameFlowController : MonoBehaviour
         foreach (var user in names)Debug.Log($"ランキング受信:{user}");
         isGameStarted = false;
         EndGame();
+        SteamVR_Fade.View(new Color(1, 1, 1, 1), 2);
         SceneManager.LoadScene("GameScene");//シーン移行
     }
 

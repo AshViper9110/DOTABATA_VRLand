@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
@@ -10,6 +12,7 @@ public class NitnitManager : MonoBehaviour
     public float MaxPoint = 999;
 
     [SerializeField] float maxTimer;
+    [SerializeField] TextMeshProUGUI timerText;
     float timer;
 
 
@@ -23,6 +26,7 @@ public class NitnitManager : MonoBehaviour
 
    public MinigameFlowController FlowController;
 
+    
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -35,9 +39,9 @@ public class NitnitManager : MonoBehaviour
         FlowController = GetComponent<MinigameFlowController>();
 
         AudioManager.StopBgm();
-       
+        timerText.text = "";
 
-        foreach(var f in InRoomPlayerData.I.PlayerList.Values)
+        foreach (var f in InRoomPlayerData.I.PlayerList.Values)
         {
             if (f.joinedUser.ConnectionId == NetworkManager.I.myConnectionId)
             {
@@ -59,13 +63,20 @@ public class NitnitManager : MonoBehaviour
                 AudioManager.ChangeBGM(AudioManager.BGM.Nit_Nit);
             }
             timer -= Time.deltaTime;
+            timerText.text = ((int)timer).ToString();
 
             if (timer < 0)
             {
+                timerText.text = "フィニッシュ！";
+              
                 FlowController.isGameStarted = false;
-                RoomModel.I.SendScore((int)(mufflerSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder-1].point*10));
+                StartCoroutine(SendScoreCount());
+                mufflerSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].DeleteRod();
                 enabled = false;
+                
                 AudioManager.StopBgm();
+                AudioManager.PlaySE(AudioManager.SE.MiniGame_Finish);
+
                 return;
             }
         }
@@ -77,5 +88,11 @@ public class NitnitManager : MonoBehaviour
 
     }
 
+
+     public IEnumerator SendScoreCount()
+    {
+        yield return new WaitForSeconds(2);
+        RoomModel.I.SendScore((int)(mufflerSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].point * 10));
+    }
  
 }
