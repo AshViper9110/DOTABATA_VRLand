@@ -296,7 +296,8 @@ public class GameManager : MonoBehaviour
 
     public void SetRankText(Guid guid,int Id)
     {
-        rankingUis[Id - 1].GetComponent<TextMeshProUGUI>().text = InRoomPlayerData.I.PlayerList[guid].joinedUser.Name;
+        rankingUis[Id - 1].GetComponent<TextMeshProUGUI>().text = InRoomPlayerData.I.PlayerList[guid].joinedUser.Name + "  win×"+
+            playerWinlist[Id];
     }
 
     //ミニゲーム抽選開始(ホストのみ実行)
