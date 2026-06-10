@@ -13,6 +13,9 @@ public class AudioManager : MonoBehaviour
         Main_crown_add,
         Main_miniGame_select,
         Main_miniGeme_decision,
+        MiniGame_CountDown,
+        MiniGame_Start,
+        MiniGame_Finish,
        
         
     }
