@@ -1,0 +1,44 @@
+using DG.Tweening.Core.Easing;
+using UnityEngine;
+
+public class AutoMove : MonoBehaviour
+{
+    public ShutterGameManager shuttergameManager;
+    public float speed = 1f;
+    public float stopDistance = 10f;
+
+    void Start()
+    {
+        //if (InRoomPlayerData.I.MySelf == null)
+        //{
+        //    Debug.LogError("‚Ü‚¾ƒ‹[ƒ€ŽQ‰Á‚Å‚«‚Ä‚È‚¢");
+        //    return;
+        //}
+
+        //int lane =
+        //    InRoomPlayerData.I.MySelf.JoinOrder;
+    }
+
+    void Update()
+    {
+        if (shuttergameManager.isGameOver)
+            return;
+
+
+        Shutter current = shuttergameManager.GetCurrentShutter();
+        if (current == null) return;
+
+        float distance = Vector3.Distance(transform.position, current.transform.position);
+
+        if (distance > stopDistance)
+        {
+            transform.position += Vector3.forward * speed * Time.deltaTime;
+
+            shuttergameManager.canInput = false;
+        }
+        else
+        {
+            shuttergameManager.canInput = true;
+        }
+    }
+}
