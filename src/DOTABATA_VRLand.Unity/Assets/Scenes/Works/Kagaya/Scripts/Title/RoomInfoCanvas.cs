@@ -1,10 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
+using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using Steamworks;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Valve.VR;
 
@@ -16,6 +19,10 @@ public class RoomInfoCanvas : MonoBehaviour {
     private string playerName;
     private int gameModeId = 0;
     private ulong steamId;
+
+    [SerializeField] private GameObject standyPanel;
+    [SerializeField] private GameObject lobbyPanel;
+    [SerializeField] private GameObject roomStartButton;
 
     // ルーム作成UI
     [SerializeField] private GameObject createRoomUI;
@@ -64,6 +71,22 @@ public class RoomInfoCanvas : MonoBehaviour {
     // パスワード入力先
     private TMP_InputField targetInputFirld;
 
+    private void OnEnable()
+    {
+        if (RoomModel.I == null) return;
+        RoomModel.I.OnJoinedUser += OnJoinedUser;
+        RoomModel.I.OnLeavedUser += OnLeavedUser;
+        RoomModel.I.OnRoomStarted += OnRoomStarted;
+    }
+
+    private void OnDisable()
+    {
+        if (RoomModel.I == null) return;
+        RoomModel.I.OnJoinedUser -= OnJoinedUser;
+        RoomModel.I.OnLeavedUser -= OnLeavedUser;
+        RoomModel.I.OnRoomStarted -= OnRoomStarted;
+    }
+
     private void Start() {
         if (SteamManager.Initialized) {
             playerName = SteamFriends.GetPersonaName();
@@ -94,31 +117,6 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// どのInputFieldを選択しているか
     /// </summary>
     private void ChangeInputFieldFocuse() {
-        //bool isOnClickBtn = false;
-
-        //// マウスクリックした瞬間、またはタッチした瞬間に処理
-        //if (!Input.GetMouseButtonDown(0) && !triggerAction.stateDown) {
-        //    return;
-        //}
-        //// Ray（光線）の生成
-        //PointerEventData pointerData = new PointerEventData(EventSystem.current);
-        //pointerData.position = Input.mousePosition;
-
-        //// ヒットしたUIを格納するリスト
-        //List<RaycastResult> results = new List<RaycastResult>();
-
-        //// UIに対してRayを飛ばし、ヒットした要素を全て取得
-        //EventSystem.current.RaycastAll(pointerData, results);
-
-        //// 結果の処理
-        //if (results.Count > 0) {
-        //    foreach (RaycastResult result in results) {
-        //        if (result.gameObject.CompareTag("KeyBoard")) {
-        //            isOnClickBtn = true;
-        //        }
-        //    }
-        //}
-
         if (passwordInputField.isFocused) {
             if (!keyBoardUI.activeSelf) {
                 keyBoardUI.SetActive(true);
@@ -131,13 +129,6 @@ public class RoomInfoCanvas : MonoBehaviour {
             }
             targetInputFirld = joinPasswordInputField;
         }
-        //else {
-        //    if (keyBoardUI.activeSelf &&
-        //        !isOnClickBtn) {
-        //        keyBoardUI.SetActive(false);
-        //        targetInputFirld = null;
-        //    }
-        //}
     }
 
     public void CloseKeyBoard()
@@ -233,14 +224,15 @@ public class RoomInfoCanvas : MonoBehaviour {
             passwordString = passwordInputField.text;
         }
 
-        RoomConfig roomConfig = new RoomConfig() {
+        RoomConfig roomConfig = new RoomConfig()
+        {
             Name = myRoomNameText.text,
             Password = passwordString,
             GameModeId = gameModeId,
-        };
-        SteamVR_Fade.View(Color.white, 0.5f);
-        
-        await NetworkManager.I.JointoNextScene("GameScene", steamId, roomConfig);
+        };        
+        await NetworkManager.I.JointoRoom(steamId, roomConfig);
+        standyPanel.SetActive(true);
+        lobbyPanel.SetActive(false);
     }
 
     /// <summary>
@@ -305,8 +297,43 @@ public class RoomInfoCanvas : MonoBehaviour {
                 Name = roomInfo.Name,
                 Password = passwordString,
             };
-            SteamVR_Fade.View(Color.white, 0.5f); 
-            await NetworkManager.I.JointoNextScene("GameScene", steamId, roomConfig);
+            await NetworkManager.I.JointoRoom(steamId, roomConfig);
+
+            standyPanel.SetActive(true);
+            lobbyPanel.SetActive(false);
         });
+    }
+
+    public async void LeaveOnRoom()
+    {
+        NetworkManager.I.isJoin = false;
+        await RoomModel.I.LeaveRoomAsync();
+        standyPanel.SetActive(false);
+        lobbyPanel.SetActive(true);
+    }
+
+    public async void RoomStart()
+    {
+        await RoomModel.I.RoomStart();
+    }
+
+    //Server通知
+    private void OnJoinedUser(JoinedUser joinedUser)
+    {
+        if(joinedUser.ConnectionId == RoomModel.I.ConnectionId)
+        {
+            if (joinedUser.JoinOrder == 1) roomStartButton.SetActive(true);
+        }
+    }
+
+    private void OnLeavedUser(Guid connectionId, int joinOrder)
+    {
+
+    }
+
+    private void OnRoomStarted()
+    {
+        SteamVR_Fade.View(Color.white, 0.5f);
+        SceneManager.LoadScene("GameScene");
     }
 }

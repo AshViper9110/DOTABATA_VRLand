@@ -111,6 +111,11 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ニットの更新
         /// </summary>
         public void OnUpdateNit(Guid id,float point);
+
+        /// <summary>
+        /// mainのゲームの開始通知
+        /// </summary>
+        public void OnRoomStart();
     }
 
 }

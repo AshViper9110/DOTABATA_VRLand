@@ -33,16 +33,6 @@ public class TitleMana : MonoBehaviour
 
         InRoomPlayerData.I.SetMySelf(new PlayerData() { playerObj = player });
     }
-    public RoomConfig SetNames()
-    {
-        RoomConfig roomConfig = new RoomConfig()
-        {
-            Name = "Name",
-            Password = "0000",
-            GameModeId = gameModeId,
-        };
-        return roomConfig;
-    }
 
     /// <summary>
     /// Gameシーンに移動ボタン
@@ -56,7 +46,7 @@ public class TitleMana : MonoBehaviour
     private IEnumerator MoveWithFade()
     {
         // 白フェードアウト
-        SteamVR_Fade.Start(Color.white, 0.5f);
+        SteamVR_Fade.View(Color.white, 0.5f);
 
         // フェード完了待ち
         yield return new WaitForSeconds(0.5f);
@@ -68,10 +58,6 @@ public class TitleMana : MonoBehaviour
         yield return null;
 
         // フェードイン
-        SteamVR_Fade.Start(Color.clear, 0.5f);
-    }
-    public async void JointoNextScene(string name)
-    {
-        await NetworkManager.I.JointoNextScene(name, steamId, SetNames());
+        SteamVR_Fade.View(Color.clear, 0.5f);
     }
 }
