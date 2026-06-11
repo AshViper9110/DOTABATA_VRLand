@@ -147,40 +147,53 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             // ルームに参加 ＆ ルームを保持
             this._roomContext.Group.Add(this.ConnectionId, Client);
 
-            var hash = HashSteamId(steamId);///ハッシュ
+            var joinedUser = new JoinedUser();
 
-            // DBからユーザー情報取得
-            User user = await _dbContext.Users.FirstAsync(user => user.SteamId == hash);
-
-            // 今日すでにアクティブ記録があるか確認
-            var today = DateTime.Today;
-            var existingRecord = await _dbContext.DailyActiveUsers
-                .FirstOrDefaultAsync(d => d.UserId == user.Id
-                                       && d.ActivityDate.Date == today);
-
-            if (existingRecord == null)
+            if (steamId == null)
             {
-                // 今日初めてのログインなら登録
-                _dbContext.DailyActiveUsers.Add(new DailyActiveUser
-                {
-                    UserId = user.Id,
-                    ActivityDate = DateTime.Now,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
-                });
-                await _dbContext.SaveChangesAsync();
-                Console.WriteLine($"[DB] {user.Name} の本日初回ログインを記録");
+                // 入室済みユーザーのデータを作成
+                joinedUser.ConnectionId = this.ConnectionId;
+                joinedUser.Name = "Guest";
+                joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
             }
             else
             {
-                Console.WriteLine($"[DB] {user.Name} は本日すでにログイン済み");
+                var hash = HashSteamId(steamId);///ハッシュ
+
+                // DBからユーザー情報取得
+                User user = await _dbContext.Users.FirstAsync(user => user.SteamId == hash);
+
+                // 今日すでにアクティブ記録があるか確認
+                var today = DateTime.Today;
+                var existingRecord = await _dbContext.DailyActiveUsers
+                    .FirstOrDefaultAsync(d => d.UserId == user.Id
+                                           && d.ActivityDate.Date == today);
+
+                if (existingRecord == null)
+                {
+                    // 今日初めてのログインなら登録
+                    _dbContext.DailyActiveUsers.Add(new DailyActiveUser
+                    {
+                        UserId = user.Id,
+                        ActivityDate = DateTime.Now,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now
+                    });
+                    await _dbContext.SaveChangesAsync();
+                    Console.WriteLine($"[DB] {user.Name} の本日初回ログインを記録");
+                }
+                else
+                {
+                    Console.WriteLine($"[DB] {user.Name} は本日すでにログイン済み");
+                }
+
+                // 入室済みユーザーのデータを作成
+                joinedUser.ConnectionId = this.ConnectionId;
+                joinedUser.Name = user.Name;
+                joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
             }
 
-            // 入室済みユーザーのデータを作成
-            var joinedUser = new JoinedUser();
-            joinedUser.ConnectionId = this.ConnectionId;
-            joinedUser.Name = user.Name;
-            joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
+
 
             // ルームコンテキストにユーザー情報を登録
             var roomUserData = new RoomUserData() { joinedUser = joinedUser, DbId = user.Id };
@@ -373,7 +386,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public Task GameStartAsync()
         {
-
+            //ボーリングの順番リセット
+            _roomContext.ballingOrder = 1;
             //ミニゲーム順位リストの初期化
             _roomContext.InitializeScoreOrder();
             // 全員に通知
@@ -644,6 +658,21 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             var bytes = System.Text.Encoding.UTF8.GetBytes(steamId.ToString());
             var hash = System.Security.Cryptography.SHA256.HashData(bytes);
             return Convert.ToHexString(hash);
+        }
+
+        //ルームの開始
+        public Task RoomStart()
+        {
+            this._roomContext.Group.All.OnRoomStart();
+            return Task.CompletedTask;
+        }
+
+        //ボーリングの順番変え
+        public Task BallingNext()
+        {
+            this._roomContext.ballingOrder++;
+            this._roomContext.Group.All.OnBallingNext(this._roomContext.ballingOrder);
+            return Task.CompletedTask;
         }
     }
 }

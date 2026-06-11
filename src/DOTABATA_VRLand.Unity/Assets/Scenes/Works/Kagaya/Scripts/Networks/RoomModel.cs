@@ -128,6 +128,10 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public Action<Guid, float> onUpdateNit { get; set; }
     public Action OnGameStartAction { get; set; }
 
+    public Action OnRoomStarted {  get; set; }
+
+    public Action<int> OnBallingNexted { get; set; }
+
     /*
      * 処理
      */
@@ -253,7 +257,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
-        await roomHub.UpdateUserTransformAsync(playerTransform);
+        if (playerTransform != null) await roomHub.UpdateUserTransformAsync(playerTransform);
     }
 
     /// <summary>
@@ -639,6 +643,39 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnAllCompleteSceneTransition() {
         if (OnAllCompletedSceneTransition  != null) {
             OnAllCompletedSceneTransition();
+        }
+    }
+
+    public async UniTask RoomStart()
+    {
+        if(roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.RoomStart();
+    }
+
+    public void OnRoomStart()
+    {
+        if (OnRoomStarted != null)
+        {
+            OnRoomStarted();
+        }
+    }
+
+    public async UniTask BallingNext()
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.BallingNext();
+    }
+
+    public void OnBallingNext(int order)
+    {
+        if (OnBallingNexted != null)
+        {
+            OnBallingNexted(order);
         }
     }
 }

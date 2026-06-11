@@ -29,6 +29,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public string Password { get; set; } // ルームパスワード
 
         // その他、ルームのデータとして保存したいものをフィールドに追加していく
+        //ボーリングの順番
+        public int ballingOrder;
+
         // コンストラクタ
         public RoomContext(IMulticastGroupProvider groupProvider, RoomConfig roomConfig) {
             Id = Guid.NewGuid(); // ルーム毎のデータにIDを付けておく

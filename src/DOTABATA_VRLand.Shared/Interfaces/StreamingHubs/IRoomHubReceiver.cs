@@ -1,6 +1,7 @@
 ﻿using DOTABATA_VRLand.Shared.Models.Entities;
 using System;
 using System.Collections.Generic;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -111,6 +112,16 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ニットの更新
         /// </summary>
         public void OnUpdateNit(Guid id,float point);
+
+        /// <summary>
+        /// mainのゲームの開始通知
+        /// </summary>
+        public void OnRoomStart();
+
+        /// <summary>
+        /// ボーリングの順番変え通知
+        /// </summary>
+        public void OnBallingNext(int order);
     }
 
 }
