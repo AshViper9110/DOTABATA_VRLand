@@ -11,6 +11,12 @@ public class PlayerTransform : MonoBehaviour {
     [SerializeField] private float duration = 0.2f;
 
     [SerializeField] public Transform crownParent;
+    [SerializeField] float crownsDistance;
+
+    private void Update()
+    {
+        crownParent.position = Camera.main.transform.position+(Vector3.up*crownsDistance);
+    }
 
     /// <summary>
     /// PlayerTransform ==> DTO 

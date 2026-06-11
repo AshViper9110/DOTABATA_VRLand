@@ -20,7 +20,7 @@ public class NitnitManager : MonoBehaviour
     [SerializeField] List<Material> materials = new List<Material>();
 
     [SerializeField] public List<MufflerSetManager> mufflerSets = new List<MufflerSetManager>();
-    [SerializeField] List<Text> pointTexts = new List<Text>();
+    [SerializeField] List<TextMeshProUGUI> pointTexts = new List<TextMeshProUGUI>();
 
     [SerializeField] List<Transform> startPos = new List<Transform>();
 

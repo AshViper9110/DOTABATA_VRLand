@@ -208,6 +208,7 @@ public class NetworkManager : Singleton<NetworkManager>
             gameManager.RankingList[user.JoinOrder] = index+1;
             gameManager.playerWinlist[user.JoinOrder] = winCount[index];
             gameManager.SetCrown(user.ConnectionId,user.JoinOrder);
+            gameManager.SetRankText(user.ConnectionId, user.JoinOrder);
             index++;
         }
     }
