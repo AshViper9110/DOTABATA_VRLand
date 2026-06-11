@@ -142,29 +142,7 @@ public class GameManager : MonoBehaviour
         SteamVR_Fade.View(new Color(0,0,0,0),2);
         EndProgress = false;
         AudioManager.ChangeBGM(AudioManager.BGM.Main_Normal);
-        //List<GameObject> crowns = new List<GameObject>();
 
-        ////Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
-
-        //for (int i = 0; i < playerWinlist[1]; i++)
-        //{
-        //    //GameObject crown = Instantiate(CrownPrefab,
-        //    //    transform);
-        //    //crowns.Add(crown);
-
-        //    GameObject crown = Instantiate(CrownPrefab,
-        //      crowntrans);
-        //    crowns.Add(crown);
-        //}
-        //int index = 0;
-
-        //foreach (GameObject crown in crowns)
-        //{
-        //    crown.transform.position = new Vector3(crown.transform.position.x, crown.transform.position.y+(crownDistance * index), crown.transform.position.z);
-        //    index++;
-        //}
-
-        //// mana = GameObject.Find("TitleManager").GetComponent<TitleMana>();
 
 
         if (rally)
@@ -362,7 +340,7 @@ public class GameManager : MonoBehaviour
         
         Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
 
-        Debug.Log(playerWinlist[ID]);
+      
 
         for (int i = 0; i < playerWinlist[ID]; i++)
         {
@@ -395,6 +373,10 @@ public class GameManager : MonoBehaviour
 
         CrownManager manager = crown.GetComponent<CrownManager>();
         manager.isNew = true;
+        manager.ParentTrans = transform;
+
+
+        playerWinlist[ID]++;
 
 
         if (playerWinlist[RankingList[InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.JoinOrder]] >= 3)
@@ -403,6 +385,8 @@ public class GameManager : MonoBehaviour
             onResult = false;
             textIndex = -1;
         }
+
+        SetRankText(guid,ID);
     }
 
     public void DeleteCrown(Guid guid, int ID)
@@ -504,7 +488,7 @@ public class GameManager : MonoBehaviour
             {
                 HostManager.I.ChengeFace(HostManager.facial.Smile);
                 DummyText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + AfterText[textIndex], 1.0f);
-                // playerWinlist[winPlayerId]++;
+               
                 if (winPlayerId == NetworkManager.I.myConnectionId)
                 {
                     RoomModel.I.RequestWinCountUp(NetworkManager.I.myConnectionId);

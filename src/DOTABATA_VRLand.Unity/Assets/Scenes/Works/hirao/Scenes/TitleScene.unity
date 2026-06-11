@@ -15062,6 +15062,10 @@ PrefabInstance:
       propertyPath: walkSpeed
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 8476141236346117073, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8580782544160415177, guid: d63cb0a539dcddf4b82d5c8c7bf6ac5e, type: 3}
       propertyPath: headsetOnHead.actionPath
       value: 
