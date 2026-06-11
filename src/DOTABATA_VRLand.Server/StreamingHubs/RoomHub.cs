@@ -196,8 +196,21 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
 
             // ルームコンテキストにユーザー情報を登録
-            var roomUserData = new RoomUserData() { joinedUser = joinedUser };
+            var roomUserData = new RoomUserData() { joinedUser = joinedUser, DbId = user.Id };
             this._roomContext.RoomUserDataList[this.ConnectionId] = roomUserData;
+
+            // ★ ルームのDB IDを取得
+            var room = await _dbContext.Rooms.FirstAsync(r => r.Name == _roomContext.Name);
+
+            // RoomUser を登録
+            _dbContext.RoomUsers.Add(new RoomUser
+            {
+                RoomId = room.Id,
+                UserId = user.Id,
+            });
+            await _dbContext.SaveChangesAsync();
+
+            Console.WriteLine($"[DB] Room Join Room:{room.Name} Name:{user.Name}");
 
             // コンソールにログを表示
             _roomContext.WriteConsoleJoinInfo(joinedUser);
@@ -213,12 +226,11 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 退出処理
         /// </summary>
-        public Task LeaveRoomAsync() {
+        public async Task LeaveRoomAsync() {
             // ルームにいなかったら無視
             if (!this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId)) {
-                return Task.CompletedTask;
+                return;
             }
-
 
             // コンソールにログを表示
             _roomContext.WriteConsoleLeaveInfo(this.ConnectionId);
@@ -239,16 +251,29 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 }
             }
 
+            await using var scope = _serviceScopeFactory.CreateAsyncScope();
+            var db = scope.ServiceProvider.GetRequiredService<GameDbContext>();
+
+            int userId = this._roomContext.RoomUserDataList[this.ConnectionId].DbId;
+            var room = await db.Rooms.FirstAsync(r => r.Name == _roomContext.Name);
+            var roomUser = await db.RoomUsers
+                .FirstOrDefaultAsync(ru => ru.RoomId == room.Id && ru.UserId == userId);
+            if (roomUser != null)
+            {
+                db.RoomUsers.Remove(roomUser);
+                await db.SaveChangesAsync();
+            }
+
             // ルームデータから退出したユーザーを削除
             this._roomContext.RoomUserDataList.Remove(this.ConnectionId);
 
             // ルーム内にユーザーが一人もいなかったらルームを削除
             if (this._roomContext.RoomUserDataList.Count == 0)
             {
-                DeleteRoomAsync();
+                await DeleteRoomAsync();
             }
 
-            return Task.CompletedTask;
+            //return Task.CompletedTask;
         }
 
         /// <summary>
