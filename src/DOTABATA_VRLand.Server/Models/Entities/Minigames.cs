@@ -3,32 +3,32 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DOTABATA_VRLand.Server.Models.Entities
 {
+    [Table("miniGames")]
     public class Minigames
     {
-        [Table("miniGame_status")]
-        public class DailyActiveUser
-        {
-            [Key]
-            [Column("id")]
-            public int Id { get; set; }
+        [Key]
+        [Column("id")]
+        public int Id { get; set; }
 
-            [Column("name")]
-            public string Name { get; set; }
+        [Column("name")]
+        public string Name { get; set; }
 
-            [Column("rule")]
-            public string Rule { get; set; }
+        [Column("rule")]
+        public string Rule { get; set; }
 
-            [Column("type")]
-            public int Type { get; set; }//タイムアタック:1 スコアアタック:2
+        [Column("type")]
+        public int Type { get; set; }//タイムアタック:1 スコアアタック:2
 
-            [Column("Scene_number")]
-            public int SceneNumber { get; set; }
+        [Column("scene_number")]
+        public int SceneNumber { get; set; }
 
-            [Column("created_at")]
-            public DateTime CreatedAt { get; set; }
+        [Column("playable")]
+        public int Playable { get; set; }
 
-            [Column("updated_at")]
-            public DateTime UpdatedAt { get; set; }
-        }
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; }
+
+        [Column("updated_at")]
+        public DateTime UpdatedAt { get; set; }
     }
 }

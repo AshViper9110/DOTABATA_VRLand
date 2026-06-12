@@ -235,17 +235,19 @@ public class MinigameFlowController : MonoBehaviour
         Debug.Log("OnReceiveRanking受信");
         foreach (var user in names)Debug.Log($"ランキング受信:{user}");
         isGameStarted = false;
-        EndGame();
-        SteamVR_Fade.View(new Color(1, 1, 1, 1), 2);
-        SceneManager.LoadScene("GameScene");//シーン移行
+        countdownText.text = "FINISH!";
+        StartCoroutine(EndGame());
     }
 
     // =====================================================
     // 終了
     // =====================================================
 
-    void EndGame()
+    IEnumerator EndGame()
     {
-        Debug.Log("ゲーム終了！");
+        yield return new WaitForSecondsRealtime(1f);
+
+        SteamVR_Fade.View(new Color(1, 1, 1, 1), 2);
+        SceneManager.LoadScene("GameScene");//シーン移行
     }
 }
