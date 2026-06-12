@@ -149,49 +149,39 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             var joinedUser = new JoinedUser();
 
-            if (steamId == null)
+            var hash = HashSteamId(steamId);///ハッシュ
+
+            // DBからユーザー情報取得
+            User user = await _dbContext.Users.FirstAsync(user => user.SteamId == hash);
+
+            // 今日すでにアクティブ記録があるか確認
+            var today = DateTime.Today;
+            var existingRecord = await _dbContext.DailyActiveUsers
+                .FirstOrDefaultAsync(d => d.UserId == user.Id
+                                        && d.ActivityDate.Date == today);
+
+            if (existingRecord == null)
             {
-                // 入室済みユーザーのデータを作成
-                joinedUser.ConnectionId = this.ConnectionId;
-                joinedUser.Name = "Guest";
-                joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
+                // 今日初めてのログインなら登録
+                _dbContext.DailyActiveUsers.Add(new DailyActiveUser
+                {
+                    UserId = user.Id,
+                    ActivityDate = DateTime.Now,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                });
+                await _dbContext.SaveChangesAsync();
+                Console.WriteLine($"[DB] {user.Name} の本日初回ログインを記録");
             }
             else
             {
-                var hash = HashSteamId(steamId);///ハッシュ
-
-                // DBからユーザー情報取得
-                User user = await _dbContext.Users.FirstAsync(user => user.SteamId == hash);
-
-                // 今日すでにアクティブ記録があるか確認
-                var today = DateTime.Today;
-                var existingRecord = await _dbContext.DailyActiveUsers
-                    .FirstOrDefaultAsync(d => d.UserId == user.Id
-                                           && d.ActivityDate.Date == today);
-
-                if (existingRecord == null)
-                {
-                    // 今日初めてのログインなら登録
-                    _dbContext.DailyActiveUsers.Add(new DailyActiveUser
-                    {
-                        UserId = user.Id,
-                        ActivityDate = DateTime.Now,
-                        CreatedAt = DateTime.Now,
-                        UpdatedAt = DateTime.Now
-                    });
-                    await _dbContext.SaveChangesAsync();
-                    Console.WriteLine($"[DB] {user.Name} の本日初回ログインを記録");
-                }
-                else
-                {
-                    Console.WriteLine($"[DB] {user.Name} は本日すでにログイン済み");
-                }
-
-                // 入室済みユーザーのデータを作成
-                joinedUser.ConnectionId = this.ConnectionId;
-                joinedUser.Name = user.Name;
-                joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
+                Console.WriteLine($"[DB] {user.Name} は本日すでにログイン済み");
             }
+
+            // 入室済みユーザーのデータを作成
+            joinedUser.ConnectionId = this.ConnectionId;
+            joinedUser.Name = user.Name;
+            joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
 
 
 
