@@ -9,6 +9,7 @@ using System;
 using Valve.VR;
 using UnityEditor;
 using TMPro;
+using Cysharp.Threading.Tasks.Triggers;
 
 
 public class GameManager : MonoBehaviour
@@ -87,6 +88,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] GameObject selectPoint;
     SelPointManager selPointManager;
+    [SerializeField] float SelPointHeght;
 
     [SerializeField] List<Sprite> miniGameTitleImages = new List<Sprite>();
 
@@ -287,7 +289,7 @@ public class GameManager : MonoBehaviour
         audio.Play();
         audio.loop = true;
 
-        float spinPower = UnityEngine.Random.Range(3, 6);
+        float spinPower = UnityEngine.Random.Range(5, 30);
 
         CenterObjRb.angularVelocity = new Vector3(0, spinPower, 0);
     }
@@ -310,6 +312,9 @@ public class GameManager : MonoBehaviour
         // ˆÊ’u‚ðŒvŽZ (X, Z•½–Ê)
         Vector3 pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
         selectPoint.transform.position = CenterObj.transform.position + pos;
+        selectPoint.transform.position = new Vector3(selectPoint.transform.position.x,
+                                                      SelPointHeght,
+                                                      selectPoint.transform.position.z);
 
         int count = miniGames.Count;
         for (int i = 0; i < count; i++)
