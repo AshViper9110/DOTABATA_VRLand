@@ -13,6 +13,7 @@ public class TitleMana : MonoBehaviour
 
     private async void Start()
     {
+        SteamVR_Fade.View(Color.clear, 0.5f);
         if (SteamManager.Initialized)
         {
             playerName = SteamFriends.GetPersonaName();
