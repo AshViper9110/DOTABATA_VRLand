@@ -74,4 +74,6 @@ public class TitleMana : MonoBehaviour
         // フェードイン
         SteamVR_Fade.View(Color.clear, 0.5f);
     }
+
+  
 }

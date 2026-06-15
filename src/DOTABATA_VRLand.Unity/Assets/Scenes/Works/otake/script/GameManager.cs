@@ -100,7 +100,7 @@ public class GameManager : MonoBehaviour
     public List<RectTransform> rankingUis;
     public List<Material> rankingMaterials;
 
-
+    [SerializeField] HostManager hostManager;
 
      public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
@@ -366,12 +366,12 @@ public class GameManager : MonoBehaviour
 
     public void AddCrown(Guid guid, int ID)
     {
-        Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
+        PlayerTransform playerTransform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>();
+        Transform transform = playerTransform.crownParent;
         GameObject crown = Instantiate(CrownPrefab,
                transform);
 
-        //GameObject crown = Instantiate(CrownPrefab,
-        //      crowntrans);
+  
 
 
         crown.transform.position = new Vector3(crown.transform.position.x, transform.position.y + (crownDistance * playerWinlist[ID])+3f, crown.transform.position.z);
@@ -392,6 +392,8 @@ public class GameManager : MonoBehaviour
         }
 
         SetRankText(guid,ID);
+        playerTransform.StartSpotLight(3);
+
     }
 
     public void DeleteCrown(Guid guid, int ID)
@@ -448,7 +450,7 @@ public class GameManager : MonoBehaviour
 
     public void MoveText()
     {
-        HostManager.I.ChengeFace(HostManager.facial.Normal);
+        hostManager.ChengeFace(HostManager.facial.Normal);
         if (EndProgress) return;
         if (!isSpin)
         {
@@ -491,7 +493,7 @@ public class GameManager : MonoBehaviour
 
             if (AfterText[textIndex] == "!!! Ç®ÇﬂÇ≈Ç∆Ç§ÅI")
             {
-                HostManager.I.ChengeFace(HostManager.facial.Smile);
+                hostManager.ChengeFace(HostManager.facial.Smile);
                 DummyText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + AfterText[textIndex], 1.0f);
                
                 if (winPlayerId == NetworkManager.I.myConnectionId)
@@ -522,9 +524,10 @@ public class GameManager : MonoBehaviour
 
             if (FinishText[textIndex] == "!!! Ç®ÇﬂÇ≈Ç∆Ç§ÅI")
             {
-                HostManager.I.ChengeFace(HostManager.facial.Smile);
+                hostManager.ChengeFace(HostManager.facial.Smile);
                 AudioManager.ChangeBGM(AudioManager.BGM.Main_End);
                 DummyText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + FinishText[textIndex], 1.0f);
+                InRoomPlayerData.I.PlayerList[winPlayerId].playerObj.GetComponent<PlayerTransform>().StartSpotLight(10);
 
             }
             else
