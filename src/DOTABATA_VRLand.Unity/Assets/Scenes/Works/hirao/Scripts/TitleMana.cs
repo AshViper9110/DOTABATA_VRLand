@@ -54,6 +54,7 @@ public class TitleMana : MonoBehaviour
     /// 
     public void JoinLobby()
     {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         StartCoroutine(MoveWithFade());
     }
 

@@ -19,6 +19,8 @@ public class AudioManager : MonoBehaviour
         //Bank
         Dial_Open,
         Bank_Open,
+        //Click
+        Button_Click,
     }
 
     public enum BGM

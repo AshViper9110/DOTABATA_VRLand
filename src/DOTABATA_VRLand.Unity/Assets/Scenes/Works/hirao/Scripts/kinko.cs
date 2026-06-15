@@ -37,7 +37,7 @@ public class Kinko : MonoBehaviour
 
     void Start()
     {
-
+        AudioManager.StopBgm(); ;
         //É_ÉCÉAÉãÇÃèâä˙ê›íË
         foreach (var dial in dialList)
         {
@@ -53,6 +53,24 @@ public class Kinko : MonoBehaviour
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.rotation = playerPos[index].rotation;
         UIPanel.eulerAngles = new Vector3(0, index * -90, 0);
         kinkoPos.eulerAngles = new Vector3(0, index * -90, 0);
+    }
+
+    private void OnEnable()
+    {
+        if (RoomModel.I == null) return;
+
+        RoomModel.I.OnCountdownAction += StartCountdown;
+    }
+
+    // =====================================================
+    // Destroy
+    // =====================================================
+
+    private void OnDestroy()
+    {
+        if (RoomModel.I == null) return;
+
+        RoomModel.I.OnCountdownAction -= StartCountdown;
     }
 
     // Update is called once per frame
@@ -86,6 +104,14 @@ public class Kinko : MonoBehaviour
             isClear = true;
             AudioManager.PlaySE(AudioManager.SE.Bank_Open);
             controller.OnSendScore(100);
+        }
+    }
+
+    public void StartCountdown(int remain)
+    {
+        if (remain <= 0)
+        {
+            AudioManager.ChangeBGM(AudioManager.BGM.Bank);
         }
     }
 }
