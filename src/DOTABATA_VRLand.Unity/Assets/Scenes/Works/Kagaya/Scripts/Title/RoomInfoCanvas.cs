@@ -133,6 +133,7 @@ public class RoomInfoCanvas : MonoBehaviour {
 
     public void CloseKeyBoard()
     {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         keyBoardUI.SetActive(false);
         targetInputFirld = null;
     }
@@ -142,6 +143,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// </summary>
     public void InputWorldNumKeyBtn(int num) {
         if (targetInputFirld != null) {
+            AudioManager.PlaySE(AudioManager.SE.Button_Click);
             if (num == -1) {
                 if (targetInputFirld.text.Length > 0) {
                     targetInputFirld.text = targetInputFirld.text.Substring(0, targetInputFirld.text.Length - 1);
@@ -177,6 +179,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// パスワードを使うかどうかのトグル
     /// </summary>
     public void UsePasswordToggleOnValueChanged(bool callBack) {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         if (callBack) {
             passwordInputField.GetComponent<Image>().color = Color.white;
             passwordInputField.readOnly = false;
@@ -191,6 +194,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// フリープレイモードにするトグル
     /// </summary>
     public void FreePlayModeToggleOnValueChanged(bool callBack) {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         if (callBack) {
             tournamentModeToggle.isOn = false;
             gameModeId = 0;
@@ -205,6 +209,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// 大会モードにするトグル
     /// </summary>
     public void TournamentModeToggleOnValueChanged(bool callBack) {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         if (callBack) {
             freePlayModeToggle.isOn = false;
             gameModeId = 1;
@@ -219,6 +224,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// ルームを作成して参加
     /// </summary>
     public async void CreateAndJoinRoom() {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         string passwordString = "";
         if (usePasswordToggle.isOn) {
             passwordString = passwordInputField.text;
@@ -239,6 +245,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// ルーム一覧更新
     /// </summary>
     public async void RefreshRoomInfoList() {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         await UniTask.WaitUntil(() => RoomModel.I != null && RoomModel.I.IsConnected);
 
         // 要素を全削除
@@ -269,6 +276,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// ルーム参加画面にする
     /// </summary>
     private void ChangeJoinRoomUIBtn(RoomInfo roomInfo) {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         createRoomUI.SetActive(false);
         joinRoomUI.SetActive(true);
 
@@ -306,6 +314,7 @@ public class RoomInfoCanvas : MonoBehaviour {
 
     public async void LeaveOnRoom()
     {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         NetworkManager.I.isJoin = false;
         await RoomModel.I.LeaveRoomAsync();
         standyPanel.SetActive(false);
@@ -314,6 +323,7 @@ public class RoomInfoCanvas : MonoBehaviour {
 
     public async void RoomStart()
     {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         await RoomModel.I.RoomStart();
     }
 
