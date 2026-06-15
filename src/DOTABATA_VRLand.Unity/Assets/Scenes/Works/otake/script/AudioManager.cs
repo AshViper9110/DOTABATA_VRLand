@@ -16,8 +16,9 @@ public class AudioManager : MonoBehaviour
         MiniGame_CountDown,
         MiniGame_Start,
         MiniGame_Finish,
-       
-        
+        //Bank
+        Dial_Open,
+        Bank_Open,
     }
 
     public enum BGM
@@ -44,7 +45,7 @@ public class AudioManager : MonoBehaviour
     static public bool isStartBgm; 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         SEs = seClips;
