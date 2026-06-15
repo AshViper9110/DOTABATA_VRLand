@@ -230,6 +230,7 @@ public class MinigameFlowController : MonoBehaviour
 
     void OnReceiveRanking(List<JoinedUser> rankOrder)
     {
+        AudioManager.PlaySE(AudioManager.SE.MiniGame_Finish);
         names.Clear();//前回のユーザー情報クリア
         foreach (var user in rankOrder)names.Add(user.Name);
         Debug.Log("OnReceiveRanking受信");
