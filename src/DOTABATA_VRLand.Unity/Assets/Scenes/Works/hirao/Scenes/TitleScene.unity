@@ -8474,7 +8474,7 @@ PrefabInstance:
     - target: {fileID: -5763012627804232645, guid: f4af59d4ba08ebb4c85a48f7a6948e3b, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9afc44310bbc76c43a46451f5061e084, type: 2}
+      objectReference: {fileID: 2100000, guid: f5e715ba2adf5d242922992968925f2f, type: 2}
     - target: {fileID: 919132149155446097, guid: f4af59d4ba08ebb4c85a48f7a6948e3b, type: 3}
       propertyPath: m_Name
       value: GateAndWall
