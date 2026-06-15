@@ -545,6 +545,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: f74f453007ae53645891184a2e2d7681, type: 2}
   - {fileID: 2100000, guid: 5f76c6079c803f149908029defff4ffb, type: 2}
   - {fileID: 2100000, guid: 54b4be028532047458fae9b695e7af33, type: 2}
+  hostManager: {fileID: 1975405642685427165}
   Roll: {fileID: 8300000, guid: 6d4a663eec9c93741aaa272107636675, type: 3}
   RollEnd: {fileID: 8300000, guid: 6b2e46aeccd8f644783882dbdc53f15a, type: 3}
 --- !u!4 &254124047
@@ -1886,6 +1887,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a88acb0522ba7d74f9beaaad0c794430, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hostManager: {fileID: 1975405642685427165}
 --- !u!222 &825064890
 CanvasRenderer:
   m_ObjectHideFlags: 0
