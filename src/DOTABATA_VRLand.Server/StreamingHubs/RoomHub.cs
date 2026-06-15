@@ -123,7 +123,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ルームに接続
         /// </summary>
-        public async Task<JoinedUser[]> JoinRoomAsync(ulong steamId, RoomConfig roomConfig)
+        public async Task<JoinedUser[]> JoinRoomAsync(ulong? steamId, RoomConfig roomConfig)
         {
             await CreateRoomAsync(roomConfig);
 
@@ -149,58 +149,75 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             var joinedUser = new JoinedUser();
 
-            var hash = HashSteamId(steamId);///ハッシュ
-
-            // DBからユーザー情報取得
-            User user = await _dbContext.Users.FirstAsync(user => user.SteamId == hash);
-
-            // 今日すでにアクティブ記録があるか確認
-            var today = DateTime.Today;
-            var existingRecord = await _dbContext.DailyActiveUsers
-                .FirstOrDefaultAsync(d => d.UserId == user.Id
-                                        && d.ActivityDate.Date == today);
-
-            if (existingRecord == null)
+            if(steamId != null)
             {
-                // 今日初めてのログインなら登録
-                _dbContext.DailyActiveUsers.Add(new DailyActiveUser
+                var hash = HashSteamId(steamId.Value);///ハッシュ
+
+                // DBからユーザー情報取得
+                User user = await _dbContext.Users.FirstAsync(user => user.SteamId == hash);
+
+                // 今日すでにアクティブ記録があるか確認
+                var today = DateTime.Today;
+                var existingRecord = await _dbContext.DailyActiveUsers
+                    .FirstOrDefaultAsync(d => d.UserId == user.Id
+                                            && d.ActivityDate.Date == today);
+
+                if (existingRecord == null)
                 {
+                    // 今日初めてのログインなら登録
+                    _dbContext.DailyActiveUsers.Add(new DailyActiveUser
+                    {
+                        UserId = user.Id,
+                        ActivityDate = DateTime.Now,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now
+                    });
+                    await _dbContext.SaveChangesAsync();
+                    Console.WriteLine($"[DB] {user.Name} の本日初回ログインを記録");
+                }
+                else
+                {
+                    Console.WriteLine($"[DB] {user.Name} は本日すでにログイン済み");
+                }
+
+                // 入室済みユーザーのデータを作成
+                joinedUser.ConnectionId = this.ConnectionId;
+                joinedUser.Name = user.Name;
+                joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
+
+                // ルームコンテキストにユーザー情報を登録
+                var roomUserData = new RoomUserData() { joinedUser = joinedUser, DbId = user.Id };
+                this._roomContext.RoomUserDataList[this.ConnectionId] = roomUserData;
+
+                // ★ ルームのDB IDを取得
+                var room = await _dbContext.Rooms.FirstAsync(r => r.Name == _roomContext.Name);
+
+                // RoomUser を登録
+                _dbContext.RoomUsers.Add(new RoomUser
+                {
+                    RoomId = room.Id,
                     UserId = user.Id,
-                    ActivityDate = DateTime.Now,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
                 });
                 await _dbContext.SaveChangesAsync();
-                Console.WriteLine($"[DB] {user.Name} の本日初回ログインを記録");
-            }
-            else
+
+                Console.WriteLine($"[DB] Room Join Room:{room.Name} Name:{user.Name}");
+            }else
             {
-                Console.WriteLine($"[DB] {user.Name} は本日すでにログイン済み");
+                User user = new User();
+                user.Name = "Gest";
+
+                // 入室済みユーザーのデータを作成
+                joinedUser.ConnectionId = this.ConnectionId;
+                joinedUser.Name = user.Name;
+                joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
+
+
+
+                // ルームコンテキストにユーザー情報を登録
+                var roomUserData = new RoomUserData() { joinedUser = joinedUser, DbId = user.Id };
+                this._roomContext.RoomUserDataList[this.ConnectionId] = roomUserData;
+
             }
-
-            // 入室済みユーザーのデータを作成
-            joinedUser.ConnectionId = this.ConnectionId;
-            joinedUser.Name = user.Name;
-            joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
-
-
-
-            // ルームコンテキストにユーザー情報を登録
-            var roomUserData = new RoomUserData() { joinedUser = joinedUser, DbId = user.Id };
-            this._roomContext.RoomUserDataList[this.ConnectionId] = roomUserData;
-
-            // ★ ルームのDB IDを取得
-            var room = await _dbContext.Rooms.FirstAsync(r => r.Name == _roomContext.Name);
-
-            // RoomUser を登録
-            _dbContext.RoomUsers.Add(new RoomUser
-            {
-                RoomId = room.Id,
-                UserId = user.Id,
-            });
-            await _dbContext.SaveChangesAsync();
-
-            Console.WriteLine($"[DB] Room Join Room:{room.Name} Name:{user.Name}");
 
             // コンソールにログを表示
             _roomContext.WriteConsoleJoinInfo(joinedUser);

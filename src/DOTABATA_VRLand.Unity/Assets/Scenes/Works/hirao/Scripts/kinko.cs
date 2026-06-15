@@ -25,10 +25,7 @@ public class Kinko : MonoBehaviour
     [SerializeField] private MinigameFlowController controller;
     [SerializeField] private List<Transform> playerPos = new List<Transform>();
     [SerializeField] private Transform UIPanel;
-
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip lockOpenSound;
-    [SerializeField] private AudioClip gameClearSound;
+    [SerializeField] private Transform kinkoPos;
 
     public SteamVR_Input_Sources handType;
     public float power;
@@ -55,6 +52,7 @@ public class Kinko : MonoBehaviour
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position = playerPos[index].position;
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.rotation = playerPos[index].rotation;
         UIPanel.eulerAngles = new Vector3(0, index * -90, 0);
+        kinkoPos.eulerAngles = new Vector3(0, index * -90, 0);
     }
 
     // Update is called once per frame
@@ -73,7 +71,7 @@ public class Kinko : MonoBehaviour
                 if (currentLockTime >= openLockTime)
                 {
                     dial.isOpen = true;
-                    audioSource.PlayOneShot(lockOpenSound);
+                    AudioManager.PlaySE(AudioManager.SE.Dial_Open);
                 }
             }
             else
@@ -86,7 +84,7 @@ public class Kinko : MonoBehaviour
         {
             Debug.Log("GameClear");
             isClear = true;
-            audioSource.PlayOneShot(gameClearSound);
+            AudioManager.PlaySE(AudioManager.SE.Bank_Open);
             controller.OnSendScore(100);
         }
     }

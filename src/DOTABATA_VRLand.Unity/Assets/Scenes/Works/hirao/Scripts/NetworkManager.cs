@@ -9,7 +9,6 @@ using UnityEngine.SceneManagement;
 public class NetworkManager : Singleton<NetworkManager>
 {
     public GameObject SyncPlayerPrefab;
-    public GameObject player;
     public Guid myConnectionId;
     public bool isJoin = false;
 
@@ -73,7 +72,7 @@ public class NetworkManager : Singleton<NetworkManager>
         );
 
         isJoin = true;
-        SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
+        SyncPlayer syncPlayer = GameObject.Find("Player(Clone)").GetComponent<SyncPlayer>();
         syncPlayer.isLocalPlayer = true;
 
         SceneManager.LoadScene(scene);
@@ -91,7 +90,7 @@ public class NetworkManager : Singleton<NetworkManager>
         );
 
         isJoin = true;
-        SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
+        SyncPlayer syncPlayer = GameObject.Find("Player(Clone)").GetComponent<SyncPlayer>();
         syncPlayer.isLocalPlayer = true;
     }
 
@@ -127,7 +126,7 @@ public class NetworkManager : Singleton<NetworkManager>
         {
             PlayerData data = new PlayerData()
             {
-                playerObj = player,
+                playerObj = GameObject.Find("Player(Clone)"),
                 joinedUser = user,
             };
             InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
