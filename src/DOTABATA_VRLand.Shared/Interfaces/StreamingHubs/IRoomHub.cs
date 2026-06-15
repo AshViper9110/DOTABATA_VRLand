@@ -20,7 +20,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// ルームに接続
         /// </summary>
-        Task<JoinedUser[]> JoinRoomAsync(ulong steamId, RoomConfig roomConfig);
+        Task<JoinedUser[]> JoinRoomAsync(ulong? steamId, RoomConfig roomConfig);
 
         /// <summary>
         /// 退出処理
