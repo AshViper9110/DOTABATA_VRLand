@@ -121,6 +121,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// アルカナスケッチのゲーム終了通知
         /// </summary>
         public void OnArcanaGameSet(Guid winnerConId);
+
     }
 
 }

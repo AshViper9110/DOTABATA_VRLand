@@ -1,4 +1,4 @@
-using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+ï»¿using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -40,9 +40,9 @@ public class kinko : MonoBehaviour
     [Header("Ready")]
     public Button readyButton;
     public Text waitingText;
-    public Transform UserReadyObject;//ƒvƒŒƒCƒ„[î•ñ®—ñ—pƒIƒuƒWƒFƒNƒg
-    public GameObject playerNamePrefab;  //ƒvƒŒƒCƒ„[ƒeƒLƒXƒgƒvƒŒƒnƒu
-    public List<GameObject> UserReadyText;   //ƒvƒŒƒCƒ„[€”õî•ñƒeƒLƒXƒg 
+    public Transform UserReadyObject;//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æƒ…å ±æ•´åˆ—ç”¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+    public GameObject playerNamePrefab;  //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒ†ã‚­ã‚¹ãƒˆãƒ—ãƒ¬ãƒãƒ–
+    public List<GameObject> UserReadyText;   //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æº–å‚™æƒ…å ±ãƒ†ã‚­ã‚¹ãƒˆ 
     public Button StartButton;
 
     [Header("Countdown")]
@@ -90,7 +90,7 @@ public class kinko : MonoBehaviour
 
     void Start()
     {
-        //ƒ_ƒCƒAƒ‹‚Ì‰Šúİ’è
+        //ãƒ€ã‚¤ã‚¢ãƒ«ã®åˆæœŸè¨­å®š
         foreach (var dial in dialList)
         {
             dial.rot = UnityEngine.Random.Range(-180, 180);
@@ -99,7 +99,7 @@ public class kinko : MonoBehaviour
         }
 
         SteamVR_Fade.Start(new Color(0, 0, 0, 0), 1.0f);
-        //RoomModelƒCƒxƒ“ƒgw“Ç
+        //RoomModelã‚¤ãƒ™ãƒ³ãƒˆè³¼èª­
         RoomModel.I.OnCountdownAction += StartCountdown;
         RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
         RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
@@ -130,7 +130,7 @@ public class kinko : MonoBehaviour
         titleText.text = info.gameName;
         descriptionText.text = info.description;
 
-        readyText.text = "0/4 ƒvƒŒƒCƒ„[€”õŠ®—¹";
+        readyText.text = "0/4 ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æº–å‚™å®Œäº†";
     }
 
     private void OnDestroy()
@@ -151,7 +151,7 @@ public class kinko : MonoBehaviour
         {
             if (dial.isOpen) continue;
             if (dial.interactable.hoveringHand == null) continue;
-            //TODO Œ®ŠJ‚¯‚Ìˆ—‚ÌÀ‘•
+            //TODO éµé–‹ã‘ã®å‡¦ç†ã®å®Ÿè£…
             float currentRot = dial.GameObject.transform.localEulerAngles.y;
             if (Mathf.Abs(Mathf.DeltaAngle(currentRot, dial.rot)) <= 3f)
             {
@@ -168,7 +168,7 @@ public class kinko : MonoBehaviour
                 if (currentLockTime > 0) currentLockTime = 0;
             }
         }
-        //ƒQ[ƒ€ƒNƒŠƒA”»’è
+        //ã‚²ãƒ¼ãƒ ã‚¯ãƒªã‚¢åˆ¤å®š
         if (dialList.Count > 0 && dialList.All(x => x.isOpen) && !isClear)
         {
             Debug.Log("GameClear");
@@ -179,67 +179,67 @@ public class kinko : MonoBehaviour
     }
 
     // =====================================================
-    // Readyƒ{ƒ^ƒ“
+    // Readyãƒœã‚¿ãƒ³
     // =====================================================
 
     public void OnReadyButton()
     {
         willReady = !willReady;
 
-        // ƒT[ƒo[‘—M
+        // ã‚µãƒ¼ãƒãƒ¼é€ä¿¡
         RoomModel.I.SendReadyState(willReady);
 
-        // UIXV
+        // UIæ›´æ–°
         if (willReady)
         {
-            readyButton.GetComponentInChildren<Text>().text = "æ‚èÁ‚µ";
+            readyButton.GetComponentInChildren<Text>().text = "å–ã‚Šæ¶ˆã—";
 
             waitingText.gameObject.SetActive(true);
         }
         else
         {
 
-            readyButton.GetComponentInChildren<Text>().text = "€”õOKI";
+            readyButton.GetComponentInChildren<Text>().text = "æº–å‚™OKï¼";
 
             waitingText.gameObject.SetActive(false);
         }
     }
 
     // =====================================================
-    // ƒvƒŒƒCƒ„[ReadyXV
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼Readyæ›´æ–°
     // =====================================================
 
     void OnUpdatePlayerReady(JoinedUser[] users, bool[] isReadyList)
     {
 
-        // Šù‘¶ƒAƒCƒeƒ€‚ğ‘Síœ
+        // æ—¢å­˜ã‚¢ã‚¤ãƒ†ãƒ ã‚’å…¨å‰Šé™¤
         foreach (var item in UserReadyText)
         {
             Destroy(item);
         }
         UserReadyText.Clear();
 
-        // l”•ª¶¬
+        // äººæ•°åˆ†ç”Ÿæˆ
         for (int i = 0; i < users.Length; i++)
         {
             GameObject item = Instantiate(playerNamePrefab, UserReadyObject);
             item.GetComponentInChildren<Text>().text =
-            isReadyList[i] ? $"{users[i].Name} : €”õOK" : $"{users[i].Name} : ‘Ò‹@’†";//isReadyList‚Ìó‹µ‚ÅƒeƒLƒXƒg‚ğ•ÒW
+            isReadyList[i] ? $"{users[i].Name} : æº–å‚™OK" : $"{users[i].Name} : å¾…æ©Ÿä¸­";//isReadyListã®çŠ¶æ³ã§ãƒ†ã‚­ã‚¹ãƒˆã‚’ç·¨é›†
             UserReadyText.Add(item);
         }
 
         // TODO:
-        // ƒvƒŒƒCƒ„[ˆê——UIXV
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ä¸€è¦§UIæ›´æ–°
     }
 
     // =====================================================
-    // ‘SˆõReady’Ê’m
+    // å…¨å“¡Readyé€šçŸ¥
     // =====================================================
 
     void OnAllReadyState(bool isAllReady)
     {
-        if (isAllReady) Debug.Log("‘SˆõReady");
-        else Debug.Log("’N‚©‚Ì€”õ‚ª‚Å‚«‚Ä‚¢‚Ü‚¹‚ñ");
+        if (isAllReady) Debug.Log("å…¨å“¡Ready");
+        else Debug.Log("èª°ã‹ã®æº–å‚™ãŒã§ãã¦ã„ã¾ã›ã‚“");
         if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder != 1) return;
         readyButton.gameObject.SetActive(!isAllReady);
         StartButton.gameObject.SetActive(isAllReady);
@@ -251,7 +251,7 @@ public class kinko : MonoBehaviour
     }
 
     // =====================================================
-    // ƒQ[ƒ€ŠJn€”õ
+    // ã‚²ãƒ¼ãƒ é–‹å§‹æº–å‚™
     // =====================================================
 
     void StartGameFlow()
@@ -265,7 +265,7 @@ public class kinko : MonoBehaviour
     }
 
     // =====================================================
-    // ƒJƒEƒ“ƒgƒ_ƒEƒ“óM
+    // ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³å—ä¿¡
     // =====================================================
 
     public void StartCountdown(int remain)
@@ -285,7 +285,7 @@ public class kinko : MonoBehaviour
     }
 
     // =====================================================
-    // ƒQ[ƒ€ŠJn
+    // ã‚²ãƒ¼ãƒ é–‹å§‹
     // =====================================================
 
     IEnumerator BeginGameAfterStart()
@@ -308,7 +308,7 @@ public class kinko : MonoBehaviour
     }
 
     // =====================================================
-    // Score‘—M
+    // Scoreé€ä¿¡
     // =====================================================
 
     public void OnSendScore(int Score)
@@ -317,7 +317,7 @@ public class kinko : MonoBehaviour
     }
 
     // =====================================================
-    // ƒ‰ƒ“ƒLƒ“ƒOóM
+    // ãƒ©ãƒ³ã‚­ãƒ³ã‚°å—ä¿¡
     // =====================================================
 
     void OnReceiveRanking(List<JoinedUser> rankOrder)
@@ -328,22 +328,22 @@ public class kinko : MonoBehaviour
         {
             names.Add(user.Name);
         }
-        Debug.Log("OnReceiveRankingóM");
+        Debug.Log("OnReceiveRankingå—ä¿¡");
         foreach (var user in names)
         {
-            Debug.Log($"ƒ‰ƒ“ƒLƒ“ƒOóM{user}");
+            Debug.Log($"ãƒ©ãƒ³ã‚­ãƒ³ã‚°å—ä¿¡{user}");
         }
         ShowRanking(names);
     }
 
     // =====================================================
-    // ƒ‰ƒ“ƒLƒ“ƒO•\¦ŠJn
+    // ãƒ©ãƒ³ã‚­ãƒ³ã‚°è¡¨ç¤ºé–‹å§‹
     // =====================================================
 
     void ShowRanking(List<string> rankOrder)
     {
         SceneManager.LoadScene("GameScene");
         willReady = false;
-        Debug.Log("ShowRankingóM");
+        Debug.Log("ShowRankingå—ä¿¡");
     }
 }

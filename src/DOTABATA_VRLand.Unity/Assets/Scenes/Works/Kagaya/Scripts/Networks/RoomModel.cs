@@ -142,6 +142,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid> OnArcanaGameSeted { get; set; }
 
+
     /*
      * 処理
      */

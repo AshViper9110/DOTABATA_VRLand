@@ -9,6 +9,8 @@ TagManager:
   - FxTemporaire
   - VRUI
   - KeyBoard
+  - ArcnaUI
+  - Map
   layers:
   - Default
   - TransparentFX
@@ -16,10 +18,10 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - DrawBoad
+  - MyUI
+  - MySelf
+  - MagicBall
   - 
   - 
   - 

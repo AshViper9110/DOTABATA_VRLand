@@ -5,20 +5,13 @@ using TMPro;
 using System;
 
 public class GestureRecognizer : MonoBehaviour {
-    private LineRenderer lineRenderer;
-    private List<Vector3> linePoints = new List<Vector3>();
-    private List<Point> gesturePoints = new List<Point>();
-
     [SerializeField] private TextMeshProUGUI resultText;
 
     [SerializeField] private TMP_InputField shapesType;
     [SerializeField] private TMP_InputField saveFileName;
 
-    private int strokeId = -1;
-    private Camera cam;
-
     public enum GestureClass {
-        Circle,
+        Circle = 0,
         Star,
         Diamond,
         Square,
@@ -26,66 +19,18 @@ public class GestureRecognizer : MonoBehaviour {
         Heart,
     }
 
-    // 図形判定後
+    // 図形判定後コールバック
     public Action<GestureClass, float> CompleteRecognize;
 
-    private void Start() {
-        lineRenderer = GetComponent<LineRenderer>();
-        cam = Camera.main;
-
-        lineRenderer.positionCount = 0;
-        lineRenderer.widthMultiplier = 0.1f;
-    }
-
-    private void Update() {
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = 10f; // ← カメラからの距離
-
-        Vector3 pos = cam.ScreenToWorldPoint(mousePos);
-        pos.z = 0f;
-
-        if (Input.GetMouseButtonDown(0)) {
-            Debug.Log("StartDraw");
-            strokeId++;
-            linePoints.Clear();
-            gesturePoints.Clear();
-            lineRenderer.positionCount = 0;
-        }
-        if (Input.GetMouseButton(0)) {
-            // 点が近すぎる場合は追加しない（重要：ノイズ対策）
-            if (linePoints.Count == 0 || Vector3.Distance(linePoints[^1], pos) > 0.05f) {
-                linePoints.Add(pos);
-                lineRenderer.positionCount = linePoints.Count;
-                lineRenderer.SetPosition(linePoints.Count - 1, pos);
-
-                gesturePoints.Add(new Point(pos.x, pos.y, strokeId));
-            }
-        }
-        if (Input.GetMouseButtonUp(0)) {
-            Debug.Log("EndDraw");
-            // 点が近すぎる場合は追加しない（重要：ノイズ対策）
-            if (linePoints.Count == 0 || Vector3.Distance(linePoints[^1], pos) > 0.05f) {
-                linePoints.Add(pos);
-                lineRenderer.positionCount = linePoints.Count;
-                lineRenderer.SetPosition(linePoints.Count - 1, pos);
-
-                gesturePoints.Add(new Point(pos.x, pos.y, strokeId));
-            }
-
-            // 判定
-            Recognize();
-        }
-
-        //SaveGesture();
-    }
-
-    private void Recognize() {
+    /// <summary>
+    /// 図形判定
+    /// </summary>
+    public bool Recognize(List<Point> gesturePoints) {
         if (gesturePoints.Count < 10) {
             Debug.Log("点が少なすぎ");
             resultText.text = "Miss";
-            return;
+            return false;
         }
-
 
         List<string> xmlNames = new List<string>() {
             "circle_1.xml",
@@ -149,18 +94,25 @@ public class GestureRecognizer : MonoBehaviour {
             resultText.text = $"{result.GestureClass}\n" +
                 $"Score:{result.Score}";
 
-            GestureClass gestureClass = (GestureClass)Enum.Parse(typeof(GestureClass), result.GestureClass, true);
+            bool parseResult = EnumExs.TryParseFromString<GestureClass>(result.GestureClass, true, out GestureClass gestureClass);
             if (CompleteRecognize != null) {
                 CompleteRecognize(gestureClass, result.Score);
+                return true;
             }
+
+            return false;
         }
         else {
             Debug.Log("失敗");
             resultText.text = "Miss";
+            return false;
         }
     }
 
-    private void SaveGesture() {
+    /// <summary>
+    /// 図形モデル保存
+    /// </summary>
+    private void SaveGesture(List<Point> gesturePoints) {
         if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.L)) {
             GestureIO.WriteGesture(gesturePoints.ToArray(), shapesType.text, Application.dataPath + $"/Gestures/{saveFileName.text}.xml");
             Debug.Log("保存した");

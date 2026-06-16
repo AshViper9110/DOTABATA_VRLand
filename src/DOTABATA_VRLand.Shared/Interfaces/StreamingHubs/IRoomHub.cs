@@ -134,5 +134,6 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// 死亡同期
         /// </summary>
         Task DeathAsync();
+
     }
 }

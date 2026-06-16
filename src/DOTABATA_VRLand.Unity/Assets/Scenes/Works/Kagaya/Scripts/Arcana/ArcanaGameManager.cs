@@ -1,25 +1,52 @@
 ﻿using Cysharp.Threading.Tasks;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
+using Valve.VR;
 using static GestureRecognizer;
 
 public class ArcanaGameManager : MonoBehaviour {
     [SerializeField] private GestureRecognizer gestureRecognizer;
 
     private PlayerData mySelf;
+    private Transform rightHand;
 
     // スポーツ位置
     [SerializeField] private List<Transform> spawnPoints;
+
+    // プレイヤーのUI
+    [SerializeField] private GameObject playerUICanvas;
 
     // 魔法のPrefab
     [SerializeField] private GameObject magicBallPrefab;
     // 魔法のVFX
     [SerializeField] private List<GameObject> magicVFXList;
+    // 魔法のマテリアル
+    [SerializeField] private List<Material> magicMaterialList;
+
+    // 手用の魔法人のPrefab
+    [SerializeField] private List<GameObject> handMagicCircleList;
+
+    // 本のオブジェクトリスト
+    [SerializeField] private List<GameObject> magicBookObjects;
+    // 杖のオブジェクトリスト
+    [SerializeField] private List<GameObject> magicStaffObjects;
 
     // 自分のコントロ
     private ArcanaPlayerController myController;
+
+    // 線を描くためのオブジェクト
+    [SerializeField] private GameObject drawBoad;
+
+    [SerializeField] private GameObject drawPointer;
+    [SerializeField] private Material lineMaterial;
+
+    // 判定VFX
+    [SerializeField] private GameObject recognizeVFX;
 
     private void Awake() {
         gestureRecognizer.CompleteRecognize += CreateMagic;
@@ -36,9 +63,26 @@ public class ArcanaGameManager : MonoBehaviour {
             await RoomModel.I.ArcanaInitGameAsync();
         }
 
-        // プレイヤーにScriptを付与
-        mySelf.playerObj.AddComponent<PlayerStatus>().SetGameManager(this);
+        // 自身にScriptを付与
         myController = mySelf.playerObj.AddComponent<ArcanaPlayerController>();
+
+        // 全員にCanvasとオブジェクトを配置してScriptを付与
+        foreach (PlayerData playerData in InRoomPlayerData.I.PlayerList.Values) {
+            GameObject myUI = Instantiate(playerUICanvas, playerData.playerObj.transform);
+            GameObject drawBoadObj = Instantiate(drawBoad, playerData.playerObj.transform);
+
+            // 自分だったら
+            if (playerData.joinedUser.ConnectionId == mySelf.joinedUser.ConnectionId) {
+                myController.SetDrawBoad(drawBoadObj);
+                myUI.layer = LayerMask.NameToLayer("MyUI");
+                rightHand = mySelf.playerObj.GetComponentsInChildren<Transform>().First(_ => _.transform.name == "RightHand");
+                myController.SetRightHand(rightHand);
+                DrawVRPointer drawVR = rightHand.AddComponent<DrawVRPointer>();
+                drawVR.SetField(drawBoadObj, drawPointer, lineMaterial, recognizeVFX);
+            }
+
+            playerData.playerObj.AddComponent<PlayerStatus>().SetGameManager(this);
+        }
 
         // スポーン位置に移動
         mySelf.playerObj.transform.position = spawnPoints[mySelf.joinedUser.JoinOrder - 1].position;
@@ -68,8 +112,10 @@ public class ArcanaGameManager : MonoBehaviour {
         int rnd = UnityEngine.Random.Range(0, magicVFXList.Count);
         // VFX生成
         Instantiate(magicVFXList[rnd], createdTransform);
+        // Material適応
+        createdTransform.GetComponent<MeshRenderer>().material = magicMaterialList[rnd];
 
-        myController.SetMagicObj(createdTransform.gameObject);
+        myController.SetMagicObj(createdTransform.gameObject, gesture, handMagicCircleList[rnd]);
     }
 
     /// <summary>
@@ -94,7 +140,15 @@ public class ArcanaGameManager : MonoBehaviour {
     public void OnArcanaGameSeted(Guid winnerConId) {
         Debug.Log($"勝者は{InRoomPlayerData.I.PlayerList[winnerConId].joinedUser.Name}");
 
-        Destroy(InRoomPlayerData.I.MySelf.playerObj.GetComponent<PlayerStatus>());
         Destroy(myController);
+        Destroy(rightHand.GetComponent<DrawVRPointer>());
+
+        foreach (PlayerData playerData in InRoomPlayerData.I.PlayerList.Values) {
+            foreach (Transform child in playerData.playerObj.transform) {
+                if (!child.CompareTag("ArcanaUI")) return;
+                Destroy(child);
+            }
+            Destroy(playerData.playerObj.GetComponent<PlayerStatus>());
+        }
     }
 }
