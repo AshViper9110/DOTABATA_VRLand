@@ -305,6 +305,7 @@ public class GameManager : MonoBehaviour
         }
         SteamVR_Fade.View(new Color(1,1,1,1), 2);
         Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
+        AudioManager.PlaySE(AudioManager.SE.MoveScene);
     }
 
     public void SetMiniGame()

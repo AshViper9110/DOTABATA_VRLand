@@ -25,6 +25,7 @@ public class BombDogePlayer : MonoBehaviour
             }
 
             EngelRing.transform.position = playerTransform.Head.position + (Vector3.up * 0.3f);
+           
         }
     }
 
