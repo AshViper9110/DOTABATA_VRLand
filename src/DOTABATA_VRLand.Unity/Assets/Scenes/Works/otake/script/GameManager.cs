@@ -239,6 +239,9 @@ public class GameManager : MonoBehaviour
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position =
             playerPos[index].position;
 
+        InRoomPlayerData.I.PlayerList[myId].playerObj.transform.rotation =
+           playerPos[index].rotation;
+
         //ここで全体ランキング、勝利数の取得、王冠の配置
         NetworkManager.I.ReqestRanking();
 
@@ -518,6 +521,7 @@ public class GameManager : MonoBehaviour
             {
                 //タイトルに戻る
                 MoveScene("TitleScene");
+                RoomModel.I.LeaveRoomAsync();
                 EndProgress = true;
                 return;
             }
