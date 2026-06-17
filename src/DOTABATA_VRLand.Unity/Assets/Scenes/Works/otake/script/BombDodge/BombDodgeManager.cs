@@ -11,17 +11,19 @@ public class BombDodgeManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        AudioManager.StopBgm();
         SteamVR_Fade.Start(new Color(0, 0, 0, 0), 1.0f);
         int index = 0;
         foreach (var obj in InRoomPlayerData.I.PlayerList.Values)
         {
-            if (obj.playerObj.GetComponent<BombDogePlayer>())
+            if (!obj.playerObj.GetComponent<BombDogePlayer>())
             {
                 BombDogePlayer dogePlayer = obj.playerObj.AddComponent<BombDogePlayer>();
                 dogePlayer.EngelRing = Instantiate(EngelRingPrefab,
                     obj.playerObj.transform.position,
                     Quaternion.identity,
                     obj.playerObj.transform);
+                dogePlayer.EngelRing.transform.Rotate(90,0,0);
             }
             obj.playerObj.transform.position = startpos[index].position;
             obj.playerObj.transform.LookAt(center);
