@@ -11,6 +11,29 @@ public class PlayerTransform : MonoBehaviour {
     [SerializeField] private float duration = 0.2f;
 
     [SerializeField] public Transform crownParent;
+    [SerializeField] float crownsDistance;
+
+    [SerializeField] GameObject SpotLight;
+    [SerializeField] float SpotDistans;
+    float spotTomer;
+
+    private void Update()
+    {
+        crownParent.position = Head.position+(Vector3.up*crownsDistance);
+        SpotLight.transform.position = Head.position + (Vector3.up * SpotDistans);
+        if (spotTomer >= 0)
+        {
+            spotTomer -= Time.deltaTime;
+
+        }
+        else
+        {
+            if(SpotLight.activeSelf)
+            {
+                SpotLight.SetActive(false);
+            }
+        }
+    }
 
     /// <summary>
     /// PlayerTransform ==> DTO 
@@ -32,5 +55,11 @@ public class PlayerTransform : MonoBehaviour {
         LeftHand.ApplyTransform(transformDTO.LeftHand, duration);
         RightHand.ApplyTransform(transformDTO.RightHand, duration);
         Body.ApplyTransform(transformDTO.Body, duration);
+    }
+
+    public void StartSpotLight(float time)
+    {
+        spotTomer = time;
+        SpotLight.SetActive(true);
     }
 }

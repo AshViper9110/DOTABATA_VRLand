@@ -181,9 +181,11 @@ public class MinigameFlowController : MonoBehaviour
         if (remain > 0)
         {
             countdownText.text = remain.ToString();
+            AudioManager.PlaySE(AudioManager.SE.MiniGame_CountDown);
         }
         else
         {
+            AudioManager.PlaySE(AudioManager.SE.MiniGame_Start);
             countdownText.text = "START!";
             StartCoroutine(BeginGameAfterStart());
         }
@@ -228,21 +230,26 @@ public class MinigameFlowController : MonoBehaviour
 
     void OnReceiveRanking(List<JoinedUser> rankOrder)
     {
+        AudioManager.PlaySE(AudioManager.SE.MiniGame_Finish);
         names.Clear();//前回のユーザー情報クリア
         foreach (var user in rankOrder)names.Add(user.Name);
         Debug.Log("OnReceiveRanking受信");
         foreach (var user in names)Debug.Log($"ランキング受信:{user}");
         isGameStarted = false;
-        EndGame();
-        SceneManager.LoadScene("GameScene");//シーン移行
+        countdownText.gameObject.SetActive(true);
+        countdownText.text = "FINISH!";
+        StartCoroutine(EndGame());
     }
 
     // =====================================================
     // 終了
     // =====================================================
 
-    void EndGame()
+    IEnumerator EndGame()
     {
-        Debug.Log("ゲーム終了！");
+        yield return new WaitForSecondsRealtime(2f);
+
+        SteamVR_Fade.View(new Color(1, 1, 1, 1), 2);
+        SceneManager.LoadScene("GameScene");//シーン移行
     }
 }

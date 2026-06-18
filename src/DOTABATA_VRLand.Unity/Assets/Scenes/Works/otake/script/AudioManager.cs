@@ -13,8 +13,14 @@ public class AudioManager : MonoBehaviour
         Main_crown_add,
         Main_miniGame_select,
         Main_miniGeme_decision,
-        Move_Scene,
-        
+        MiniGame_CountDown,
+        MiniGame_Start,
+        MiniGame_Finish,
+        //Bank
+        Dial_Open,
+        Bank_Open,
+        //Click
+        Button_Click,
     }
 
     public enum BGM
@@ -38,12 +44,15 @@ public class AudioManager : MonoBehaviour
 
     static AudioSource audioSource;
 
+    static public bool isStartBgm; 
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         SEs = seClips;
         BGMs = bgmClips;
+        isStartBgm = false;
     }
 
     // Update is called once per frame
@@ -61,6 +70,13 @@ public class AudioManager : MonoBehaviour
     {
         audioSource.clip = BGMs[(int)type];
         audioSource.Play();
+        isStartBgm = true;
+    }
+
+    static public void StopBgm()
+    {
+        audioSource.Stop();
+        isStartBgm = false;
     }
 
 }

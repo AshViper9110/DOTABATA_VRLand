@@ -9,7 +9,6 @@ using UnityEngine.SceneManagement;
 public class NetworkManager : Singleton<NetworkManager>
 {
     public GameObject SyncPlayerPrefab;
-    public GameObject player;
     public Guid myConnectionId;
     public bool isJoin = false;
 
@@ -73,11 +72,28 @@ public class NetworkManager : Singleton<NetworkManager>
         );
 
         isJoin = true;
-        SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
+        SyncPlayer syncPlayer = GameObject.Find("Player(Clone)").GetComponent<SyncPlayer>();
         syncPlayer.isLocalPlayer = true;
 
         SceneManager.LoadScene(scene);
     }
+
+    /// <summary>
+    /// Roomに参加ボタン
+    /// </summary>
+    public async Task JointoRoom(ulong steamID, RoomConfig roomConfig)
+    {
+        await RoomModel.I.JoinRoomAsync(steamID, roomConfig);
+
+        await Cysharp.Threading.Tasks.UniTask.WaitUntil(() =>
+            InRoomPlayerData.I.PlayerList.ContainsKey(myConnectionId)
+        );
+
+        isJoin = true;
+        SyncPlayer syncPlayer = GameObject.Find("Player(Clone)").GetComponent<SyncPlayer>();
+        syncPlayer.isLocalPlayer = true;
+    }
+
     /// <summary>
     /// ルーム全取得
     /// </summary>
@@ -110,7 +126,7 @@ public class NetworkManager : Singleton<NetworkManager>
         {
             PlayerData data = new PlayerData()
             {
-                playerObj = player,
+                playerObj = GameObject.Find("Player(Clone)"),
                 joinedUser = user,
             };
             InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
@@ -134,7 +150,8 @@ public class NetworkManager : Singleton<NetworkManager>
     /// </summary>
     private void OnLeavedUser(Guid connectionId, int joinOrder)
     {
-        TextLogs($"ConnectionId：{connectionId} が退室");
+        if (connectionId == myConnectionId) return;
+            TextLogs($"ConnectionId：{connectionId} が退室");
         InRoomPlayerData.I.RemovePlayer(connectionId);
     }
 
@@ -190,6 +207,7 @@ public class NetworkManager : Singleton<NetworkManager>
             gameManager.RankingList[user.JoinOrder] = index+1;
             gameManager.playerWinlist[user.JoinOrder] = winCount[index];
             gameManager.SetCrown(user.ConnectionId,user.JoinOrder);
+            gameManager.SetRankText(user.ConnectionId, user.JoinOrder);
             index++;
         }
     }

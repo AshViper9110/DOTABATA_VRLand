@@ -28,5 +28,10 @@ namespace DOTABATA_VRLand.Server.Models.Entities {
         /// </summary>
         public MiniGameResultData miniGameResultData = new MiniGameResultData();
 
+        /// <summary>
+        /// DB上のID
+        /// </summary>
+        public int DbId;
+
     }
 }

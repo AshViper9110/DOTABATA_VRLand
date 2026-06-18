@@ -13,6 +13,8 @@ public class TestManager : MonoBehaviour
 
     private void Start()
     {
+        SteamVR_Fade.View(new Color(0, 0, 0, 0), 2);
+        AudioManager.ChangeBGM(AudioManager.BGM.Title);
         if (SteamManager.Initialized)
         {
             playerName = SteamFriends.GetPersonaName();

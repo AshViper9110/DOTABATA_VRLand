@@ -1,31 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84da42625acf83d49882881f0cff86be, type: 3}
-  m_Name: SyncObjectDataSO
-  m_EditorClassIdentifier: 
-  syncObjectDataList:
-  - objectListId: 1
-    syncObject: {fileID: 2236606099346283477, guid: 3ea295a6128cfbd48bcb4e8d33acd6ee, type: 3}
-  - objectListId: 2
-    syncObject: {fileID: 170850, guid: 8e13c6e5a21aeea4db3c25ef0e529308, type: 3}
-  - objectListId: 3
-    syncObject: {fileID: 103010, guid: b9d299b8c6aa86242bec9a060f7e2d81, type: 3}
-  - objectListId: 4
-    syncObject: {fileID: 196770, guid: a5b684916cfe6804985d74652a2af09f, type: 3}
-  - objectListId: 5
-    syncObject: {fileID: 173346, guid: f1f5f898fbfdb80478825ce9b01fe8ae, type: 3}
-  - objectListId: 6
-    syncObject: {fileID: 173732, guid: 81fc1450441aca64e8cc1a0e14b1aa77, type: 3}
-  - objectListId: 7
-    syncObject: {fileID: 2605816537857199021, guid: 26369a01791ef97478927b5e1f8a3f2d, type: 3}
-  - objectListId: 8
-    syncObject: {fileID: 5751627812098760897, guid: 54d89d526b4ae684db447295710712e7, type: 3}
+version https://git-lfs.github.com/spec/v1
+oid sha256:3f60dd9ba87cc0ea775bad26e27940d718a7b4c7c50d9e173ab2be71fe9b7ab1
+size 1397

@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
@@ -10,19 +12,21 @@ public class NitnitManager : MonoBehaviour
     public float MaxPoint = 999;
 
     [SerializeField] float maxTimer;
+    [SerializeField] TextMeshProUGUI timerText;
     float timer;
-    [SerializeField] Text TimerText;
-    
+
+
     [SerializeField] List<GameObject> nitPrefabs = new List<GameObject>();
     [SerializeField] List<Material> materials = new List<Material>();
 
     [SerializeField] public List<MufflerSetManager> mufflerSets = new List<MufflerSetManager>();
-    [SerializeField] List<Text> pointTexts = new List<Text>();
+    [SerializeField] List<TextMeshProUGUI> pointTexts = new List<TextMeshProUGUI>();
 
     [SerializeField] List<Transform> startPos = new List<Transform>();
 
    public MinigameFlowController FlowController;
 
+    
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -34,9 +38,10 @@ public class NitnitManager : MonoBehaviour
 
         FlowController = GetComponent<MinigameFlowController>();
 
-       
+        AudioManager.StopBgm();
+        timerText.text = "";
 
-        foreach(var f in InRoomPlayerData.I.PlayerList.Values)
+        foreach (var f in InRoomPlayerData.I.PlayerList.Values)
         {
             if (f.joinedUser.ConnectionId == NetworkManager.I.myConnectionId)
             {
@@ -51,32 +56,29 @@ public class NitnitManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (FlowController.isGameStarted)
+       if(FlowController.isGameStarted)
         {
-            timer -= Time.deltaTime;
-            if(!TimerText.gameObject.activeSelf)
+            if(!AudioManager.isStartBgm)
             {
-                TimerText.gameObject.SetActive(true);
+                AudioManager.ChangeBGM(AudioManager.BGM.Nit_Nit);
             }
-            TimerText.text = (Mathf.Floor(timer*10)/10).ToString();
+            timer -= Time.deltaTime;
+            timerText.text = ((int)timer).ToString();
 
             if (timer < 0)
             {
+                timerText.text = "フィニッシュ！";
+              
                 FlowController.isGameStarted = false;
-                RoomModel.I.SendScore((int)(mufflerSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].point * 10));
+                StartCoroutine(SendScoreCount());
+                mufflerSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].DeleteRod();
                 enabled = false;
-                TimerText.text = "フィニッシュ！";
+                
+                AudioManager.StopBgm();
+                AudioManager.PlaySE(AudioManager.SE.MiniGame_Finish);
 
-                foreach (MufflerSetManager mufflerSet in mufflerSets)
-                {
-                    mufflerSet.DeleteRod();
-                }
                 return;
             }
-        }
-        else
-        {
-            TimerText.gameObject.SetActive(false);
         }
 
         for (int i = 0; i < pointTexts.Count; i++)
@@ -86,5 +88,11 @@ public class NitnitManager : MonoBehaviour
 
     }
 
+
+     public IEnumerator SendScoreCount()
+    {
+        yield return new WaitForSeconds(2);
+        RoomModel.I.SendScore((int)(mufflerSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].point * 10));
+    }
  
 }

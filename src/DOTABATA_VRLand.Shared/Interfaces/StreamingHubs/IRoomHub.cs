@@ -20,7 +20,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// ルームに接続
         /// </summary>
-        Task<JoinedUser[]> JoinRoomAsync(ulong steamId, RoomConfig roomConfig);
+        Task<JoinedUser[]> JoinRoomAsync(ulong? steamId, RoomConfig roomConfig);
 
         /// <summary>
         /// 退出処理
@@ -125,5 +125,15 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// シーン移行が完了したことを他プレイヤーに伝える
         /// </summary>
         Task CompleteSceneTransition();
+
+        /// <summary>
+        /// Roomオーナーがmainのゲームを開始させることを通知する
+        /// </summary>
+        Task RoomStart();
+
+        /// <summary>
+        /// ボーリングの順番変え
+        /// </summary>
+        Task BallingNext();
     }
 }
