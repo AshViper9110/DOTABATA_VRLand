@@ -15,7 +15,7 @@ public class MiniGameCanvasContoroller : MonoBehaviour
 
     private void Start()
     {
-        if (!target) target = GameObject.Find("Player").transform;
+        if (!target) target = GameObject.Find("Player(Clone)").transform;
     }
 
     private void LateUpdate()

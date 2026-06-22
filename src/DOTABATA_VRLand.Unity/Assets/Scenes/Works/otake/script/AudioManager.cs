@@ -70,6 +70,7 @@ public class AudioManager : MonoBehaviour
     {
         audioSource.clip = BGMs[(int)type];
         audioSource.Play();
+        audioSource.loop = true;
         isStartBgm = true;
     }
 

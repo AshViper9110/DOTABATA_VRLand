@@ -122,6 +122,16 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ボーリングの順番変え通知
         /// </summary>
         public void OnBallingNext(int order);
+
+        /// <summary>
+        /// 爆弾ドッチボールのヒット通知
+        /// </summary>
+        public void OnHitDodgeBall(Guid connectionId);
+
+        /// <summary>
+        /// 爆弾ドッチボールの死亡通知
+        /// </summary>
+        public void OnHitBomber(Guid connectionId);
     }
 
 }

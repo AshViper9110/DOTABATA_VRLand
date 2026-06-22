@@ -75,7 +75,7 @@ public class NitnitManager : MonoBehaviour
                 enabled = false;
                 
                 AudioManager.StopBgm();
-                AudioManager.PlaySE(AudioManager.SE.MiniGame_Finish);
+
 
                 return;
             }
