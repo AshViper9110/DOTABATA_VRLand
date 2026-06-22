@@ -30,19 +30,36 @@ app.use(
 // --- 認証系 ---
 
 // ログイン処理（※現在は固定認証）
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
-  // 固定値で認証（本番ではDB + ハッシュ比較が必要）
-  if (username === "admin" && password === "Yoshidajobi2024") {
-    // セッションにユーザー情報を保存
-    req.session.user = username;
+  try {
+    const [rows] = await db.query(
+        "SELECT * FROM admin_users WHERE name = ?",
+        [username]
+    );
 
-    return res.json({ success: true });
+    // ユーザーが存在しない
+    if (rows.length === 0) {
+      return res.status(401).json({ success: false });
+    }
+
+    const user = rows[0];
+
+    // パスワード確認
+    if (user.password !== password) {
+      return res.status(401).json({ success: false });
+    }
+
+    // ログイン成功
+    req.session.user = user.name;
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
   }
-
-  // 認証失敗
-  res.status(401).json({ success: false });
 });
 
 // セッションチェックAPI
@@ -64,11 +81,11 @@ app.post("/logout", (req, res) => {
 app.get("/main", (req, res) => {
   // 未ログインならログイン画面へリダイレクト
   if (!req.session.user) {
-    return res.redirect("/login.html");
+    return res.redirect("/index.html");
   }
 
   // ログイン済みならメイン画面を返す
-  res.sendFile(path.join(__dirname, "../public/index.html"));
+  res.sendFile(path.join(__dirname, "../public/main.html"));
 });
 
 // --- API（ユーザー操作） ---
@@ -86,6 +103,21 @@ app.get("/api/users/get", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+/**
+ * 管理ユーザー一覧取得
+ */
+app.get("/api/admin-users/get", async (req, res) => {
+  try {
+    const [rows] = await db.query(`SELECT id,name,created_at FROM admin_users ORDER BY id `)
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 /**
  * ID検索

@@ -3,32 +3,44 @@ function logout() {
   // /logout エンドポイントにPOST送信（セッション破棄想定）
   fetch("/logout", { method: "POST" })
     // 完了後にログイン画面へ遷移
-    .then(() => (location.href = "/login.html"));
+    .then(() => (location.href = "/main.html"));
 }
 
 // ユーザー一覧を取得して表示
 async function loadUsers() {
-  // APIから全ユーザー取得
   const res = await fetch("/api/users/get");
   const users = await res.json();
 
-  // 表示先のul/ol要素を取得
   const list = document.getElementById("list");
 
-  // 一旦リストを初期化
   list.innerHTML = "";
 
-  // データが存在する場合
   if (users != null) {
     users.forEach((user) => {
-      // ユーザー名表示用li
-      const li = document.createElement("li");
-      li.textContent = user.name;
-      list.appendChild(li);
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${user.id}</td>
+        <td>${user.name}</td>
+        <td>
+          <button onclick="detailUser(${user.id})">詳細</button>
+          <button onclick="deleteUser(${user.id})">削除</button>
+        </td>
+      `;
+
+      list.appendChild(tr);
     });
   }
 }
+// --- ユーザー編集処理 ---
+function detailUser(id) {
+  console.log(id);
+}
 
+// --- ユーザー削除処理 ---
+function deleteUser(id) {
+  console.log(id);
+}
 // --- ユーザー登録処理 ---
 document.getElementById("form").addEventListener("submit", async (e) => {
   // フォームのデフォルト送信を停止
