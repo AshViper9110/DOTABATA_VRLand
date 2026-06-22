@@ -1,40 +1,110 @@
 <!doctype html>
+<style>
+  body {
+    background: #f4f6f9;
+    font-family: sans-serif;
+    margin: 0;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .search-form {
+    display: flex;
+    gap: 10px;
+  }
+
+  .search-form input {
+    flex: 1;
+    padding: 10px;
+  }
+
+  .search-form button {
+    padding: 10px 20px;
+  }
+
+  .user-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .user-table th,
+  .user-table td {
+    border-bottom: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+
+  .user-table th {
+    background-color: #f8f9fa;
+  }
+
+  .user-table tr:hover {
+    background-color: #f5f5f5;
+  }
+
+  .home-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+  }
+</style>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin</title>
-    <link rel="stylesheet" href="./css/style.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
 
-  <body>
-    <div class="container">
-      <h1>ユーザー管理</h1>
+<body>
+<div class="container">
+  <h1>ユーザー管理</h1>
 
-      <div class="card">
-        <h2>ユーザー追加</h2>
-        <form id="form">
-          <input type="text" id="name" placeholder="名前" required />
-          <button type="submit">追加</button>
-        </form>
-      </div>
+  <div class="card">
+    <h2>ユーザー検索</h2>
+    <form id="idSearch" class="search-form">
+      <input type="text" id="id" placeholder="IDを入力" />
+      <button type="submit">検索</button>
+    </form>
+  </div>
 
-      <div class="card">
-        <h2>ID検索</h2>
-        <form id="idSearch">
-          <input type="text" id="id" placeholder="ID" required />
-          <button type="submit">検索</button>
-        </form>
-      </div>
+  <div class="card">
+    <h2>ユーザー一覧</h2>
 
-      <div class="card">
-        <h2>ユーザー一覧</h2>
-        <ul id="list" class="user-list"></ul>
-      </div>
+    <table class="user-table">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>名前</th>
+        <th>操作</th>
+      </tr>
+      </thead>
+      <tbody id="list">
+      </tbody>
+    </table>
+  </div>
 
-      <a href="./index.html">home</a>
-    </div>
-    <script src="./js/logincheck.js"></script>
-    <script src="./js/users.js"></script>
-  </body>
+  <a href="main.html" class="home-link">ホームへ戻る</a>
+</div>
+
+<script src="./js/logincheck.js"></script>
+<script src="./js/users.js"></script>
+</body>
 </html>
