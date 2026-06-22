@@ -682,5 +682,19 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             this._roomContext.Group.All.OnBallingNext(this._roomContext.ballingOrder);
             return Task.CompletedTask;
         }
+
+        //爆弾ドッチボールのヒット処理
+        public Task HitDodgeBall(Guid connectionId)
+        {
+            this._roomContext.Group.All.OnHitDodgeBall(connectionId);
+            return Task.CompletedTask;
+        }
+
+        //爆弾ドッチボールの死亡処理
+        public Task HitBomber(Guid connectionId)
+        {
+            this._roomContext.Group.All.OnHitBomber(connectionId);
+            return Task.CompletedTask;
+        }
     }
 }

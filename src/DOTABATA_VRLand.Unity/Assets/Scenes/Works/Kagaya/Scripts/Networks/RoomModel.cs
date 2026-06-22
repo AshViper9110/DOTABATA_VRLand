@@ -132,6 +132,9 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action<int> OnBallingNexted { get; set; }
 
+    public Action<Guid> OnHitingDodgeBall { get; set; }
+    public Action<Guid> OnHitingBomber { get; set; }
+
     /*
      * 処理
      */
@@ -676,6 +679,40 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (OnBallingNexted != null)
         {
             OnBallingNexted(order);
+        }
+    }
+
+    public async UniTask HitDodgeBall()
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.HitDodgeBall(NetworkManager.I.myConnectionId);
+    }
+
+    public void OnHitDodgeBall(Guid connectionId)
+    {
+        if(OnHitingDodgeBall != null)
+        {
+            OnHitingDodgeBall(connectionId);
+        }
+    }
+
+    public async UniTask HitBomber()
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.HitBomber(NetworkManager.I.myConnectionId);
+    }
+
+    public void OnHitBomber(Guid connectionId)
+    {
+        if (OnHitingBomber != null)
+        {
+            OnHitingBomber(connectionId);
         }
     }
 }

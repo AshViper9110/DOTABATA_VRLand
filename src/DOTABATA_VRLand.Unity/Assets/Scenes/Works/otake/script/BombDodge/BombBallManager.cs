@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -23,12 +24,19 @@ public class BombBallManager : MonoBehaviour
 
     [SerializeField]GameObject BomberObj;
 
+    SyncObject syncObject;
+
+    BombDodgeManager bombDodgeManager;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        BombTimer = BombTimerMax;
-        interactable = gameObject.GetComponent<Interactable>();
-        rb = gameObject.GetComponent<Rigidbody>();
+        InitBall();
+        }
+
+    private void OnDestroy()
+    {
+       
     }
 
     // Update is called once per frame
@@ -40,8 +48,23 @@ public class BombBallManager : MonoBehaviour
         {
             BombTimer = 0;
             BomberObj.SetActive(true);
-            Destroy(this.gameObject, 3.0f);
+
+            interactable.attachedToHand.DetachObject(this.gameObject);
+
+            Destroy(this.gameObject, 1.0f);
             enabled = false;
+            StartCoroutine(bombDodgeManager.CreateBall());
+        }
+        
+        if(syncObject.IsOwner)
+        {
+            rb.useGravity = true;
+        }
+        else
+        {
+            rb.useGravity = false;
+
+            
         }
 
 
@@ -51,47 +74,33 @@ public class BombBallManager : MonoBehaviour
         BombTimerText.transform.LookAt(Camera.main.transform);
         BombTimerText.transform.Rotate(0, 180, 0);
 
-        
+        var hand = interactable.attachedToHand;
 
-        //if (interactable.isHovering)
-        //{
-        //    var hand = interactable.hoveringHand;
+        if (hand != null)
+        {
+            if (!syncObject.IsOwner)
+            {
+                syncObject.GetOwnership(true);
+                RestartPos = bombDodgeManager.BombStartpos[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].position;
+                Debug.Log("君の物だよ");
+            }
 
-        //    if (hand != null && interactable.attachedToHand == null && grabAction.GetStateDown(hand.handType))
-        //    {
-        //        // 手のモデルを非表示（通常の掴みと同じ挙動）
-        //        hand.HideController();
-        //        hand.otherHand.HideController();
-
-        //        hand.AttachObject(
-        //        interactable.gameObject,
-        //        GrabTypes.Scripted,
-        //        Hand.AttachmentFlags.ParentToHand
-        //        | Hand.AttachmentFlags.SnapOnAttach
-        //        | Hand.AttachmentFlags.DetachOthers
-        //        | Hand.AttachmentFlags.VelocityMovement
-        //    );
-
-        //        interactable.attachedToHand = hand;
-              
-        //    }
-        //}
-
-        //// 離されたら手を再表示
-        //if (interactable.attachedToHand == null)
-        //{
-        //    var hand = interactable.hoveringHand;
-        //    if (hand.grabGripAction != null)
-        //    {
-        //        hand.ShowController();
-        //        hand.otherHand.ShowController();
-        //        hand.DetachObject( interactable.gameObject );
-        //    }
-        //}
+        }
 
     }
 
- 
+    public void InitBall()
+    {
+        BombTimer = BombTimerMax;
+        interactable = gameObject.GetComponent<Interactable>();
+        rb = gameObject.GetComponent<Rigidbody>();
+        syncObject = gameObject.GetComponent<SyncObject>();
+        bombDodgeManager = GameObject.Find("GameManager").GetComponent<BombDodgeManager>();
+        BomberObj.SetActive(false);
+        bombDodgeManager.Bomb = this;
+    }
+
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -105,12 +114,16 @@ public class BombBallManager : MonoBehaviour
         if (other.transform.parent != null && other.transform.parent.parent != null)
         {
 
-            if (other.transform.parent.transform.parent.gameObject.GetComponent<PlayerTransform>())
+            if (other.transform.parent.transform.parent.gameObject == InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj)
             {
                 Debug.Log("あててんのよ♡");
+                //TODO:自分が当たったことを通知
+                RoomModel.I.HitDodgeBall();
             }
         }
 
     }
-   
+
+    
+
 }
