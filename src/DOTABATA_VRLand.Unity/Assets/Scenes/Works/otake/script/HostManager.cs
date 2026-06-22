@@ -1,7 +1,7 @@
 using DG.Tweening;
 using UnityEngine;
 
-public class HostManager : Singleton<HostManager>
+public class HostManager :MonoBehaviour 
 {
     [SerializeField]SkinnedMeshRenderer meshRenderer;
 

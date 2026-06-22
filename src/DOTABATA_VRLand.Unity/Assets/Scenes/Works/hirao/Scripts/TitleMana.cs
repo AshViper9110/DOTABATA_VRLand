@@ -3,36 +3,49 @@ using UnityEngine;
 using Steamworks;
 using Valve.VR;
 using System.Collections;
+using System.Threading.Tasks;
 
 public class TitleMana : MonoBehaviour
 {
     private string playerName;
     private ulong steamId;
-    public int gameModeId = 1;
-    public GameObject player;
+    public GameObject playerPrefab;
 
-    private async void Start()
+    private async void Awake()
     {
-        SteamVR_Fade.View(Color.clear, 0.5f);
-        if (SteamManager.Initialized)
+        if (GameObject.Find("Player(Clone)") == null)
         {
-            playerName = SteamFriends.GetPersonaName();
-            steamId = SteamUser.GetSteamID().m_SteamID;//steamIdを取得
-            Debug.Log($"name:{playerName} SteamID:{steamId}");
-            await UserModel.I.CreateUserModel();
-            bool result = await UserModel.I.RegistUserAsync(
-            playerName,
-            steamId
-            );
-            Debug.Log($"result:{result}");
+            Instantiate(playerPrefab, new Vector3(0,0,-20), Quaternion.identity);
 
+            await Task.Yield();
+
+            if (SteamManager.Initialized)
+            {
+                playerName = SteamFriends.GetPersonaName();
+                steamId = SteamUser.GetSteamID().m_SteamID;//steamIdを取得
+                Debug.Log($"name:{playerName} SteamID:{steamId}");
+                await UserModel.I.CreateUserModel();
+                bool result = await UserModel.I.RegistUserAsync(
+                playerName,
+                steamId
+                );
+                Debug.Log($"result:{result}");
+
+            }
+            else
+            {
+                Debug.LogError("Steam is not initialized.");
+            }
+
+            InRoomPlayerData.I.SetMySelf(new PlayerData() { playerObj = GameObject.Find("Player(Clone)") });
         }
         else
         {
-            Debug.LogError("Steam is not initialized.");
+            GameObject.Find("Player(Clone)").transform.position = Vector3.zero;
+            SteamVR_Fade.View(Color.clear, 2);
         }
 
-        InRoomPlayerData.I.SetMySelf(new PlayerData() { playerObj = player });
+        AudioManager.ChangeBGM(AudioManager.BGM.Title);
     }
 
     /// <summary>
@@ -41,6 +54,7 @@ public class TitleMana : MonoBehaviour
     /// 
     public void JoinLobby()
     {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         StartCoroutine(MoveWithFade());
     }
 
@@ -53,7 +67,7 @@ public class TitleMana : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         // 移動
-        player.transform.position = Vector3.zero;
+        GameObject.Find("Player(Clone)").transform.position = Vector3.zero;
 
         // 1フレーム待つと安定しやすい
         yield return null;
@@ -61,4 +75,6 @@ public class TitleMana : MonoBehaviour
         // フェードイン
         SteamVR_Fade.View(Color.clear, 0.5f);
     }
+
+  
 }

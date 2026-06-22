@@ -436,7 +436,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             var users = rank.Select(r => r.user).ToList();//ユーザーの順位順リストを取得
             var winCounts = rank.Select(r => r.winCount).ToList();//勝利数を取得、//    users[i] と winCounts[i] は必ず同じプレイヤーに対応
 
-            _roomContext.Group.All.OnGetAllRoundRanking(users, winCounts);
+            // 呼び出した本人にだけ送信
+            Client.OnGetAllRoundRanking(users, winCounts);
             return Task.CompletedTask;
             // 順位送信
            

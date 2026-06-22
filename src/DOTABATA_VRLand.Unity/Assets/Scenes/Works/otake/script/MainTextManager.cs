@@ -7,6 +7,8 @@ public class DummyTextManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     TextMeshProUGUI text;
     string tempText;
+
+    [SerializeField] HostManager hostManager;
     void Start()
     {
         text = GetComponent<TextMeshProUGUI>();
@@ -19,7 +21,7 @@ public class DummyTextManager : MonoBehaviour
         if (tempText != text.text)
         {
             AudioManager.PlaySE(AudioManager.SE.Main_text_voice);
-            HostManager.I.MoveBeard();
+           hostManager.MoveBeard();
             tempText = text.text;
         }
     }

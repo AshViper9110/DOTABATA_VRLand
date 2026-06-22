@@ -100,7 +100,7 @@ public class GameManager : MonoBehaviour
     public List<RectTransform> rankingUis;
     public List<Material> rankingMaterials;
 
-
+    [SerializeField] HostManager hostManager;
 
      public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
@@ -239,6 +239,9 @@ public class GameManager : MonoBehaviour
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position =
             playerPos[index].position;
 
+        InRoomPlayerData.I.PlayerList[myId].playerObj.transform.rotation =
+           playerPos[index].rotation;
+
         //ここで全体ランキング、勝利数の取得、王冠の配置
         NetworkManager.I.ReqestRanking();
 
@@ -302,6 +305,7 @@ public class GameManager : MonoBehaviour
         }
         SteamVR_Fade.View(new Color(1,1,1,1), 2);
         Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
+        AudioManager.PlaySE(AudioManager.SE.MoveScene);
     }
 
     public void SetMiniGame()
@@ -366,12 +370,12 @@ public class GameManager : MonoBehaviour
 
     public void AddCrown(Guid guid, int ID)
     {
-        Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
+        PlayerTransform playerTransform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>();
+        Transform transform = playerTransform.crownParent;
         GameObject crown = Instantiate(CrownPrefab,
                transform);
 
-        //GameObject crown = Instantiate(CrownPrefab,
-        //      crowntrans);
+  
 
 
         crown.transform.position = new Vector3(crown.transform.position.x, transform.position.y + (crownDistance * playerWinlist[ID])+3f, crown.transform.position.z);
@@ -392,6 +396,8 @@ public class GameManager : MonoBehaviour
         }
 
         SetRankText(guid,ID);
+        playerTransform.StartSpotLight(3);
+
     }
 
     public void DeleteCrown(Guid guid, int ID)
@@ -448,7 +454,7 @@ public class GameManager : MonoBehaviour
 
     public void MoveText()
     {
-        HostManager.I.ChengeFace(HostManager.facial.Normal);
+        hostManager.ChengeFace(HostManager.facial.Normal);
         if (EndProgress) return;
         if (!isSpin)
         {
@@ -491,7 +497,7 @@ public class GameManager : MonoBehaviour
 
             if (AfterText[textIndex] == "!!! おめでとう！")
             {
-                HostManager.I.ChengeFace(HostManager.facial.Smile);
+                hostManager.ChengeFace(HostManager.facial.Smile);
                 DummyText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + AfterText[textIndex], 1.0f);
                
                 if (winPlayerId == NetworkManager.I.myConnectionId)
@@ -516,15 +522,17 @@ public class GameManager : MonoBehaviour
             {
                 //タイトルに戻る
                 MoveScene("TitleScene");
+                RoomModel.I.LeaveRoomAsync();
                 EndProgress = true;
                 return;
             }
 
             if (FinishText[textIndex] == "!!! おめでとう！")
             {
-                HostManager.I.ChengeFace(HostManager.facial.Smile);
+                hostManager.ChengeFace(HostManager.facial.Smile);
                 AudioManager.ChangeBGM(AudioManager.BGM.Main_End);
                 DummyText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + FinishText[textIndex], 1.0f);
+                InRoomPlayerData.I.PlayerList[winPlayerId].playerObj.GetComponent<PlayerTransform>().StartSpotLight(10);
 
             }
             else
