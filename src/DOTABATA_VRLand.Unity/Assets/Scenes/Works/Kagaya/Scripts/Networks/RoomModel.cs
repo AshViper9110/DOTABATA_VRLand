@@ -125,17 +125,14 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action OnAllCompletedSceneTransition { get; set; }
 
-    ///<summary>
-    ///ニットの更新
-    /// </summary>
-    public Action<Guid, float> onUpdateNit;
-
+    public Action<Guid, float> onUpdateNit { get; set; }
     public Action OnGameStartAction { get; set; }
 
     /// <summary>
     /// アルカナスケッチの死亡通知
     /// </summary>
     public Action<Guid> OnDead {  get; set; }
+    public Action OnRoomStarted {  get; set; }
 
     /// <summary>
     /// アルカナスケッチのゲーム終了通知
@@ -157,6 +154,11 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// プレイヤーのステータス同期通知
     /// </summary>
     public Action<Guid, float> OnSyncdPlayerStatus { get; set; }
+
+    public Action<int> OnBallingNexted { get; set; }
+
+    public Action<Guid> OnHitingDodgeBall { get; set; }
+    public Action<Guid> OnHitingBomber { get; set; }
 
     /*
      * 処理
@@ -217,13 +219,13 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ルームに入室
     /// </summary>
-    public async UniTask JoinRoomAsync(string userName, RoomConfig roomConfig) {
+    public async UniTask JoinRoomAsync(ulong steamID, RoomConfig roomConfig) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
 
         try {
-            JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync(userName, roomConfig);
+            JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync(steamID, roomConfig);
             isJoinRoom = true;
             if (joinedUsers != null) {
                 foreach (var user in joinedUsers) {
@@ -282,7 +284,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
-        await roomHub.UpdateUserTransformAsync(playerTransform);
+        if (playerTransform != null) await roomHub.UpdateUserTransformAsync(playerTransform);
     }
 
     /// <summary>
@@ -492,6 +494,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     {
         Debug.Log($"{user.Name} の勝利数: {winCount}");
         // UIの更新など
+        GameManager manager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        manager.AddCrown(user.ConnectionId, user.JoinOrder);
     }
     /*
      * オブジェクト
@@ -771,6 +775,73 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnSyncPlayerStatus(Guid playerConId, float hp) {
         if (OnSyncdPlayerStatus  != null) {
             OnSyncdPlayerStatus(playerConId, hp);
+        }
+    }
+
+    public async UniTask RoomStart()
+    {
+        if(roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.RoomStart();
+    }
+
+    public void OnRoomStart()
+    {
+        if (OnRoomStarted != null)
+        {
+            OnRoomStarted();
+        }
+    }
+
+    public async UniTask BallingNext()
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.BallingNext();
+    }
+
+    public void OnBallingNext(int order)
+    {
+        if (OnBallingNexted != null)
+        {
+            OnBallingNexted(order);
+        }
+    }
+
+    public async UniTask HitDodgeBall()
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.HitDodgeBall(NetworkManager.I.myConnectionId);
+    }
+
+    public void OnHitDodgeBall(Guid connectionId)
+    {
+        if(OnHitingDodgeBall != null)
+        {
+            OnHitingDodgeBall(connectionId);
+        }
+    }
+
+    public async UniTask HitBomber()
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.HitBomber(NetworkManager.I.myConnectionId);
+    }
+
+    public void OnHitBomber(Guid connectionId)
+    {
+        if (OnHitingBomber != null)
+        {
+            OnHitingBomber(connectionId);
         }
     }
 }

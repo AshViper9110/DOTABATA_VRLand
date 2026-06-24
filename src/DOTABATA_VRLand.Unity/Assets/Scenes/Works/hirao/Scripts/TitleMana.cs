@@ -1,68 +1,80 @@
-ï»¿using DOTABATA_VRLand.Shared.Models.Entities;
+using DOTABATA_VRLand.Shared.Models.Entities;
 using UnityEngine;
 using Steamworks;
 using Valve.VR;
 using System.Collections;
+using System.Threading.Tasks;
 
 public class TitleMana : MonoBehaviour
 {
     private string playerName;
-    public int gameModeId = 1;
-    public GameObject player;
+    private ulong steamId;
+    public GameObject playerPrefab;
 
-    private void Start()
+    private async void Awake()
     {
-        if (SteamManager.Initialized)
+        if (GameObject.Find("Player(Clone)") == null)
         {
-            playerName = SteamFriends.GetPersonaName();
-            Debug.Log(playerName);
+            Instantiate(playerPrefab, new Vector3(0,0,-20), Quaternion.identity);
+
+            await Task.Yield();
+
+            if (SteamManager.Initialized)
+            {
+                playerName = SteamFriends.GetPersonaName();
+                steamId = SteamUser.GetSteamID().m_SteamID;//steamId‚ğæ“¾
+                Debug.Log($"name:{playerName} SteamID:{steamId}");
+                await UserModel.I.CreateUserModel();
+                bool result = await UserModel.I.RegistUserAsync(
+                playerName,
+                steamId
+                );
+                Debug.Log($"result:{result}");
+
+            }
+            else
+            {
+                Debug.LogError("Steam is not initialized.");
+            }
+
+            InRoomPlayerData.I.SetMySelf(new PlayerData() { playerObj = GameObject.Find("Player(Clone)") });
         }
         else
         {
-            Debug.LogError("Steam is not initialized.");
+            GameObject.Find("Player(Clone)").transform.position = Vector3.zero;
+            SteamVR_Fade.View(Color.clear, 2);
         }
 
-        //InRoomPlayerData.I.SetMySelf(new PlayerData() { playerObj = player });
-    }
-    public RoomConfig SetNames()
-    {
-        RoomConfig roomConfig = new RoomConfig()
-        {
-            Name = "Name",
-            Password = "0000",
-            GameModeId = gameModeId,
-        };
-        return roomConfig;
+        AudioManager.ChangeBGM(AudioManager.BGM.Title);
     }
 
     /// <summary>
-    /// Gameã‚·ãƒ¼ãƒ³ã«ç§»å‹•ãƒœã‚¿ãƒ³
+    /// GameƒV[ƒ“‚ÉˆÚ“®ƒ{ƒ^ƒ“
     /// </summary>
     /// 
     public void JoinLobby()
     {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         StartCoroutine(MoveWithFade());
     }
 
     private IEnumerator MoveWithFade()
     {
-        // ç™½ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ
-        SteamVR_Fade.Start(Color.white, 0.5f);
+        // ”’ƒtƒF[ƒhƒAƒEƒg
+        SteamVR_Fade.View(Color.white, 0.5f);
 
-        // ãƒ•ã‚§ãƒ¼ãƒ‰å®Œäº†å¾…ã¡
+        // ƒtƒF[ƒhŠ®—¹‘Ò‚¿
         yield return new WaitForSeconds(0.5f);
 
-        // ç§»å‹•
-        player.transform.position = Vector3.zero;
+        // ˆÚ“®
+        GameObject.Find("Player(Clone)").transform.position = Vector3.zero;
 
-        // 1ãƒ•ãƒ¬ãƒ¼ãƒ å¾…ã¤ã¨å®‰å®šã—ã‚„ã™ã„
+        // 1ƒtƒŒ[ƒ€‘Ò‚Â‚ÆˆÀ’è‚µ‚â‚·‚¢
         yield return null;
 
-        // ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³
-        SteamVR_Fade.Start(Color.clear, 0.5f);
+        // ƒtƒF[ƒhƒCƒ“
+        SteamVR_Fade.View(Color.clear, 0.5f);
     }
-    public async void JointoNextScene(string name)
-    {
-        await NetworkManager.I.JointoNextScene(name, playerName, SetNames());
-    }
+
+  
 }

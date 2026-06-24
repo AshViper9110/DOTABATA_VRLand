@@ -9,6 +9,8 @@ public class CrownManager : MonoBehaviour
     public bool isNew = false;
 
     public float fallSpeed;
+
+    public Transform ParentTrans;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -23,11 +25,19 @@ public class CrownManager : MonoBehaviour
 
         if(isNew)
         {
-            this.transform.position = new Vector3(transform.position.x,transform.position.y-fallSpeed,transform.position.z);
+            this.transform.position = Vector3.MoveTowards(transform.position,ParentTrans.position,fallSpeed);
         }
     }
 
     private void OnCollisionEnter(Collision collision)
+    {
+        if (isNew)
+        {
+            isNew = false;
+            Debug.Log("Ž~‚Ü‚è‚Ü‚·");
+        }
+    }
+    private void OnTriggerEnter(Collider other)
     {
         if (isNew)
         {

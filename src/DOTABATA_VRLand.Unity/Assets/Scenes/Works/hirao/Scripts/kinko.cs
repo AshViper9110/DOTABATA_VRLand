@@ -1,20 +1,18 @@
-﻿using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
-public class kinko : MonoBehaviour
+public class Kinko : MonoBehaviour
 {
     [Serializable]
     class DialData
     {
         public GameObject GameObject;
+        public GameObject chackMark;
         public float rot = 0;
         public bool isOpen = false;
 
@@ -22,328 +20,128 @@ public class kinko : MonoBehaviour
         public Interactable interactable;
     }
 
-    #region Inspector
-
-    [Header("UI")]
-    public GameObject introUI;
-    public GameObject gameUI;
-    public GameObject resultUI;
-
-    [Header("Intro")]
-    public GameObject descriptionPanel;
-    public GameObject readyPanel;
-
-    public Text titleText;
-    public Text descriptionText;
-    public Text readyText;
-
-    [Header("Ready")]
-    public Button readyButton;
-    public Text waitingText;
-    public Transform UserReadyObject;//プレイヤー情報整列用オブジェクト
-    public GameObject playerNamePrefab;  //プレイヤーテキストプレハブ
-    public List<GameObject> UserReadyText;   //プレイヤー準備情報テキスト 
-    public Button StartButton;
-
-    [Header("Countdown")]
-    public Image fadeImage;
-    public Text countdownText;
-
-    [Header("Result")]
-    public Text rank1Text;
-    public Text rank2Text;
-    public Text rank3Text;
-    public Text rank4Text;
-
-
-    [Header("Data")]
-    public MinigameInfo info;
-
-    private bool isGameStarted = false;
-    private bool isResultShown = false;
-
-    public List<string> names;
-    bool willReady = false;
-
     [SerializeField] private List<DialData> dialList = new();
 
     [SerializeField] private float openLockTime;
 
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip lockOpenSound;
-    [SerializeField] private AudioClip gameClearSound;
+    [SerializeField] private MinigameFlowController controller;
+    [SerializeField] private List<Transform> playerPos = new List<Transform>();
+    [SerializeField] private Transform UIPanel;
+    [SerializeField] private Transform kinkoPos;
 
     public SteamVR_Input_Sources handType;
     public float power;
-
-    #endregion
-
-    #region Runtime
-
     private bool isClear;
     private float currentLockTime;
 
     public SteamVR_Action_Vibration hapticAction =
         SteamVR_Input.GetAction<SteamVR_Action_Vibration>("Hapic");
 
-    #endregion
+    [SerializeField] float maxTimer;
+    [SerializeField] TextMeshProUGUI timerText;
+    float timer;
 
     void Start()
     {
-        //ダイアルの初期設定
+        AudioManager.StopBgm(); ;
+        timer = maxTimer;
+        timerText.text = "";
+        //�_�C�A���̏����ݒ�
         foreach (var dial in dialList)
         {
             dial.rot = UnityEngine.Random.Range(-180, 180);
             dial.isOpen = false;
             dial.interactable = dial.GameObject.GetComponent<Interactable>();
+            dial.chackMark.gameObject.SetActive(false);
         }
 
-        SteamVR_Fade.Start(new Color(0, 0, 0, 0), 1.0f);
-        //RoomModelイベント購読
-        RoomModel.I.OnCountdownAction += StartCountdown;
-        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
-        RoomModel.I.OnUpdatedAllReadyStateAction += OnAllReadyState;
-        RoomModel.I.OnUpdatedReadyStateAction += OnUpdatePlayerReady;
-        RoomModel.I.OnGameStartAction += StartGameFlow;
-        InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position = Vector3.zero;
-        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)
-        {
-            if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
-            player.playerObj.SetActive(false);
-        }
-
-
-        //StartCoroutine(GameFlow());
-
-        waitingText.gameObject.SetActive(false);
-        countdownText.gameObject.SetActive(false);
-
-        resultUI.SetActive(false);
-        gameUI.SetActive(false);
-
-        introUI.SetActive(false);
-        StartButton.gameObject.SetActive(false);
-
-
-        introUI.SetActive(true);
-
-        titleText.text = info.gameName;
-        descriptionText.text = info.description;
-
-        readyText.text = "0/4 プレイヤー準備完了";
+        //�V�[���ڍs��̈ʒu�z�u
+        var myId = NetworkManager.I.myConnectionId;
+        int index = InRoomPlayerData.I.PlayerList[myId].joinedUser.JoinOrder - 1;
+        InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position = playerPos[index].position;
+        InRoomPlayerData.I.PlayerList[myId].playerObj.transform.rotation = playerPos[index].rotation;
+        UIPanel.eulerAngles = new Vector3(0, index * -90, 0);
+        kinkoPos.eulerAngles = new Vector3(0, index * -90, 0);
     }
+
+    private void OnEnable()
+    {
+        if (RoomModel.I == null) return;
+
+        RoomModel.I.OnCountdownAction += StartCountdown;
+    }
+
+    // =====================================================
+    // Destroy
+    // =====================================================
 
     private void OnDestroy()
     {
         if (RoomModel.I == null) return;
 
         RoomModel.I.OnCountdownAction -= StartCountdown;
-        RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
-        RoomModel.I.OnUpdatedAllReadyStateAction -= OnAllReadyState;
-        RoomModel.I.OnUpdatedReadyStateAction -= OnUpdatePlayerReady;
-        RoomModel.I.OnGameStartAction -= StartGameFlow;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        foreach (var dial in dialList)
+        if (controller.isGameStarted)
         {
-            if (dial.isOpen) continue;
-            if (dial.interactable.hoveringHand == null) continue;
-            //TODO 鍵開けの処理の実装
-            float currentRot = dial.GameObject.transform.localEulerAngles.y;
-            if (Mathf.Abs(Mathf.DeltaAngle(currentRot, dial.rot)) <= 3f)
+
+            foreach (var dial in dialList)
             {
-                hapticAction.Execute(0, Time.deltaTime, 100, power, handType);
-                currentLockTime += 0.1f;
-                if (currentLockTime >= openLockTime)
+                if (dial.isOpen) continue;
+                if (dial.interactable.hoveringHand == null) continue;
+                //TODO ���J���̏����̎���
+                float currentRot = dial.GameObject.transform.localEulerAngles.y;
+                if (Mathf.Abs(Mathf.DeltaAngle(currentRot, dial.rot)) <= 3f)
                 {
-                    dial.isOpen = true;
-                    audioSource.PlayOneShot(lockOpenSound);
+                    hapticAction.Execute(0, Time.deltaTime, 100, power, handType);
+                    currentLockTime += 0.1f;
+                    if (currentLockTime >= openLockTime)
+                    {
+                        dial.isOpen = true;
+                        dial.chackMark.gameObject.SetActive(true);
+                        AudioManager.PlaySE(AudioManager.SE.Dial_Open);
+                    }
+                }
+                else
+                {
+                    if (currentLockTime > 0) currentLockTime = 0;
+                }
+
+                timer -= Time.deltaTime;
+                timerText.text = ((int)timer).ToString();
+
+                if (timer < 0)
+                {
+                    controller.isGameStarted = false;
+                    Debug.Log("GameEnd");
+                    timerText.text = "Finish";
+                    isClear = true;
+                    controller.OnSendScore((int)timer);
+                    return;
                 }
             }
-            else
+            //�Q�[���N���A����
+            if (dialList.Count > 0 && dialList.All(x => x.isOpen) && !isClear)
             {
-                if (currentLockTime > 0) currentLockTime = 0;
+                controller.isGameStarted = false;
+                Debug.Log("GameClear");
+                timerText.text = "Open!!";
+                isClear = true;
+                AudioManager.PlaySE(AudioManager.SE.Bank_Open);
+                controller.OnSendScore((int)timer);
+                return;
             }
         }
-        //ゲームクリア判定
-        if (dialList.Count > 0 && dialList.All(x => x.isOpen) && !isClear)
-        {
-            Debug.Log("GameClear");
-            isClear = true;
-            audioSource.PlayOneShot(gameClearSound);
-            OnSendScore(100);
-        }
     }
-
-    // =====================================================
-    // Readyボタン
-    // =====================================================
-
-    public void OnReadyButton()
-    {
-        willReady = !willReady;
-
-        // サーバー送信
-        RoomModel.I.SendReadyState(willReady);
-
-        // UI更新
-        if (willReady)
-        {
-            readyButton.GetComponentInChildren<Text>().text = "取り消し";
-
-            waitingText.gameObject.SetActive(true);
-        }
-        else
-        {
-
-            readyButton.GetComponentInChildren<Text>().text = "準備OK！";
-
-            waitingText.gameObject.SetActive(false);
-        }
-    }
-
-    // =====================================================
-    // プレイヤーReady更新
-    // =====================================================
-
-    void OnUpdatePlayerReady(JoinedUser[] users, bool[] isReadyList)
-    {
-
-        // 既存アイテムを全削除
-        foreach (var item in UserReadyText)
-        {
-            Destroy(item);
-        }
-        UserReadyText.Clear();
-
-        // 人数分生成
-        for (int i = 0; i < users.Length; i++)
-        {
-            GameObject item = Instantiate(playerNamePrefab, UserReadyObject);
-            item.GetComponentInChildren<Text>().text =
-            isReadyList[i] ? $"{users[i].Name} : 準備OK" : $"{users[i].Name} : 待機中";//isReadyListの状況でテキストを編集
-            UserReadyText.Add(item);
-        }
-
-        // TODO:
-        // プレイヤー一覧UI更新
-    }
-
-    // =====================================================
-    // 全員Ready通知
-    // =====================================================
-
-    void OnAllReadyState(bool isAllReady)
-    {
-        if (isAllReady) Debug.Log("全員Ready");
-        else Debug.Log("誰かの準備ができていません");
-        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder != 1) return;
-        readyButton.gameObject.SetActive(!isAllReady);
-        StartButton.gameObject.SetActive(isAllReady);
-    }
-
-    public void GameStart()
-    {
-        RoomModel.I.OnGameStartAsync();
-    }
-
-    // =====================================================
-    // ゲーム開始準備
-    // =====================================================
-
-    void StartGameFlow()
-    {
-        isGameStarted = true;
-        StartButton.gameObject.SetActive(false);
-        descriptionPanel.SetActive(false);
-        readyPanel.SetActive(false);
-        RoomModel.I.StartCountdown();
-
-    }
-
-    // =====================================================
-    // カウントダウン受信
-    // =====================================================
 
     public void StartCountdown(int remain)
     {
-        countdownText.gameObject.SetActive(true);
-
-        if (remain > 0)
+        if (remain <= 0)
         {
-            countdownText.text = remain.ToString();
+            AudioManager.ChangeBGM(AudioManager.BGM.Bank);
         }
-        else
-        {
-            countdownText.text = "START!";
-
-            StartCoroutine(BeginGameAfterStart());
-        }
-    }
-
-    // =====================================================
-    // ゲーム開始
-    // =====================================================
-
-    IEnumerator BeginGameAfterStart()
-    {
-        yield return new WaitForSecondsRealtime(1f);
-
-        countdownText.gameObject.SetActive(false);
-
-
-
-        introUI.SetActive(false);
-
-        gameUI.SetActive(true);
-
-        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)
-        {
-            if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
-            player.playerObj.SetActive(true);
-        }
-    }
-
-    // =====================================================
-    // Score送信
-    // =====================================================
-
-    public void OnSendScore(int Score)
-    {
-        RoomModel.I.SendScore(Score);
-    }
-
-    // =====================================================
-    // ランキング受信
-    // =====================================================
-
-    void OnReceiveRanking(List<JoinedUser> rankOrder)
-    {
-        names.Clear();
-
-        foreach (var user in rankOrder)
-        {
-            names.Add(user.Name);
-        }
-        Debug.Log("OnReceiveRanking受信");
-        foreach (var user in names)
-        {
-            Debug.Log($"ランキング受信{user}");
-        }
-        ShowRanking(names);
-    }
-
-    // =====================================================
-    // ランキング表示開始
-    // =====================================================
-
-    void ShowRanking(List<string> rankOrder)
-    {
-        SceneManager.LoadScene("GameScene");
-        willReady = false;
-        Debug.Log("ShowRanking受信");
     }
 }

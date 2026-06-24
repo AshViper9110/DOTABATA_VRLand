@@ -1,11 +1,12 @@
 ﻿using Cysharp.Threading.Tasks;
+using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using Steamworks;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Valve.VR;
@@ -17,6 +18,11 @@ public class RoomInfoCanvas : MonoBehaviour {
 
     private string playerName;
     private int gameModeId = 0;
+    private ulong steamId;
+
+    [SerializeField] private GameObject standyPanel;
+    [SerializeField] private GameObject lobbyPanel;
+    [SerializeField] private GameObject roomStartButton;
 
     // ルーム作成UI
     [SerializeField] private GameObject createRoomUI;
@@ -65,9 +71,26 @@ public class RoomInfoCanvas : MonoBehaviour {
     // パスワード入力先
     private TMP_InputField targetInputFirld;
 
+    private void OnEnable()
+    {
+        if (RoomModel.I == null) return;
+        RoomModel.I.OnJoinedUser += OnJoinedUser;
+        RoomModel.I.OnLeavedUser += OnLeavedUser;
+        RoomModel.I.OnRoomStarted += OnRoomStarted;
+    }
+
+    private void OnDisable()
+    {
+        if (RoomModel.I == null) return;
+        RoomModel.I.OnJoinedUser -= OnJoinedUser;
+        RoomModel.I.OnLeavedUser -= OnLeavedUser;
+        RoomModel.I.OnRoomStarted -= OnRoomStarted;
+    }
+
     private void Start() {
         if (SteamManager.Initialized) {
             playerName = SteamFriends.GetPersonaName();
+            steamId = SteamUser.GetSteamID().m_SteamID;//steamIdを取得
             Debug.Log(playerName);
         }
         else {
@@ -94,31 +117,6 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// どのInputFieldを選択しているか
     /// </summary>
     private void ChangeInputFieldFocuse() {
-        //bool isOnClickBtn = false;
-
-        //// マウスクリックした瞬間、またはタッチした瞬間に処理
-        //if (!Input.GetMouseButtonDown(0) && !triggerAction.stateDown) {
-        //    return;
-        //}
-        //// Ray（光線）の生成
-        //PointerEventData pointerData = new PointerEventData(EventSystem.current);
-        //pointerData.position = Input.mousePosition;
-
-        //// ヒットしたUIを格納するリスト
-        //List<RaycastResult> results = new List<RaycastResult>();
-
-        //// UIに対してRayを飛ばし、ヒットした要素を全て取得
-        //EventSystem.current.RaycastAll(pointerData, results);
-
-        //// 結果の処理
-        //if (results.Count > 0) {
-        //    foreach (RaycastResult result in results) {
-        //        if (result.gameObject.CompareTag("KeyBoard")) {
-        //            isOnClickBtn = true;
-        //        }
-        //    }
-        //}
-
         if (passwordInputField.isFocused) {
             if (!keyBoardUI.activeSelf) {
                 keyBoardUI.SetActive(true);
@@ -131,17 +129,11 @@ public class RoomInfoCanvas : MonoBehaviour {
             }
             targetInputFirld = joinPasswordInputField;
         }
-        //else {
-        //    if (keyBoardUI.activeSelf &&
-        //        !isOnClickBtn) {
-        //        keyBoardUI.SetActive(false);
-        //        targetInputFirld = null;
-        //    }
-        //}
     }
 
     public void CloseKeyBoard()
     {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         keyBoardUI.SetActive(false);
         targetInputFirld = null;
     }
@@ -151,6 +143,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// </summary>
     public void InputWorldNumKeyBtn(int num) {
         if (targetInputFirld != null) {
+            AudioManager.PlaySE(AudioManager.SE.Button_Click);
             if (num == -1) {
                 if (targetInputFirld.text.Length > 0) {
                     targetInputFirld.text = targetInputFirld.text.Substring(0, targetInputFirld.text.Length - 1);
@@ -186,6 +179,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// パスワードを使うかどうかのトグル
     /// </summary>
     public void UsePasswordToggleOnValueChanged(bool callBack) {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         if (callBack) {
             passwordInputField.GetComponent<Image>().color = Color.white;
             passwordInputField.readOnly = false;
@@ -200,6 +194,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// フリープレイモードにするトグル
     /// </summary>
     public void FreePlayModeToggleOnValueChanged(bool callBack) {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         if (callBack) {
             tournamentModeToggle.isOn = false;
             gameModeId = 0;
@@ -214,6 +209,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// 大会モードにするトグル
     /// </summary>
     public void TournamentModeToggleOnValueChanged(bool callBack) {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         if (callBack) {
             freePlayModeToggle.isOn = false;
             gameModeId = 1;
@@ -228,24 +224,28 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// ルームを作成して参加
     /// </summary>
     public async void CreateAndJoinRoom() {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         string passwordString = "";
         if (usePasswordToggle.isOn) {
             passwordString = passwordInputField.text;
         }
 
-        RoomConfig roomConfig = new RoomConfig() {
+        RoomConfig roomConfig = new RoomConfig()
+        {
             Name = myRoomNameText.text,
             Password = passwordString,
             GameModeId = gameModeId,
-        };
-
-        await NetworkManager.I.JointoNextScene("GameScene", playerName, roomConfig);
+        };        
+        await NetworkManager.I.JointoRoom(steamId, roomConfig);
+        standyPanel.SetActive(true);
+        lobbyPanel.SetActive(false);
     }
 
     /// <summary>
     /// ルーム一覧更新
     /// </summary>
     public async void RefreshRoomInfoList() {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         await UniTask.WaitUntil(() => RoomModel.I != null && RoomModel.I.IsConnected);
 
         // 要素を全削除
@@ -276,6 +276,7 @@ public class RoomInfoCanvas : MonoBehaviour {
     /// ルーム参加画面にする
     /// </summary>
     private void ChangeJoinRoomUIBtn(RoomInfo roomInfo) {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
         createRoomUI.SetActive(false);
         joinRoomUI.SetActive(true);
 
@@ -304,7 +305,45 @@ public class RoomInfoCanvas : MonoBehaviour {
                 Name = roomInfo.Name,
                 Password = passwordString,
             };
-            await NetworkManager.I.JointoNextScene("GameScene", playerName, roomConfig);
+            await NetworkManager.I.JointoRoom(steamId, roomConfig);
+
+            standyPanel.SetActive(true);
+            lobbyPanel.SetActive(false);
         });
+    }
+
+    public async void LeaveOnRoom()
+    {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
+        NetworkManager.I.isJoin = false;
+        await RoomModel.I.LeaveRoomAsync();
+        standyPanel.SetActive(false);
+        lobbyPanel.SetActive(true);
+    }
+
+    public async void RoomStart()
+    {
+        AudioManager.PlaySE(AudioManager.SE.Button_Click);
+        await RoomModel.I.RoomStart();
+    }
+
+    //Server通知
+    private void OnJoinedUser(JoinedUser joinedUser)
+    {
+        if(joinedUser.ConnectionId == RoomModel.I.ConnectionId)
+        {
+            if (joinedUser.JoinOrder == 1) roomStartButton.SetActive(true);
+        }
+    }
+
+    private void OnLeavedUser(Guid connectionId, int joinOrder)
+    {
+
+    }
+
+    private void OnRoomStarted()
+    {
+        SteamVR_Fade.View(Color.white, 0.5f);
+        SceneManager.LoadScene("GameScene");
     }
 }

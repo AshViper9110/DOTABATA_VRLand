@@ -19,7 +19,8 @@ public static class ToolbarSceneSwitcher {
     private static readonly string[] SCENE_FOLDERS = new[]
     {
             "Assets/Scenes/Works/Kagaya",
-            "Assets/Scenes/Works/hirao/Scenes"
+            "Assets/Scenes/Works/hirao/Scenes",
+            "Assets/Scenes/Works/otake/Scene",
         };
     private const string TOOLBAR_ZONE_LEFT_ALIGN = "ToolbarZoneLeftAlign";
     private const string SCENE_ASSET_ICON = "SceneAsset Icon";

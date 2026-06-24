@@ -4,15 +4,18 @@ using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion.Server.Hubs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
+using System.Xml.Linq;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub : StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub
     {
         private readonly RoomContextRepository _roomContextRepository;
-        private readonly GameDbContext _dbContext;
+        private readonly GameDbContext _dbContext;                                                                  
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         private RoomContext? _roomContext;
 
@@ -26,10 +29,11 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         //    _roomContextRepository = roomContextRepository;
         //}
 
-        public RoomHub(RoomContextRepository roomContextRepository, GameDbContext dbContext)
+        public RoomHub(RoomContextRepository roomContextRepository, GameDbContext dbContext, IServiceScopeFactory serviceScopeFactory)
         {
             _roomContextRepository = roomContextRepository;
             _dbContext = dbContext;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         /// <summary>
@@ -42,6 +46,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             return CompletedTask;
         }
+
 
         /// <summary>
         /// ルームを全取得
@@ -65,7 +70,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ルーム作成
         /// </summary>
-        public Task CreateRoomAsync(RoomConfig roomConfig)
+        public async Task CreateRoomAsync(RoomConfig roomConfig)
         {
             // 同時に生成しない用に排他制御
             lock (_roomContextRepository)
@@ -76,26 +81,55 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 {
                     // なかったら生成
                     this._roomContext = _roomContextRepository.CreateContext(roomConfig);
+                    
                 }
             }
 
-            return Task.CompletedTask;
+            var exists = await _dbContext.Rooms
+                     .AnyAsync(r => r.Name == roomConfig.Name);//DBにルームが存在するかチェック
+
+            if (!exists)//新規
+            {
+                var room = new Rooms()
+                {
+                    Name = roomConfig.Name,
+                    Pass = roomConfig.Password,
+                    GameModeId = roomConfig.GameModeId
+                };
+
+                _dbContext.Rooms.Add(room);
+                await _dbContext.SaveChangesAsync();//保存
+
+                Console.WriteLine($"[DB] Room Created Id:{room.Id} Name:{room.Name}");
+            }           
         }
 
         /// <summary>
         /// ルーム削除
         /// </summary>
-        public Task DeleteRoomAsync()
+        public　async Task DeleteRoomAsync()
         {
             _roomContextRepository.RemoveContext(_roomContext.Id);
 
-            return Task.CompletedTask;
+            using var scope = _serviceScopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<GameDbContext>();
+
+            var room = await db.Rooms
+                .FirstOrDefaultAsync(r => r.Name == _roomContext.Name);//データベーステーブル削除
+
+            if (room != null)//削除できていれば
+            {
+                db.Rooms.Remove(room);
+                await db.SaveChangesAsync();
+                Console.WriteLine($"[DB] Room Deleted Id:{room.Id} Name:{room.Name}");
+            }
+
         }
 
         /// <summary>
         /// ルームに接続
         /// </summary>
-        public async Task<JoinedUser[]> JoinRoomAsync(string userName, RoomConfig roomConfig)
+        public async Task<JoinedUser[]> JoinRoomAsync(ulong? steamId, RoomConfig roomConfig)
         {
             await CreateRoomAsync(roomConfig);
 
@@ -118,55 +152,78 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             // ルームに参加 ＆ ルームを保持
             this._roomContext.Group.Add(this.ConnectionId, Client);
-         /*
-            // DBからユーザー情報取得
-            User user = await _dbContext.Users.FirstAsync(user => user.Name == userName);
 
-            // ゲーム初回ログインならUsersテーブルに登録
-            if (user == null)
+            var joinedUser = new JoinedUser();
+
+            if(steamId != null)
             {
-                user = new User
-                {
-                    Name = userName, 
-                };
-                _dbContext.Users.Add(user);
-                await _dbContext.SaveChangesAsync();
-                Console.WriteLine($"[DB] {userName} の初回ログインを登録");
-            }
+                var hash = HashSteamId(steamId.Value);///ハッシュ
 
-            // 今日すでにアクティブ記録があるか確認
-            var today = DateTime.Today;
-            var existingRecord = await _dbContext.DailyActiveUsers
-                .FirstOrDefaultAsync(d => d.UserId == user.Id
-                                       && d.ActivityDate.Date == today);
+                // DBからユーザー情報取得
+                User user = await _dbContext.Users.FirstAsync(user => user.SteamId == hash);
 
-            if (existingRecord == null)
-            {
-                // 今日初めてのログインなら登録
-                _dbContext.DailyActiveUsers.Add(new DailyActiveUser
+                // 今日すでにアクティブ記録があるか確認
+                var today = DateTime.Today;
+                var existingRecord = await _dbContext.DailyActiveUsers
+                    .FirstOrDefaultAsync(d => d.UserId == user.Id
+                                            && d.ActivityDate.Date == today);
+
+                if (existingRecord == null)
                 {
+                    // 今日初めてのログインなら登録
+                    _dbContext.DailyActiveUsers.Add(new DailyActiveUser
+                    {
+                        UserId = user.Id,
+                        ActivityDate = DateTime.Now,
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now
+                    });
+                    await _dbContext.SaveChangesAsync();
+                    Console.WriteLine($"[DB] {user.Name} の本日初回ログインを記録");
+                }
+                else
+                {
+                    Console.WriteLine($"[DB] {user.Name} は本日すでにログイン済み");
+                }
+
+                // 入室済みユーザーのデータを作成
+                joinedUser.ConnectionId = this.ConnectionId;
+                joinedUser.Name = user.Name;
+                joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
+
+                // ルームコンテキストにユーザー情報を登録
+                var roomUserData = new RoomUserData() { joinedUser = joinedUser, DbId = user.Id };
+                this._roomContext.RoomUserDataList[this.ConnectionId] = roomUserData;
+
+                // ★ ルームのDB IDを取得
+                var room = await _dbContext.Rooms.FirstAsync(r => r.Name == _roomContext.Name);
+
+                // RoomUser を登録
+                _dbContext.RoomUsers.Add(new RoomUser
+                {
+                    RoomId = room.Id,
                     UserId = user.Id,
-                    ActivityDate = DateTime.Now,
-                    CreatedDay = DateTime.Now,
-                    UpdatedAt = DateTime.Now
                 });
                 await _dbContext.SaveChangesAsync();
-                Console.WriteLine($"[DB] {userName} の本日初回ログインを記録");
-            }
-            else
+
+                Console.WriteLine($"[DB] Room Join Room:{room.Name} Name:{user.Name}");
+            }else
             {
-                Console.WriteLine($"[DB] {userName} は本日すでにログイン済み");
-            }*/
+                User user = new User();
+                user.Name = "Gest";
 
-            // 入室済みユーザーのデータを作成
-            var joinedUser = new JoinedUser();
-            joinedUser.ConnectionId = this.ConnectionId;
-            joinedUser.Name = userName;
-            joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
+                // 入室済みユーザーのデータを作成
+                joinedUser.ConnectionId = this.ConnectionId;
+                joinedUser.Name = user.Name;
+                joinedUser.JoinOrder = this._roomContext.RoomUserDataList.Count + 1;
 
-            // ルームコンテキストにユーザー情報を登録
-            var roomUserData = new RoomUserData() { joinedUser = joinedUser };
-            this._roomContext.RoomUserDataList[this.ConnectionId] = roomUserData;
+
+
+                // ルームコンテキストにユーザー情報を登録
+                var roomUserData = new RoomUserData() { joinedUser = joinedUser, DbId = user.Id };
+                this._roomContext.RoomUserDataList[this.ConnectionId] = roomUserData;
+
+            }
 
             // コンソールにログを表示
             _roomContext.WriteConsoleJoinInfo(joinedUser);
@@ -182,12 +239,11 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 退出処理
         /// </summary>
-        public Task LeaveRoomAsync() {
+        public async Task LeaveRoomAsync() {
             // ルームにいなかったら無視
             if (!this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId)) {
-                return Task.CompletedTask;
+                return;
             }
-
 
             // コンソールにログを表示
             _roomContext.WriteConsoleLeaveInfo(this.ConnectionId);
@@ -208,16 +264,29 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 }
             }
 
+            await using var scope = _serviceScopeFactory.CreateAsyncScope();
+            var db = scope.ServiceProvider.GetRequiredService<GameDbContext>();
+
+            int userId = this._roomContext.RoomUserDataList[this.ConnectionId].DbId;
+            var room = await db.Rooms.FirstAsync(r => r.Name == _roomContext.Name);
+            var roomUser = await db.RoomUsers
+                .FirstOrDefaultAsync(ru => ru.RoomId == room.Id && ru.UserId == userId);
+            if (roomUser != null)
+            {
+                db.RoomUsers.Remove(roomUser);
+                await db.SaveChangesAsync();
+            }
+
             // ルームデータから退出したユーザーを削除
             this._roomContext.RoomUserDataList.Remove(this.ConnectionId);
 
             // ルーム内にユーザーが一人もいなかったらルームを削除
             if (this._roomContext.RoomUserDataList.Count == 0)
             {
-                DeleteRoomAsync();
+                await DeleteRoomAsync();
             }
 
-            return Task.CompletedTask;
+            //return Task.CompletedTask;
         }
 
         /// <summary>
@@ -330,10 +399,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public Task GameStartAsync()
         {
-
+            //ボーリングの順番リセット
+            _roomContext.ballingOrder = 1;
             //ミニゲーム順位リストの初期化
             _roomContext.InitializeScoreOrder();
-            _roomContext.InitializeMiniGameResultData(); 
             // 全員に通知
             _roomContext.Group.All.OnGameStart();
             Console.WriteLine("[RoomHub]ゲーム開始");
@@ -373,7 +442,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             var users = rank.Select(r => r.user).ToList();//ユーザーの順位順リストを取得
             var winCounts = rank.Select(r => r.winCount).ToList();//勝利数を取得、//    users[i] と winCounts[i] は必ず同じプレイヤーに対応
 
-            _roomContext.Group.All.OnGetAllRoundRanking(users, winCounts);
+            // 呼び出した本人にだけ送信
+            Client.OnGetAllRoundRanking(users, winCounts);
             return Task.CompletedTask;
             // 順位送信
            
@@ -640,6 +710,43 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             // 自分以外に通知
             this._roomContext.Group.Except([this.ConnectionId]).OnSyncMagicBall(objectId, this.ConnectionId, gestureClassName);
 
+            return Task.CompletedTask;
+        }
+
+
+        //steamIDのハッシュ化
+        private static string HashSteamId(ulong steamId)
+        {
+            var bytes = System.Text.Encoding.UTF8.GetBytes(steamId.ToString());
+            var hash = System.Security.Cryptography.SHA256.HashData(bytes);
+            return Convert.ToHexString(hash);
+        }
+
+        //ルームの開始
+        public Task RoomStart()
+        {
+            this._roomContext.Group.All.OnRoomStart();
+            return Task.CompletedTask;
+        }
+
+        //ボーリングの順番変え
+        public Task BallingNext()
+        {
+            this._roomContext.ballingOrder++;
+            this._roomContext.Group.All.OnBallingNext(this._roomContext.ballingOrder);
+            return Task.CompletedTask;
+        }
+
+        //爆弾ドッチボールのヒット処理
+        public Task HitDodgeBall(Guid connectionId)
+        {
+            this._roomContext.Group.All.OnHitDodgeBall(connectionId);
+            return Task.CompletedTask;
+        }
+
+        //爆弾ドッチボールの死亡処理
+        public Task HitBomber(Guid connectionId) {
+            this._roomContext.Group.All.OnHitBomber(connectionId);
             return Task.CompletedTask;
         }
 

@@ -51,7 +51,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 9433041f081fbcf4d91d8ecf3f20296f, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9c82da1aedfeca043b53265b5c07b03b, type: 2}
+      objectReference: {fileID: 2100000, guid: c249387a56b4db343932ef1ab5203e88, type: 2}
     - target: {fileID: 919132149155446097, guid: 9433041f081fbcf4d91d8ecf3f20296f, type: 3}
       propertyPath: m_Name
       value: crown 1
@@ -91,6 +91,7 @@ MonoBehaviour:
   rotateSpeed: 0
   isNew: 0
   fallSpeed: 0.01
+  ParentTrans: {fileID: 0}
 --- !u!65 &6077155420359993871
 BoxCollider:
   m_ObjectHideFlags: 0

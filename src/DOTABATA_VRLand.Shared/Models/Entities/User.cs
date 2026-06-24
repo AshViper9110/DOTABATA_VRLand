@@ -14,5 +14,11 @@ namespace DOTABATA_VRLand.Shared.Models.Entities {
         public int Id { get; set; }
         [Key(1)]
         public string Name { get; set; }
+        [Key(2)]
+        [Column("steam_id")]
+        public string SteamId { get; set; }
+
+     
     }
 }
+

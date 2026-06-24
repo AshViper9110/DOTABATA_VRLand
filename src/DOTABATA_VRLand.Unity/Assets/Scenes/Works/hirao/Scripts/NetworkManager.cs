@@ -9,7 +9,6 @@ using UnityEngine.SceneManagement;
 public class NetworkManager : Singleton<NetworkManager>
 {
     public GameObject SyncPlayerPrefab;
-    public GameObject player;
     public Guid myConnectionId;
     public bool isJoin = false;
 
@@ -64,20 +63,37 @@ public class NetworkManager : Singleton<NetworkManager>
     /// <summary>
     /// Gameシーンに移動ボタン
     /// </summary>
-    public async Task JointoNextScene(string scene, string name, RoomConfig roomConfig)
+    public async Task JointoNextScene(string scene, ulong steamID, RoomConfig roomConfig)
     {
-        await RoomModel.I.JoinRoomAsync(name, roomConfig);
+        await RoomModel.I.JoinRoomAsync(steamID, roomConfig);
 
         await Cysharp.Threading.Tasks.UniTask.WaitUntil(() =>
             InRoomPlayerData.I.PlayerList.ContainsKey(myConnectionId)
         );
 
         isJoin = true;
-        SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
+        SyncPlayer syncPlayer = GameObject.Find("Player(Clone)").GetComponent<SyncPlayer>();
         syncPlayer.isLocalPlayer = true;
 
         SceneManager.LoadScene(scene);
     }
+
+    /// <summary>
+    /// Roomに参加ボタン
+    /// </summary>
+    public async Task JointoRoom(ulong steamID, RoomConfig roomConfig)
+    {
+        await RoomModel.I.JoinRoomAsync(steamID, roomConfig);
+
+        await Cysharp.Threading.Tasks.UniTask.WaitUntil(() =>
+            InRoomPlayerData.I.PlayerList.ContainsKey(myConnectionId)
+        );
+
+        isJoin = true;
+        SyncPlayer syncPlayer = GameObject.Find("Player(Clone)").GetComponent<SyncPlayer>();
+        syncPlayer.isLocalPlayer = true;
+    }
+
     /// <summary>
     /// ルーム全取得
     /// </summary>
@@ -109,10 +125,9 @@ public class NetworkManager : Singleton<NetworkManager>
         }
         else
         {
-            player.GetComponent<SyncPlayer>().SetConnectionId(user.ConnectionId);
             PlayerData data = new PlayerData()
             {
-                playerObj = player,
+                playerObj = GameObject.Find("Player(Clone)"),
                 joinedUser = user,
             };
             InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
@@ -137,7 +152,8 @@ public class NetworkManager : Singleton<NetworkManager>
     /// </summary>
     private void OnLeavedUser(Guid connectionId, int joinOrder)
     {
-        TextLogs($"ConnectionId：{connectionId} が退室");
+        if (connectionId == myConnectionId) return;
+            TextLogs($"ConnectionId：{connectionId} が退室");
         InRoomPlayerData.I.RemovePlayer(connectionId);
     }
 
@@ -157,7 +173,7 @@ public class NetworkManager : Singleton<NetworkManager>
     {
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-        gameManager.miniRankingList[user.JoinOrder + 1]= rank;
+        gameManager.miniRankingList[user.ConnectionId]= rank;
         Debug.Log($"{user.JoinOrder}:::{rank}");
         
         if (rank != 0)
@@ -184,13 +200,16 @@ public class NetworkManager : Singleton<NetworkManager>
     /// </summary>
     public void OnGetRanking(List<JoinedUser> ranking, List<int> winCount)
     {
+        Debug.Log("らんきんぐしゅとく");
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         int index = 0;
         foreach (JoinedUser user in ranking)
         {
+            Debug.Log(winCount[index]);
             gameManager.RankingList[user.JoinOrder] = index+1;
-            GameManager.playerWinlist[user.JoinOrder] = winCount[index];
+            gameManager.playerWinlist[user.JoinOrder] = winCount[index];
             gameManager.SetCrown(user.ConnectionId,user.JoinOrder);
+            gameManager.SetRankText(user.ConnectionId, user.JoinOrder);
             index++;
         }
     }
@@ -207,7 +226,7 @@ public class NetworkManager : Singleton<NetworkManager>
 
     /// <summary>
     /// [サーバー通知]
-    /// ミニゲームの順位取得通知
+    /// ミニゲーム大会の司会進行通知送信
     /// </summary>
     public void OnHostProgress()
     {

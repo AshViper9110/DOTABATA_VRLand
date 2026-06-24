@@ -1,14 +1,17 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MainTextManager : MonoBehaviour
+public class DummyTextManager : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    Text text;
+    TextMeshProUGUI text;
     string tempText;
+
+    [SerializeField] HostManager hostManager;
     void Start()
     {
-        text = GetComponent<Text>();
+        text = GetComponent<TextMeshProUGUI>();
         tempText = "";
     }
 
@@ -18,6 +21,7 @@ public class MainTextManager : MonoBehaviour
         if (tempText != text.text)
         {
             AudioManager.PlaySE(AudioManager.SE.Main_text_voice);
+           hostManager.MoveBeard();
             tempText = text.text;
         }
     }

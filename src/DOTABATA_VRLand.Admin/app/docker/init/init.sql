@@ -2,17 +2,20 @@
 CREATE TABLE `users` (
  `id`          INT NOT NULL AUTO_INCREMENT,
  `name`        VARCHAR(255) NOT NULL,
- `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `steam_id`    VARCHAR(255) NOT NULL,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- PRIMARY KEY (`id`)
+ PRIMARY KEY (`id`),
+ UNIQUE KEY uk_users_steam_id (steam_id)
 );
 
 -- 2. rooms
 CREATE TABLE `rooms` (
  `id`          INT NOT NULL AUTO_INCREMENT,
+ `name`        VARCHAR(255) NOT NULL,
  `pass`        VARCHAR(255),
- `type`        INT NOT NULL,
- `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `game_mode_id`    INT NOT NULL,
+ `created_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  PRIMARY KEY (`id`)
 ) ;
@@ -25,7 +28,7 @@ CREATE TABLE `miniGames` (
  `type`         INT NOT NULL,
  `scene_number` INT NOT NULL,
  `playable`     TINYINT(1) NOT NULL DEFAULT 1,
- `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  PRIMARY KEY (`id`)
 ) ;
@@ -35,7 +38,7 @@ CREATE TABLE `daily_active_users` (
   `id`            INT NOT NULL AUTO_INCREMENT,
   `user_id`       INT NOT NULL,
   `activity_date` DATE NOT NULL,
-  `created_day`   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at`   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_user_date` (`user_id`, `activity_date`),
@@ -47,7 +50,7 @@ CREATE TABLE `room_users` (
   `id`          INT NOT NULL AUTO_INCREMENT,
   `room_id`     INT NOT NULL,
   `user_id`     INT NOT NULL,
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_room_user` (`room_id`, `user_id`),
@@ -63,10 +66,25 @@ CREATE TABLE `miniGame_logs` (
  `user_id`     INT NOT NULL,
  `rank`        INT,
  `score`       INT,
- `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  PRIMARY KEY (`id`),
  CONSTRAINT `fk_ml_room`     FOREIGN KEY (`room_id`)     REFERENCES `rooms` (`id`),
  CONSTRAINT `fk_ml_miniGame` FOREIGN KEY (`miniGame_id`) REFERENCES `miniGames` (`id`),
  CONSTRAINT `fk_ml_user`     FOREIGN KEY (`user_id`)     REFERENCES `users` (`id`)
 ) ;
+
+-- 7. admin_users
+CREATE TABLE `admin_users` (
+`id` INT NOT NULL AUTO_INCREMENT,
+`name` VARCHAR(255) NOT NULL,
+`password` VARCHAR(255) NOT NULL,
+`created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+`updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY (`id`)
+);
+
+-- admin_users MasterUser
+INSERT INTO admin_users (name, password)
+VALUES ('admin', 'Yoshidajobi2024');

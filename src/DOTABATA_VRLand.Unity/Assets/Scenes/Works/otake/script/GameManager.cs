@@ -8,6 +8,8 @@ using UnityEngine.InputSystem;
 using System;
 using Valve.VR;
 using UnityEditor;
+using TMPro;
+using Cysharp.Threading.Tasks.Triggers;
 
 
 public class GameManager : MonoBehaviour
@@ -30,12 +32,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject CrownPrefab;
     public float crownDistance;
 
-    AudioManager audioManager;
-
-    ///あとで消す
-    [SerializeField] Transform crowntrans;
 
 
+
+
+    //
 
 
 
@@ -43,7 +44,8 @@ public class GameManager : MonoBehaviour
     /// 進行UI関係
     /// </summary>
 
-    public Text MainText;
+    public Text DummyText;
+    public TextMeshProUGUI MainText;
     public int textIndex;
 
     public bool onSelect;
@@ -86,42 +88,46 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] GameObject selectPoint;
     SelPointManager selPointManager;
+    [SerializeField] float SelPointHeght;
 
     [SerializeField] List<Sprite> miniGameTitleImages = new List<Sprite>();
 
     bool isSpin;
+    bool EndProgress;
 
     //ランキングUI
     public List<RectTransform> rankingPosList;
     public List<RectTransform> rankingUis;
+    public List<Material> rankingMaterials;
 
+    [SerializeField] HostManager hostManager;
 
-
-    static public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
+     public Dictionary<int, int> playerWinlist = new Dictionary<int, int>()
     {
-        { 1,2},{2,2 },{3,1},{4,1}
+        { 1,0},{2,0},{3,0},{4,0}
     };//勝利数
 
     public Dictionary<int, int> RankingList = new Dictionary<int, int>()
     {
-        {1,1},
-        {2,2},
-        { 3,3},
-        { 4,4}
-
-    };
-
-
-    public Dictionary<int, int> miniRankingList = new Dictionary<int, int>()
-    {
-        {1,1},
+        {1,0},
         {2,0},
         { 3,0},
         { 4,0}
+
+    };
+
+
+    public Dictionary<Guid, int> miniRankingList = new Dictionary<Guid, int>()
+    {
+        
         
     };
 
-    public int winPlayerId;
+    public Guid winPlayerId;
+
+    AudioSource audio;
+    [SerializeField] AudioClip Roll;
+    [SerializeField] AudioClip RollEnd;
 
   
 
@@ -134,31 +140,11 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        audioManager = GetComponent<AudioManager>();
-        SteamVR_Fade.Start(new Color(0,0,0,0),2);
-        //List<GameObject> crowns = new List<GameObject>();
+       audio = GetComponent<AudioSource>();
+        SteamVR_Fade.View(new Color(0,0,0,0),2);
+        EndProgress = false;
+        AudioManager.ChangeBGM(AudioManager.BGM.Main_Normal);
 
-        ////Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent.GetComponent<PlayerTransform>().crownParent;
-
-        //for (int i = 0; i < playerWinlist[1]; i++)
-        //{
-        //    //GameObject crown = Instantiate(CrownPrefab,
-        //    //    transform);
-        //    //crowns.Add(crown);
-
-        //    GameObject crown = Instantiate(CrownPrefab,
-        //      crowntrans);
-        //    crowns.Add(crown);
-        //}
-        //int index = 0;
-
-        //foreach (GameObject crown in crowns)
-        //{
-        //    crown.transform.position = new Vector3(crown.transform.position.x, crown.transform.position.y+(crownDistance * index), crown.transform.position.z);
-        //    index++;
-        //}
-
-        //// mana = GameObject.Find("TitleManager").GetComponent<TitleMana>();
 
 
         if (rally)
@@ -186,9 +172,12 @@ public class GameManager : MonoBehaviour
         {
             if (CenterObjRb.angularVelocity.y < 0.01f)
             {
-                MainText.text = "";
+                DummyText.text = "";
                 Debug.Log(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました");
-                MainText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
+                DummyText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
+
+                audio.Stop();
+                audio.PlayOneShot(RollEnd);
 
                 onSelect = true;
                 onResult = false;
@@ -197,8 +186,9 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        MainText.text = DummyText.text;
 
-        //TODO：自身がホストの場合はミニゲーム一覧の回転同期とテキストの遷移
+
         if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
         {
             if (Input.GetMouseButtonDown(0) || grabAction.GetStateDown(handType))
@@ -230,11 +220,11 @@ public class GameManager : MonoBehaviour
 
 
         //onResult = true;
-        //MainText.text = "";
+        //DummyText.text = "";
         //textIndex = 0;
 
 
-        //MainText.DOText(AfterText[textIndex], 1.0f);
+        //DummyText.DOText(AfterText[textIndex], 1.0f);
         //SetResult();
 
         SetRanking();
@@ -249,6 +239,9 @@ public class GameManager : MonoBehaviour
         InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position =
             playerPos[index].position;
 
+        InRoomPlayerData.I.PlayerList[myId].playerObj.transform.rotation =
+           playerPos[index].rotation;
+
         //ここで全体ランキング、勝利数の取得、王冠の配置
         NetworkManager.I.ReqestRanking();
 
@@ -257,14 +250,16 @@ public class GameManager : MonoBehaviour
         {
             NetworkManager.I.ReqestMinigameRanking(guid);
 
-            
+            SetRankText(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
         }
 
 
+
+
      
-            MainText.text = "";
+            DummyText.text = "";
             textIndex = 0;
-            MainText.DOText(StartText[textIndex], 1.0f);
+            DummyText.DOText(StartText[textIndex], 1.0f);
         
 
        
@@ -274,21 +269,30 @@ public class GameManager : MonoBehaviour
     public　void InitResult()
     {
         onResult = true;
-        MainText.text = "";
+        DummyText.text = "";
         textIndex = 0;
 
 
-        MainText.DOText(AfterText[textIndex], 1.0f);
+        DummyText.DOText(AfterText[textIndex], 1.0f);
         SetResult();
+    }
+
+    public void SetRankText(Guid guid,int Id)
+    {
+        rankingUis[Id - 1].GetComponent<TextMeshProUGUI>().text = InRoomPlayerData.I.PlayerList[guid].joinedUser.Name + "  win×"+
+            playerWinlist[Id];
     }
 
     //ミニゲーム抽選開始(ホストのみ実行)
     public void SelectMiniGame()
     {
         isSpin = true;
-        
 
-        float spinPower = UnityEngine.Random.Range(3, 6);
+        audio.clip = Roll;
+        audio.Play();
+        audio.loop = true;
+
+        float spinPower = UnityEngine.Random.Range(5, 30);
 
         CenterObjRb.angularVelocity = new Vector3(0, spinPower, 0);
     }
@@ -297,10 +301,11 @@ public class GameManager : MonoBehaviour
     {
         foreach (Guid guid in InRoomPlayerData.I.PlayerList.Keys)
         {
-            AddCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+            DeleteCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
         }
-        SteamVR_Fade.Start(new Color(1,1,1,1), 2);
+        SteamVR_Fade.View(new Color(1,1,1,1), 2);
         Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
+        AudioManager.PlaySE(AudioManager.SE.MoveScene);
     }
 
     public void SetMiniGame()
@@ -311,6 +316,9 @@ public class GameManager : MonoBehaviour
         // 位置を計算 (X, Z平面)
         Vector3 pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
         selectPoint.transform.position = CenterObj.transform.position + pos;
+        selectPoint.transform.position = new Vector3(selectPoint.transform.position.x,
+                                                      SelPointHeght,
+                                                      selectPoint.transform.position.z);
 
         int count = miniGames.Count;
         for (int i = 0; i < count; i++)
@@ -336,11 +344,14 @@ public class GameManager : MonoBehaviour
 
     public void SetCrown(Guid guid,int ID)
     {
+       
         List<GameObject> crowns = new List<GameObject>();
         
         Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
-  
-        for (int i = 0; i < playerWinlist[1]; i++)
+
+      
+
+        for (int i = 0; i < playerWinlist[ID]; i++)
         {
             GameObject crown = Instantiate(CrownPrefab,
                 transform);
@@ -359,19 +370,33 @@ public class GameManager : MonoBehaviour
 
     public void AddCrown(Guid guid, int ID)
     {
-        //Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
-        //GameObject crown = Instantiate(CrownPrefab,
-        //       transform);
-
+        PlayerTransform playerTransform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>();
+        Transform transform = playerTransform.crownParent;
         GameObject crown = Instantiate(CrownPrefab,
-              crowntrans);
+               transform);
+
+  
 
 
         crown.transform.position = new Vector3(crown.transform.position.x, transform.position.y + (crownDistance * playerWinlist[ID])+3f, crown.transform.position.z);
 
         CrownManager manager = crown.GetComponent<CrownManager>();
         manager.isNew = true;
+        manager.ParentTrans = transform;
 
+
+        playerWinlist[ID]++;
+
+
+        if (playerWinlist[RankingList[InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.JoinOrder]] >= 3)
+        {
+            onEnd = true;
+            onResult = false;
+            textIndex = -1;
+        }
+
+        SetRankText(guid,ID);
+        playerTransform.StartSpotLight(3);
 
     }
 
@@ -388,13 +413,13 @@ public class GameManager : MonoBehaviour
     }
     public void SetResult()
     {
-        for (int i = 0; i < miniRankingList.Count; i++)
+        foreach(Guid guid in miniRankingList.Keys)
         {
 
-            if (miniRankingList[i+1] == 1)
+            if (miniRankingList[guid] == 1)
             {
 
-                winPlayerId = miniRankingList[i + 1];
+                winPlayerId = guid;
                
             }
 
@@ -421,12 +446,16 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < RankingList.Count; i++)
         {
             rankingUis[i].DOAnchorPosY(rankingPosList[RankingList[i + 1] - 1].anchoredPosition.y, 1f);
+            rankingUis[i].GetComponent<TextMeshProUGUI>().material = rankingMaterials[i];
+            
         }
 
     }
 
     public void MoveText()
     {
+        hostManager.ChengeFace(HostManager.facial.Normal);
+        if (EndProgress) return;
         if (!isSpin)
         {
             textIndex++;
@@ -435,49 +464,56 @@ public class GameManager : MonoBehaviour
         {
             if (CenterObjRb.angularVelocity.y < 0.01f)
             {
-                MainText.text = "";
+                audio.Stop();
+                audio.PlayOneShot(RollEnd);
+                DummyText.text = "";
                 Debug.Log(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました");
-                MainText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
+                DummyText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
 
                 onSelect = true;
                 onResult = false;
                 onEnd = false;
+               
 
             }
         }
 
 
 
-        MainText.text = "";
+        DummyText.text = "";
         if (onResult)
         {
             if (textIndex >= AfterText.Count && !isSpin)
             {
                 SelectMiniGame();
+              
+                return;
+            }
+
+            if(isSpin)
+            {
                 return;
             }
 
             if (AfterText[textIndex] == "!!! おめでとう！")
             {
-
-                MainText.DOText($"プレイヤー{winPlayerId}" + AfterText[textIndex], 1.0f);
-                playerWinlist[winPlayerId]++;
+                hostManager.ChengeFace(HostManager.facial.Smile);
+                DummyText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + AfterText[textIndex], 1.0f);
+               
+                if (winPlayerId == NetworkManager.I.myConnectionId)
+                {
+                    RoomModel.I.RequestWinCountUp(NetworkManager.I.myConnectionId);
+                        }
 
                 SetRanking();
                 //一旦仮で入れてます。本実装は優勝者のGuidいれてください。
 
-               
 
-                if (playerWinlist[RankingList[winPlayerId]] >= 3)
-                {
-                    onEnd = true;
-                    onResult = false;
-                    textIndex = -1;
-                }
+
             }
             else
             {
-                MainText.DOText(AfterText[textIndex], 1.0f);
+                DummyText.DOText(AfterText[textIndex], 1.0f);
             }
         }
         else if (onEnd)
@@ -486,34 +522,40 @@ public class GameManager : MonoBehaviour
             {
                 //タイトルに戻る
                 MoveScene("TitleScene");
+                RoomModel.I.LeaveRoomAsync();
+                EndProgress = true;
                 return;
             }
 
             if (FinishText[textIndex] == "!!! おめでとう！")
             {
+                hostManager.ChengeFace(HostManager.facial.Smile);
                 AudioManager.ChangeBGM(AudioManager.BGM.Main_End);
-                MainText.DOText($"プレイヤー{winPlayerId}" + FinishText[textIndex], 1.0f);
+                DummyText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + FinishText[textIndex], 1.0f);
+                InRoomPlayerData.I.PlayerList[winPlayerId].playerObj.GetComponent<PlayerTransform>().StartSpotLight(10);
 
             }
             else
             {
-                MainText.DOText(FinishText[textIndex], 1.0f);
+                DummyText.DOText(FinishText[textIndex], 1.0f);
             }
         }
         else if (onSelect)
         {
             MoveScene(miniGames[selPointManager.SelectId]);
+            EndProgress = true;
         }
         else
         {
             if (textIndex >= StartText.Count && !isSpin)
             {
                 SelectMiniGame();
+               
                 return;
             }
             else if(textIndex < StartText.Count) 
             {
-                MainText.DOText(StartText[textIndex], 1.0f);
+                DummyText.DOText(StartText[textIndex], 1.0f);
             }
         }
 
