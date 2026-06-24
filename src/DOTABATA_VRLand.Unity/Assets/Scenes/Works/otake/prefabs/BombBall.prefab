@@ -289,7 +289,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3571430627682616519}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -468,7 +468,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cdc205878620274ab9bfb9804d6c08a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BombTimerMax: 50
+  BombTimerMax: 30
   BombTimerText: {fileID: 1267131730072149264}
   RestartPos: {x: 0, y: 0, z: 0}
   grabAction:
@@ -642,9 +642,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectListId: 0
-  SendCreate: 0
-  SendTransform: 0
-  SendSpan: 0.2
-  SendDestroy: 0
-  stringObjectId: 
+  objectListId: 10
+  SendCreate: 1
+  SendTransform: 1
+  SendSpan: 0.04
+  SendDestroy: 1
+  stringObjectId: a87a648a-1ff0-4fed-916b-352908cf047a

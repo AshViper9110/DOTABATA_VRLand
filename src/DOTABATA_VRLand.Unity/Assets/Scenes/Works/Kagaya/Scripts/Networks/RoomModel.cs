@@ -128,9 +128,37 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public Action<Guid, float> onUpdateNit { get; set; }
     public Action OnGameStartAction { get; set; }
 
+    /// <summary>
+    /// アルカナスケッチの死亡通知
+    /// </summary>
+    public Action<Guid> OnDead {  get; set; }
     public Action OnRoomStarted {  get; set; }
 
+    /// <summary>
+    /// アルカナスケッチのゲーム終了通知
+    /// </summary>
+    public Action<Guid> OnArcanaGameSeted { get; set; }
+
+    /// <summary>
+    /// 絵描き板の表示非表示同期通知
+    /// </summary>
+    public Action<Guid, bool> OnSwitchedDrawBoadActive { get; set; }
+
+    /// <summary>
+    /// 魔法オブジェクトのフィールド同期
+    /// </summary>
+    public Action<Guid, Guid, string> OnSyncdMagicBall { get; set; }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// プレイヤーのステータス同期通知
+    /// </summary>
+    public Action<Guid, float> OnSyncdPlayerStatus { get; set; }
+
     public Action<int> OnBallingNexted { get; set; }
+
+    public Action<Guid> OnHitingDodgeBall { get; set; }
+    public Action<Guid> OnHitingBomber { get; set; }
 
     /*
      * 処理
@@ -199,7 +227,6 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         try {
             JoinedUser[] joinedUsers = await roomHub.JoinRoomAsync(steamID, roomConfig);
             isJoinRoom = true;
-            InRoomPlayerData.I.SetMySelf(new PlayerData() { joinedUser = joinedUsers.First(_ => _.ConnectionId == ConnectionId) });
             if (joinedUsers != null) {
                 foreach (var user in joinedUsers) {
                     // 自分自身はスキップ
@@ -646,6 +673,111 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         }
     }
 
+    /// <summary>
+    /// アルカナスケッチの初期化
+    /// </summary>
+    public async UniTask ArcanaInitGameAsync() {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.ArcanaInitGameAsync();
+    }
+
+    /// <summary>
+    /// 死亡同期
+    /// </summary>
+    public async UniTask DeathAsync() {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.DeathAsync();
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 死亡通知
+    /// </summary>
+    public void OnDeath(Guid connectionId) {
+        if (OnDead != null) {
+            OnDead(connectionId);
+        }
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// アルカナスケッチのゲーム終了通知
+    /// </summary>
+    public void OnArcanaGameSet(Guid winnerConId) {
+        if (OnArcanaGameSeted != null) {
+            OnArcanaGameSeted(winnerConId);
+        }
+    }
+
+    /// <summary>
+    /// 魔法オブジェクトのフィールド同期
+    /// </summary>
+    public async UniTask SyncMagicBallAsync(Guid objectId, string gestureClassName) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.SyncMagicBallAsync(objectId, gestureClassName);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 魔法オブジェクトのフィールド同期
+    /// </summary>
+    public void OnSyncMagicBall(Guid objectId, Guid createrConId, string gestureClassName) {
+        if (OnSyncdMagicBall != null) {
+            OnSyncdMagicBall(objectId, createrConId, gestureClassName);
+        }
+    }
+
+    /// <summary>
+    /// 絵描き板の表示非表示同期
+    /// </summary>
+    public async UniTask SwitchDrawBoadActiveAsync(bool active) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.SwitchDrawBoadActiveAsync(active);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 絵描き板の表示非表示同期通知
+    /// </summary>
+    public void OnSwitchDrawBoadActive(Guid playerConId, bool active) {
+        if (OnSwitchedDrawBoadActive != null) {
+            OnSwitchedDrawBoadActive(playerConId, active);
+        }
+    }
+
+    /// <summary>
+    /// プレイヤーのステータス同期
+    /// </summary>
+    public async UniTask SyncPlayerStatusAsync(float hp) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.SyncPlayerStatusAsync(hp);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// プレイヤーのステータス同期通知
+    /// </summary>
+    public void OnSyncPlayerStatus(Guid playerConId, float hp) {
+        if (OnSyncdPlayerStatus  != null) {
+            OnSyncdPlayerStatus(playerConId, hp);
+        }
+    }
+
     public async UniTask RoomStart()
     {
         if(roomHub == null) {
@@ -676,6 +808,40 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (OnBallingNexted != null)
         {
             OnBallingNexted(order);
+        }
+    }
+
+    public async UniTask HitDodgeBall()
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.HitDodgeBall(NetworkManager.I.myConnectionId);
+    }
+
+    public void OnHitDodgeBall(Guid connectionId)
+    {
+        if(OnHitingDodgeBall != null)
+        {
+            OnHitingDodgeBall(connectionId);
+        }
+    }
+
+    public async UniTask HitBomber()
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.HitBomber(NetworkManager.I.myConnectionId);
+    }
+
+    public void OnHitBomber(Guid connectionId)
+    {
+        if (OnHitingBomber != null)
+        {
+            OnHitingBomber(connectionId);
         }
     }
 }

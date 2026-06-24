@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using Valve.VR;
+using TMPro;
 
 public class MinigameFlowController : MonoBehaviour
 {
@@ -17,20 +18,20 @@ public class MinigameFlowController : MonoBehaviour
     public GameObject descriptionPanel;
     public GameObject readyPanel;
 
-    public Text titleText;
-    public Text descriptionText;
-    public Text readyText;
+    public TextMeshProUGUI titleText;
+    public TextMeshProUGUI descriptionText;
+    public TextMeshProUGUI readyText;
 
     [Header("Ready")]
     public Button readyButton;
-    public Text waitingText;
+    public TextMeshProUGUI waitingText;
     public Transform UserReadyObject;//プレイヤー情報整列用オブジェクト
     public GameObject playerNamePrefab;  //プレイヤーテキストプレハブ
     public List<GameObject> UserReadyText;   //プレイヤー準備情報テキスト 
     public Button StartButton;
 
     [Header("Countdown")]
-    public Text countdownText;
+    public TextMeshProUGUI countdownText;
 
     [Header("Data")]
     public MinigameInfo info;
@@ -110,12 +111,12 @@ public class MinigameFlowController : MonoBehaviour
         // UI更新
         if (willReady)
         {
-            readyButton.GetComponentInChildren<Text>().text = "取り消し";
+            readyButton.GetComponentInChildren<TextMeshProUGUI>().text = "取り消し";
             waitingText.gameObject.SetActive(true);
         }
         else
         {
-            readyButton.GetComponentInChildren<Text>().text = "準備OK！";
+            readyButton.GetComponentInChildren<TextMeshProUGUI>().text = "準備OK！";
             waitingText.gameObject.SetActive(false);
         }
     }
