@@ -1,7 +1,6 @@
 ﻿using PDollarGestureRecognizer;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using Valve.VR;
 
@@ -100,6 +99,7 @@ public class DrawVRPointer : MonoBehaviour {
     /// 描き始め
     /// </summary>
     private void StartLine() {
+        if (!drawBoadObj.activeSelf) return;
         if (!drawAction.GetStateDown(drawHandType)) return;
 
         GameObject lineObj = new("Line");
@@ -111,7 +111,6 @@ public class DrawVRPointer : MonoBehaviour {
         currentLine.startWidth = lineWidth;
         currentLine.endWidth = lineWidth;
 
-
         points.Clear();
         gesturePoints.Clear();
     }
@@ -120,6 +119,7 @@ public class DrawVRPointer : MonoBehaviour {
     /// 描く
     /// </summary>
     private void Draw() {
+        if (!drawBoadObj.activeSelf) return;
         if (!drawAction.GetState(drawHandType)) return;
 
         if (points.Count > 0) {
@@ -139,6 +139,7 @@ public class DrawVRPointer : MonoBehaviour {
     /// 描き終わり
     /// </summary>
     private void EndLine() {
+        if (!drawBoadObj.activeSelf) return;
         if (!drawAction.GetStateUp(drawHandType)) return;
 
         Destroy(currentLine.gameObject);

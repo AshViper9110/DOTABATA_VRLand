@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7175582737499254097}
   - component: {fileID: 6254033610025279190}
   - component: {fileID: 2300161707160784299}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: DrawBoad
   m_TagString: ArcnaUI
   m_Icon: {fileID: 0}

@@ -12,11 +12,11 @@ public class GestureRecognizer : MonoBehaviour {
 
     public enum GestureClass {
         Circle = 0,
-        Star,
-        Diamond,
-        Square,
-        Triangle,
-        Heart,
+        Star = 1,
+        Diamond = 2,
+        Square = 3,
+        Triangle = 4,
+        Heart = 5,
     }
 
     // 図形判定後コールバック

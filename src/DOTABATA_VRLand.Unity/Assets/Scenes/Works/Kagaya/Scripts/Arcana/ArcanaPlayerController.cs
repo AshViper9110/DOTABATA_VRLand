@@ -1,12 +1,20 @@
-﻿using DG.Tweening;
-using PDollarGestureRecognizer;
-using Unity.VisualScripting;
+﻿using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using System;
+using System.Linq;
 using UnityEngine;
 using Valve.VR;
-using Valve.VR.InteractionSystem;
 using static GestureRecognizer;
 
 public class ArcanaPlayerController : MonoBehaviour {
+    private SyncPlayer syncPlayer;
+
+    // 魔法を当てるターゲット
+    private Transform targetPlayer;
+    private LayerMask targetLayerMask = -1;
+    private GameObject targetCircle;
+    private GameObject createdTargetCircle;
+
     // 魔法オブジェクト
     private GameObject myMagicObj;
     // 魔法人
@@ -15,42 +23,81 @@ public class ArcanaPlayerController : MonoBehaviour {
     // 右手
     private Transform rightHand;
 
-
     // 絵描き板
     private GameObject drawBoadObj;
 
-    private SteamVR_Action_Boolean drawBoadAction;
-    private SteamVR_Input_Sources handType;
+    // Input
+    // HandType
+    private SteamVR_Input_Sources leftHandType;
+    private SteamVR_Input_Sources rightHandType;
 
-    // 右手の
+    // 絵描き用
+    private SteamVR_Action_Boolean drawBoadAction;
+
+    // ターゲット選定
+    private SteamVR_Action_Boolean selectTargetAction;
+
+    // 右手のうで振り
     private SteamVR_Behaviour_Pose controllerPose;
 
     // 魔法を撃つ力
-    [SerializeField] private float shotPower = 10f;
+    [SerializeField] private float shotPower = 5f;
 
     private void Start() {
+        syncPlayer = GetComponent<SyncPlayer>();
+
+        selectTargetAction = SteamVR_Actions.default_GrabGrip;
+        rightHandType = SteamVR_Input_Sources.RightHand;
         drawBoadAction = SteamVR_Actions.default_InteractUI;
-        handType = SteamVR_Input_Sources.LeftHand;
+        leftHandType = SteamVR_Input_Sources.LeftHand;
+        targetLayerMask = targetLayerMask.Remove("MySelf");
     }
 
     private void Update() {
+        SelectTarget();
         TrackingHand();
+        TrackingTargetPlayer();
         ShotMagic();
         SwitchDrawBoadActive();
     }
 
     /// <summary>
-    /// 右手の設定
+    /// フィールド設定
     /// </summary>
-    public void SetRightHand(Transform rHand) {
+    public void SetField(Transform rHand, GameObject obj, GameObject targetCircle) {
+        this.drawBoadObj = obj;
         this.rightHand = rHand;
         controllerPose = rightHand.GetComponent<SteamVR_Behaviour_Pose>();
+        this.targetCircle = targetCircle;
     }
+
     /// <summary>
-    /// DrawBoad設定
+    /// ターゲット選定
     /// </summary>
-    public void SetDrawBoad(GameObject obj) {
-        this.drawBoadObj = obj;
+    private void SelectTarget() {
+        if (!selectTargetAction.GetState(rightHandType)) return;
+        RaycastHit[] hits = Physics.RaycastAll(rightHand.position, Camera.main.transform.forward, 50f, targetLayerMask);
+        hits = hits.OrderBy(hit => hit.distance).ToArray();
+        foreach (RaycastHit hit in hits) {
+            if (!hit.collider.gameObject.CompareTag("Player")) return;
+            targetPlayer = hit.collider.transform;
+            Debug.Log($"ターゲット選定：{hit.collider.gameObject.name}");
+        }
+    }
+
+    /// <summary>
+    /// ターゲットに追従
+    /// </summary>
+    private void TrackingTargetPlayer() {
+        if (targetPlayer) {
+            if (!createdTargetCircle) {
+                createdTargetCircle = Instantiate(targetCircle);
+            }
+            createdTargetCircle.transform.position = targetPlayer.transform.position;
+        }
+        else {
+            Destroy(createdTargetCircle);
+        }
     }
 
     /// <summary>
@@ -63,6 +110,9 @@ public class ArcanaPlayerController : MonoBehaviour {
         myMagicObj = magicObject;
         myMagicObj.GetComponent<MagicController>().Init(RoomModel.I.ConnectionId, gesture);
 
+        if (magicCircle) {
+            Destroy(magicCircle);
+        }
         magicCircle = Instantiate(magicCircleObj, (rightHand.position + -rightHand.right), Quaternion.identity);
     }
 
@@ -80,6 +130,7 @@ public class ArcanaPlayerController : MonoBehaviour {
             myMagicObj = null;
             magicObjRb.linearVelocity = Vector3.zero;
             magicObjRb.AddForce(Camera.main.transform.forward.normalized * shotPower, ForceMode.Impulse);
+            magicObjRb.GetComponent<MagicController>().SetTarget(targetPlayer);
             magicObjRb.GetComponent<MagicController>().ReleaseHand();
 
             Destroy(magicCircle);
@@ -100,7 +151,7 @@ public class ArcanaPlayerController : MonoBehaviour {
 
         if (!magicCircle) return;
         // 追従
-        magicCircle.transform.position = rightHand.position + -rightHand.right * 0.05f + -rightHand.up * 0.02f + -rightHand.forward * 0.07f;
+        magicCircle.transform.position = rightHand.position + -rightHand.right * 0.02f + -rightHand.up * 0.02f + -rightHand.forward * 0.07f;
         // 向き
         magicCircle.transform.up = -rightHand.right;
     }
@@ -109,8 +160,9 @@ public class ArcanaPlayerController : MonoBehaviour {
     /// DrawBoadのアクティブ変更
     /// </summary>
     private void SwitchDrawBoadActive() {
-        if (drawBoadAction.GetStateDown(handType) && drawBoadObj) {
+        if (drawBoadAction.GetStateDown(leftHandType) && drawBoadObj) {
             drawBoadObj.SetActive(!drawBoadObj.activeSelf);
+            RoomModel.I.SwitchDrawBoadActiveAsync(drawBoadObj.activeSelf).Forget();
         }
     }
 }

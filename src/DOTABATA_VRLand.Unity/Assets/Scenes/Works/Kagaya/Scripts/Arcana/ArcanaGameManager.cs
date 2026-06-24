@@ -21,7 +21,7 @@ public class ArcanaGameManager : MonoBehaviour {
     // プレイヤーのUI
     [SerializeField] private GameObject playerUICanvas;
 
-    // 魔法のPrefab
+    // 魔法のPrefabList
     [SerializeField] private GameObject magicBallPrefab;
     // 魔法のVFX
     [SerializeField] private List<GameObject> magicVFXList;
@@ -30,6 +30,8 @@ public class ArcanaGameManager : MonoBehaviour {
 
     // 手用の魔法人のPrefab
     [SerializeField] private List<GameObject> handMagicCircleList;
+    // ターゲットにつける魔法人
+    [SerializeField] private GameObject targetCircle;
 
     // 本のオブジェクトリスト
     [SerializeField] private List<GameObject> magicBookObjects;
@@ -73,15 +75,16 @@ public class ArcanaGameManager : MonoBehaviour {
 
             // 自分だったら
             if (playerData.joinedUser.ConnectionId == mySelf.joinedUser.ConnectionId) {
-                myController.SetDrawBoad(drawBoadObj);
+                drawBoadObj.layer = LayerMask.NameToLayer("DrawBoad");
                 myUI.layer = LayerMask.NameToLayer("MyUI");
                 rightHand = mySelf.playerObj.GetComponentsInChildren<Transform>().First(_ => _.transform.name == "RightHand");
-                myController.SetRightHand(rightHand);
+                myController.SetField(rightHand, drawBoadObj, targetCircle);
                 DrawVRPointer drawVR = rightHand.AddComponent<DrawVRPointer>();
                 drawVR.SetField(drawBoadObj, drawPointer, lineMaterial, recognizeVFX);
             }
 
             playerData.playerObj.AddComponent<PlayerStatus>().SetGameManager(this);
+            playerData.playerObj.AddComponent<SyncDrawBoad>().SetField(drawBoadObj);
         }
 
         // スポーン位置に移動
@@ -106,7 +109,7 @@ public class ArcanaGameManager : MonoBehaviour {
     /// <summary>
     /// 魔法生成
     /// </summary>
-    private void CreateMagic(GestureClass gesture, float score) {
+    private async void CreateMagic(GestureClass gesture, float score) {
         // 魔法生成
         Transform createdTransform = Instantiate(magicBallPrefab, new Vector3(0, 10, 0), Quaternion.identity).transform;
         int rnd = UnityEngine.Random.Range(0, magicVFXList.Count);
@@ -114,6 +117,14 @@ public class ArcanaGameManager : MonoBehaviour {
         Instantiate(magicVFXList[rnd], createdTransform);
         // Material適応
         createdTransform.GetComponent<MeshRenderer>().material = magicMaterialList[rnd];
+
+        await UniTask.DelayFrame(2);
+
+        // オブジェクトId取得
+        Guid objectId = createdTransform.GetComponent<SyncObject>().ObjectId;
+
+        // オブジェクトのフィールド同期
+        await RoomModel.I.SyncMagicBallAsync(objectId, gesture.ToString());
 
         myController.SetMagicObj(createdTransform.gameObject, gesture, handMagicCircleList[rnd]);
     }

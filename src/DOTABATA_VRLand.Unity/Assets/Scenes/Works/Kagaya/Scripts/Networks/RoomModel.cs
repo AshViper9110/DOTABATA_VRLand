@@ -142,6 +142,21 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid> OnArcanaGameSeted { get; set; }
 
+    /// <summary>
+    /// 絵描き板の表示非表示同期通知
+    /// </summary>
+    public Action<Guid, bool> OnSwitchedDrawBoadActive { get; set; }
+
+    /// <summary>
+    /// 魔法オブジェクトのフィールド同期
+    /// </summary>
+    public Action<Guid, Guid, string> OnSyncdMagicBall { get; set; }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// プレイヤーのステータス同期通知
+    /// </summary>
+    public Action<Guid, float> OnSyncdPlayerStatus { get; set; }
 
     /*
      * 処理
@@ -693,6 +708,69 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnArcanaGameSet(Guid winnerConId) {
         if (OnArcanaGameSeted != null) {
             OnArcanaGameSeted(winnerConId);
+        }
+    }
+
+    /// <summary>
+    /// 魔法オブジェクトのフィールド同期
+    /// </summary>
+    public async UniTask SyncMagicBallAsync(Guid objectId, string gestureClassName) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.SyncMagicBallAsync(objectId, gestureClassName);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 魔法オブジェクトのフィールド同期
+    /// </summary>
+    public void OnSyncMagicBall(Guid objectId, Guid createrConId, string gestureClassName) {
+        if (OnSyncdMagicBall != null) {
+            OnSyncdMagicBall(objectId, createrConId, gestureClassName);
+        }
+    }
+
+    /// <summary>
+    /// 絵描き板の表示非表示同期
+    /// </summary>
+    public async UniTask SwitchDrawBoadActiveAsync(bool active) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.SwitchDrawBoadActiveAsync(active);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 絵描き板の表示非表示同期通知
+    /// </summary>
+    public void OnSwitchDrawBoadActive(Guid playerConId, bool active) {
+        if (OnSwitchedDrawBoadActive != null) {
+            OnSwitchedDrawBoadActive(playerConId, active);
+        }
+    }
+
+    /// <summary>
+    /// プレイヤーのステータス同期
+    /// </summary>
+    public async UniTask SyncPlayerStatusAsync(float hp) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.SyncPlayerStatusAsync(hp);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// プレイヤーのステータス同期通知
+    /// </summary>
+    public void OnSyncPlayerStatus(Guid playerConId, float hp) {
+        if (OnSyncdPlayerStatus  != null) {
+            OnSyncdPlayerStatus(playerConId, hp);
         }
     }
 }

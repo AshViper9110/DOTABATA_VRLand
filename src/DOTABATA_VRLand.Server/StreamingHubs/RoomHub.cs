@@ -622,5 +622,35 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// 絵描き板の表示非表示同期
+        /// </summary>
+        public Task SwitchDrawBoadActiveAsync(bool active) {
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnSwitchDrawBoadActive(this.ConnectionId, active);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 魔法オブジェクトのフィールド同期
+        /// </summary>
+        public Task SyncMagicBallAsync(Guid objectId, string gestureClassName) {
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnSyncMagicBall(objectId, this.ConnectionId, gestureClassName);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// プレイヤーのステータス同期
+        /// </summary>
+        public Task SyncPlayerStatusAsync(float hp) {
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnSyncPlayerStatus(this.ConnectionId, hp);
+
+            return Task.CompletedTask;
+        }
     }
 }
