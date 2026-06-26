@@ -3,7 +3,12 @@ guid: 638914910cae66a43a65bbeb86e0be6b
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: shutter
+    second: {fileID: 2100000, guid: 20492faeaf537c343b45e9e1d4ce9f2b, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
