@@ -22,7 +22,7 @@ public class BombBallManager : MonoBehaviour
 
     Rigidbody rb;
 
-    [SerializeField]GameObject BomberObj;
+    [SerializeField] GameObject BomberEffectPrefab;
 
     SyncObject syncObject;
 
@@ -47,13 +47,18 @@ public class BombBallManager : MonoBehaviour
         if (BombTimer <= 0)
         {
             BombTimer = 0;
-            BomberObj.SetActive(true);
+    
+            Instantiate(BomberEffectPrefab,
+              transform.position,
+                Quaternion.identity);
+            bombDodgeManager.StartCreateBall();
 
-            interactable.attachedToHand.DetachObject(this.gameObject);
+            Destroy(interactable);
 
-            Destroy(this.gameObject, 1.0f);
+
+            Destroy(this.gameObject);
             enabled = false;
-            StartCoroutine(bombDodgeManager.CreateBall());
+            
         }
         
         if(syncObject.IsOwner)
@@ -96,7 +101,7 @@ public class BombBallManager : MonoBehaviour
         rb = gameObject.GetComponent<Rigidbody>();
         syncObject = gameObject.GetComponent<SyncObject>();
         bombDodgeManager = GameObject.Find("GameManager").GetComponent<BombDodgeManager>();
-        BomberObj.SetActive(false);
+      
         bombDodgeManager.Bomb = this;
     }
 

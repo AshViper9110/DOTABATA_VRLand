@@ -237,8 +237,11 @@ public class MinigameFlowController : MonoBehaviour
         Debug.Log("OnReceiveRanking受信");
         foreach (var user in names)Debug.Log($"ランキング受信:{user}");
         isGameStarted = false;
-        countdownText.gameObject.SetActive(true);
-        countdownText.text = "FINISH!";
+        if (countdownText != null)
+        {
+            countdownText.gameObject.SetActive(true);
+            countdownText.text = "FINISH!";
+        }
         StartCoroutine(EndGame());
     }
 

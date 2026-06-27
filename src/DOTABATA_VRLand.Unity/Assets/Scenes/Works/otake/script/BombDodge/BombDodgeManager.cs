@@ -19,6 +19,8 @@ public class BombDodgeManager : MonoBehaviour
     bool isStart;
 
     MinigameFlowController flowController;
+
+    [SerializeField] Canvas introCanvas;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
 
     private void OnEnable()
@@ -52,8 +54,12 @@ public class BombDodgeManager : MonoBehaviour
                     obj.playerObj.transform);
                 dogePlayer.EngelRing.transform.Rotate(90,0,0);
             }
-            obj.playerObj.transform.position = startpos[obj.joinedUser.JoinOrder-1].position;
-            obj.playerObj.transform.LookAt(center);
+            if (obj.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) {
+                obj.playerObj.transform.position = startpos[obj.joinedUser.JoinOrder - 1].position;
+                obj.playerObj.transform.LookAt(center);
+                introCanvas.transform.LookAt(obj.playerObj.transform);
+                introCanvas.transform.Rotate(0,180,0);
+                    }
             index++;
 
            
@@ -74,7 +80,9 @@ public class BombDodgeManager : MonoBehaviour
                     Quaternion.identity);
                 gameObject.GetComponent<BombBallManager>().RestartPos = gameObject.transform.position;
                 Bomb = gameObject.GetComponent<BombBallManager>();
+                AudioManager.ChangeBGM(AudioManager.BGM.Bom_doge);
             }
+
             isStart = true;
         }
 
@@ -82,6 +90,10 @@ public class BombDodgeManager : MonoBehaviour
         {
 
             DestroyEngelRing();
+            if (Bomb != null)
+            {
+                Bomb = null;
+            }
         }
     }
 
@@ -103,12 +115,16 @@ public class BombDodgeManager : MonoBehaviour
 
     public void OnHitingDodgeBall(Guid ConnectionId)
     {
-        Bomb.RestartPos = BombStartpos[InRoomPlayerData.I.PlayerList[ConnectionId].joinedUser.JoinOrder-1].position;
+        if (Bomb != null)
+        {
+            Bomb.RestartPos = BombStartpos[InRoomPlayerData.I.PlayerList[ConnectionId].joinedUser.JoinOrder - 1].position;
+        }
     }
 
     public void OnHitingBomber(Guid ConnectionId)
     {
         BombDogePlayer player = InRoomPlayerData.I.PlayerList[ConnectionId].playerObj.GetComponent<BombDogePlayer>();
+        if (player == null)return;
         player.isDead = true;
 
         if(NetworkManager.I.myConnectionId == ConnectionId)
@@ -142,10 +158,18 @@ public class BombDodgeManager : MonoBehaviour
         }
     }
 
+    public void StartCreateBall()
+    {
+        StartCoroutine(CreateBall());
+    }
+
 
     public IEnumerator CreateBall()
     {
+
         yield return new WaitForSeconds(3);
+        if (!flowController.isGameStarted && isStart) yield break;
+        Debug.Log("CreateBall");
         int index = 3;
         foreach (var t in InRoomPlayerData.I.PlayerList.Values)
         {
