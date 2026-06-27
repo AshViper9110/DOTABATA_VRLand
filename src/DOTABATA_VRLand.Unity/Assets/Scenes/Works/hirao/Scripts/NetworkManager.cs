@@ -114,6 +114,7 @@ public class NetworkManager : Singleton<NetworkManager>
         {
             GameObject player = Instantiate(SyncPlayerPrefab);
             SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
+            syncPlayer.SetConnectionId(user.ConnectionId);
             PlayerData data = new PlayerData()
             {
                 playerObj = player,
@@ -130,6 +131,7 @@ public class NetworkManager : Singleton<NetworkManager>
                 joinedUser = user,
             };
             InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
+            InRoomPlayerData.I.SetMySelf(data);
         }
     }
 
