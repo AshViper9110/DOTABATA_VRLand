@@ -159,6 +159,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action<Guid> OnHitingDodgeBall { get; set; }
     public Action<Guid> OnHitingBomber { get; set; }
+    public Action<Guid> OnOpenedShutter { get; set; }
 
     /*
      * 処理
@@ -842,6 +843,23 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (OnHitingBomber != null)
         {
             OnHitingBomber(connectionId);
+        }
+    }
+
+    public async UniTask OpenShutter()
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.OpenShutter(NetworkManager.I.myConnectionId);
+
+    }
+    public void OnOpenShutter(Guid connectionId)
+    {
+        if (OnOpenedShutter != null)
+        {
+            OnOpenedShutter(connectionId);
         }
     }
 }
