@@ -59,6 +59,7 @@ public class BombDodgeManager : MonoBehaviour
                 obj.playerObj.transform.LookAt(center);
                 introCanvas.transform.LookAt(obj.playerObj.transform);
                 introCanvas.transform.Rotate(0,180,0);
+                introCanvas.transform.rotation = new Quaternion(0, introCanvas.transform.rotation.y,0, introCanvas.transform.rotation.w);
                     }
             index++;
 
