@@ -177,7 +177,5 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
         Task OpenShutter(Guid connectionID);
 
-       
-
     }
 }
