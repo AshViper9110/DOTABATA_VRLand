@@ -68,6 +68,7 @@ public class NitnitManager : MonoBehaviour
             if (timer < 0)
             {
                 timerText.text = "フィニッシュ！";
+                Destroy(FlowController.countdownText.gameObject);
               
                 FlowController.isGameStarted = false;
                 StartCoroutine(SendScoreCount());

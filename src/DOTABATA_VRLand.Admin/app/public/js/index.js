@@ -1,93 +1,35 @@
-// ログアウト処理
-function logout() {
-  // /logout エンドポイントにPOST送信（セッション破棄想定）
-  fetch("/logout", { method: "POST" })
-    // 完了後にログイン画面へ遷移
-    .then(() => (location.href = "/main.html"));
-}
+// ログイン処理（フォーム送信時に呼び出す想定）
+async function login() {
+  // 入力フォームからユーザー名を取得
+  const username = document.getElementById("username").value;
 
-// ユーザー一覧を取得して表示
-async function loadUsers() {
-  const res = await fetch("/api/users/get");
-  const users = await res.json();
+  // 入力フォームからパスワードを取得
+  const password = document.getElementById("password").value;
 
-  const list = document.getElementById("list");
-
-  list.innerHTML = "";
-
-  if (users != null) {
-    users.forEach((user) => {
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-        <td>${user.id}</td>
-        <td>${user.name}</td>
-        <td>
-          <button onclick="detailUser(${user.id})">詳細</button>
-          <button onclick="deleteUser(${user.id})">削除</button>
-        </td>
-      `;
-
-      list.appendChild(tr);
-    });
-  }
-}
-// --- ユーザー編集処理 ---
-function detailUser(id) {
-  console.log(id);
-}
-
-// --- ユーザー削除処理 ---
-function deleteUser(id) {
-  console.log(id);
-}
-// --- ユーザー登録処理 ---
-document.getElementById("form").addEventListener("submit", async (e) => {
-  // フォームのデフォルト送信を停止
-  e.preventDefault();
-
-  // 入力値取得
-  const name = document.getElementById("name").value;
-
-  // APIへPOST送信（JSON形式）
-  await fetch("/api/user/add", {
+  // /login APIへPOSTリクエストを送信
+  const res = await fetch("/login", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      // JSON形式で送信することを明示
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify({ name }),
+    // リクエストボディに認証情報を付与
+    body: JSON.stringify({ username, password })
   });
 
-  // 登録後に一覧を再取得
-  loadUsers();
-});
-
-// --- ID検索 ---
-document.getElementById("idSearch").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  // 入力されたID取得
-  const id = document.getElementById("id").value;
-
-  // クエリパラメータでAPI呼び出し
-  const res = await fetch(`/api/user/search/id?value=${id}`);
-  const user = await res.json();
-
-  const list = document.getElementById("list");
-  list.innerHTML = "";
-
-  // 結果が存在する場合
-  if (user && user.length > 0) {
-    user.forEach((user) => {
-      const li = document.createElement("li");
-      li.textContent = `${user.name}`;
-      list.appendChild(li);
-    });
+  // ステータスコードが200系なら成功
+  if (res.ok) {
+    // ログイン成功 → トップページへ遷移
+    location.href = "/main.html";
   } else {
-    // 該当データなし
-    list.innerHTML = "<li>データなし</li>";
+    // ログイン失敗 → アラート表示
+    alert("ログイン失敗");
   }
-});
 
-// 初回ロード時に一覧取得
-loadUsers();
+  function logout() {
+    // /logout エンドポイントにPOST送信（セッション破棄想定）
+    fetch("/logout", { method: "POST" })
+        // 完了後にログイン画面へ遷移
+        .then(() => (location.href = "/main.html"));
+  }
+}
