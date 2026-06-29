@@ -33,6 +33,12 @@ public class ArcanaGameManager : MonoBehaviour {
     // ターゲットにつける魔法人
     [SerializeField] private GameObject targetCircle;
 
+    // シールドのエフェクト
+    [SerializeField] private GameObject shieldEffect;
+
+    // 死亡時のエッフェクト
+    [SerializeField] private GameObject deathEffect;
+
     // 本のオブジェクトリスト
     [SerializeField] private List<GameObject> magicBookObjects;
     // 杖のオブジェクトリスト
@@ -57,6 +63,9 @@ public class ArcanaGameManager : MonoBehaviour {
     private async void Start() {
         RoomModel.I.OnDead += OnDead;
         RoomModel.I.OnArcanaGameSeted += OnArcanaGameSeted;
+
+        AudioManager.StopBgm();
+        SteamVR_Fade.View(new Color(0, 0, 0, 0), 1.0f);
 
         // 自分のインスタンスを保持
         mySelf = InRoomPlayerData.I.MySelf;
@@ -83,7 +92,7 @@ public class ArcanaGameManager : MonoBehaviour {
                 drawVR.SetField(drawBoadObj, drawPointer, lineMaterial, recognizeVFX);
             }
 
-            playerData.playerObj.AddComponent<PlayerStatus>().SetGameManager(this);
+            playerData.playerObj.AddComponent<PlayerStatus>().SetField(this, shieldEffect);
             playerData.playerObj.AddComponent<SyncDrawBoad>().SetField(drawBoadObj);
         }
 
@@ -133,6 +142,8 @@ public class ArcanaGameManager : MonoBehaviour {
     /// 志望動機
     /// </summary>
     public async void DeathAsync() {
+        // VFX
+        Instantiate(deathEffect, mySelf.playerObj.transform.position, Quaternion.identity);
         await RoomModel.I.DeathAsync();
     }
 
@@ -156,10 +167,13 @@ public class ArcanaGameManager : MonoBehaviour {
 
         foreach (PlayerData playerData in InRoomPlayerData.I.PlayerList.Values) {
             foreach (Transform child in playerData.playerObj.transform) {
-                if (!child.CompareTag("ArcanaUI")) return;
-                Destroy(child);
+                if (child.gameObject.name.StartsWith("ArcanaUICanvas") ||
+                    child.gameObject.name.StartsWith("DrawBoad")) {
+                    Destroy(child);
+                }
             }
             Destroy(playerData.playerObj.GetComponent<PlayerStatus>());
+            Destroy(playerData.playerObj.GetComponent<SyncDrawBoad>());
         }
     }
 }
