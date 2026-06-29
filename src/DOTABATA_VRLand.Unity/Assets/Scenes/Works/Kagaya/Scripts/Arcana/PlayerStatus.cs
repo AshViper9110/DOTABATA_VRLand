@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,10 +10,16 @@ public class PlayerStatus : MonoBehaviour {
     private ArcanaGameManager arcanaGameManager;
     private SyncPlayer syncPlayer;
 
-    private Slider hpSlider;
+    private Transform hpImages;
 
-    [SerializeField] private float maxHp = 100;
-    [SerializeField] private float hp;
+    // シールドのエフェクト
+    private GameObject shieldEffect;
+
+    [SerializeField] private int maxHp = 3;
+    [SerializeField] private int hp;
+
+    // シールド中か
+    private bool isShield = false;
 
     private void Awake() {
         RoomModel.I.OnSyncdPlayerStatus += OnSyncdPlayerStatus;
@@ -29,26 +38,32 @@ public class PlayerStatus : MonoBehaviour {
     private void Start() {
         syncPlayer = this.GetComponent<SyncPlayer>();
 
-        hpSlider = this.GetComponentInChildren<Slider>();
+        hpImages = this.GetComponentsInChildren<Transform>().First(_=>_.gameObject.name == "Heats");
     
         hp = maxHp;
     }
 
     /// <summary>
-    /// ゲームマネージャーをセット
+    /// フィールド設定
     /// </summary>
-    public void SetGameManager(ArcanaGameManager gameManager) {
+    public void SetField(ArcanaGameManager gameManager, GameObject shieldEffect) {
         this.arcanaGameManager = gameManager;
+        this.shieldEffect = shieldEffect;
     }
 
     /// <summary>
     /// ダメージ受ける処理
     /// </summary>
-    public async void OnDamage(float damage) {
+    public async void OnDamage() {
         if (!syncPlayer.IsOwner()) return;
 
-        hp -= damage;
+        // シールド中だったら
+        if (isShield) {
+            DisenableShield();
+            return;
+        }
 
+        hp--;
         UpdateHpSlider();
 
         await RoomModel.I.SyncPlayerStatusAsync(hp);
@@ -60,17 +75,54 @@ public class PlayerStatus : MonoBehaviour {
     }
 
     /// <summary>
-    /// HPバー更新
+    /// HP画像更新
     /// </summary>
     private void UpdateHpSlider() {
-        hpSlider.value = hp / maxHp;
+        foreach (Transform child in hpImages) {
+            child.Find("Heat").gameObject.SetActive(true);
+        }
+
+        if (hp == 2) {
+            hpImages.Find("Heat_3/Heat").gameObject.SetActive(false);
+        }
+        else if (hp == 1) {
+            hpImages.Find("Heat_3/Heat").gameObject.SetActive(false);
+            hpImages.Find("Heat_2/Heat").gameObject.SetActive(false);
+
+        }
+        else if (hp == 0) {
+            hpImages.Find("Heat_3/Heat").gameObject.SetActive(false);
+            hpImages.Find("Heat_2/Heat").gameObject.SetActive(false);
+            hpImages.Find("Heat_1/Heat").gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// シールドを有効か
+    /// </summary>
+    public async void EnableShield() {
+        if (isShield) return;
+
+        isShield = true;
+        Instantiate(shieldEffect, this.transform.position, Quaternion.identity, this.transform);
+
+        await UniTask.WaitForSeconds(4);
+
+        DisenableShield();
+    }
+
+    /// <summary>
+    /// シールド無効化
+    /// </summary>
+    private void DisenableShield() {
+        isShield = false;
     }
 
     /// <summary>
     /// [サーバー通知]
     /// プレイヤーのステータス同期通知
     /// </summary>
-    public void OnSyncdPlayerStatus(Guid playerConId, float hp) {
+    public void OnSyncdPlayerStatus(Guid playerConId, int hp) {
         if (syncPlayer.ConnectionId != playerConId) return;
         this.hp = hp;
 

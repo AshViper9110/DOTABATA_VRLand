@@ -114,9 +114,11 @@ public class MagicController : MonoBehaviour {
             PlayerStatus otherStatus = other.gameObject.GetComponent<PlayerStatus>();
             if (otherStatus == null) return;
 
+            Debug.Log("Hit");
+
             isAttacked = true;
             // ダメージを付与
-            otherStatus.OnDamage(attackDamage);
+            otherStatus.OnDamage();
 
             Destroy(this.gameObject);
         }
