@@ -759,5 +759,17 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             return Task.CompletedTask;
         }
+
+
+        /// <summary>
+        /// シャッターの開放同期
+        /// </summary>
+        public Task OpenShutter(Guid connectionID)
+        {
+            // 全員に通知
+            this._roomContext.Group.All.OnOpenShutter(connectionID);
+
+            return Task.CompletedTask;
+        }
     }
 }

@@ -172,5 +172,9 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// プレイヤーのステータス同期
         /// </summary>
         Task SyncPlayerStatusAsync(float hp);
+        /// <summary>
+        /// シャッターの開放同期
+        /// </summary>
+        Task OpenShutter(Guid connectionID);
     }
 }
