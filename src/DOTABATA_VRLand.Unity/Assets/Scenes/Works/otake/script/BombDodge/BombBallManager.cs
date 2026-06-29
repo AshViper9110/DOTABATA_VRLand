@@ -85,6 +85,7 @@ public class BombBallManager : MonoBehaviour
         {
             if (!syncObject.IsOwner)
             {
+                if(InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<BombDogePlayer>().isDead)return;
                 syncObject.GetOwnership(true);
                 RestartPos = bombDodgeManager.BombStartpos[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].position;
                 Debug.Log("君の物だよ");
