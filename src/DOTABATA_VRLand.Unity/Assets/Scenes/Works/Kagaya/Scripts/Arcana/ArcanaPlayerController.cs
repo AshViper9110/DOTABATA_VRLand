@@ -61,7 +61,7 @@ public class ArcanaPlayerController : MonoBehaviour {
         TrackingTargetPlayer();
         ShotMagic();
         SwitchDrawBoadActive();
-        UseShield();
+        ControllShield();
     }
 
     /// <summary>
@@ -170,10 +170,14 @@ public class ArcanaPlayerController : MonoBehaviour {
     }
 
     /// <summary>
-    /// シールドを使う
+    /// シールド操作
     /// </summary>
-    private void UseShield() {
-        if (!grabGripAction.GetStateDown(leftHandType)) return;
-        playerStatus.EnableShield();
+    private void ControllShield() {
+        if (grabGripAction.GetState(leftHandType)) {
+            playerStatus.EnableShield();
+        }
+        else if (grabGripAction.GetStateUp(leftHandType)) {
+            playerStatus.DisenableShield();
+        }
     }
 }

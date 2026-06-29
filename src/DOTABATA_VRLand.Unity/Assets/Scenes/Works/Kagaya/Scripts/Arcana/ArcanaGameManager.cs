@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 using Valve.VR;
 using static GestureRecognizer;
 
@@ -47,8 +48,8 @@ public class ArcanaGameManager : MonoBehaviour {
     // 自分のコントロ
     private ArcanaPlayerController myController;
 
-    // 線を描くためのオブジェクト
-    [SerializeField] private GameObject drawBoad;
+    // playerのカメラUI
+    [SerializeField] private GameObject playerCameraUI;
 
     [SerializeField] private GameObject drawPointer;
     [SerializeField] private Material lineMaterial;
@@ -80,7 +81,8 @@ public class ArcanaGameManager : MonoBehaviour {
         // 全員にCanvasとオブジェクトを配置してScriptを付与
         foreach (PlayerData playerData in InRoomPlayerData.I.PlayerList.Values) {
             GameObject myUI = Instantiate(playerUICanvas, playerData.playerObj.transform);
-            GameObject drawBoadObj = Instantiate(drawBoad, playerData.playerObj.transform);
+            GameObject pCamUI = Instantiate(playerCameraUI, playerData.playerObj.transform);
+            GameObject drawBoadObj = pCamUI.transform.GetChild(0).gameObject;
 
             // 自分だったら
             if (playerData.joinedUser.ConnectionId == mySelf.joinedUser.ConnectionId) {
@@ -92,7 +94,7 @@ public class ArcanaGameManager : MonoBehaviour {
                 drawVR.SetField(drawBoadObj, drawPointer, lineMaterial, recognizeVFX);
             }
 
-            playerData.playerObj.AddComponent<PlayerStatus>().SetField(this, shieldEffect);
+            playerData.playerObj.AddComponent<PlayerStatus>().SetField(this, shieldEffect, pCamUI.GetComponentsInChildren<Slider>().First(_=>_.gameObject.name == "ShieldInfoSlider"));
             playerData.playerObj.AddComponent<SyncDrawBoad>().SetField(drawBoadObj);
         }
 
