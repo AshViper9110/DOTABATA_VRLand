@@ -15,6 +15,9 @@ MonoBehaviour:
   debugs:
   - use: 1
     saveUse: 1
+    url: http://localhost:5244
+  - use: 0
+    saveUse: 0
     url: http://10.70.41.29:25565
   productions:
   - use: 1
