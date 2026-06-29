@@ -4,7 +4,7 @@ async function checkLogin() {
     const data = await res.json();
 
     if (!data.loggedIn) {
-        location.href = "/main.html";
+        location.href = "/index.js";
     }
 }
 
