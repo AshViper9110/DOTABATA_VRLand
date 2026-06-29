@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - Bomber
+  - KeyBoard
+  - Undefined
+  - ArcanaUI
   layers:
   - Default
   - TransparentFX
@@ -11,9 +15,9 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
+  - DrawBoad
+  - MyUI
+  - MySelf
   - 
   - 
   - 
