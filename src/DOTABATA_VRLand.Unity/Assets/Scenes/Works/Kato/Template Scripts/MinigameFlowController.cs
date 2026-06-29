@@ -101,12 +101,12 @@ public class MinigameFlowController : MonoBehaviour
     // Ready切り替え
     // =====================================================
 
-    public void OnReadyButton()
+    public async void OnReadyButton()
     {
          willReady = !willReady;//状態切り替え
 
         // サーバー送信
-        RoomModel.I.SendReadyState(willReady);
+        await RoomModel.I.SendReadyState(willReady);
 
         // UI更新
         if (willReady)

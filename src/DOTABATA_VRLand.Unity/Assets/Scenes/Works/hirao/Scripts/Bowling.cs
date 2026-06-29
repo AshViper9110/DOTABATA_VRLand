@@ -25,6 +25,7 @@ public class Bowling : MonoBehaviour
 
     private List<PinStatus> pinList = new List<PinStatus>();
     private GameObject currentBall;
+    [SerializeField] private List<Transform> playerPos = new List<Transform>();
 
     private void OnEnable()
     {
@@ -40,6 +41,8 @@ public class Bowling : MonoBehaviour
 
     private void OnBallingNexted(int order)
     {
+        UpdatePlayerPosition();
+
         if (InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.JoinOrder == order)
         {
             SpawnBall();
@@ -48,10 +51,28 @@ public class Bowling : MonoBehaviour
 
     private void Start()
     {
+        UpdatePlayerPosition();
+
         if (InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.JoinOrder == 1)
         {
             SpawnBall();
         }
+    }
+
+    private void UpdatePlayerPosition()
+    {
+        var myId = NetworkManager.I.myConnectionId;
+
+        if (!InRoomPlayerData.I.PlayerList.TryGetValue(myId, out var playerData))
+            return;
+
+        int index = playerData.joinedUser.JoinOrder - 1;
+
+        if (index < 0 || index >= playerPos.Count)
+            return;
+
+        playerData.playerObj.transform.position = playerPos[index].position;
+        playerData.playerObj.transform.rotation = playerPos[index].rotation; // •K—v‚È‚çŒü‚«‚à
     }
 
     private async void FixedUpdate()
@@ -116,6 +137,7 @@ public class Bowling : MonoBehaviour
             Destroy(currentBall);
         }
         currentBall = Instantiate(ball, spawnPosBall);
+        currentBall.GetComponent<Rigidbody>().useGravity = true;
         SetPin();
         defeatedPinCount = 0;
     }
@@ -150,6 +172,7 @@ public class Bowling : MonoBehaviour
                 Vector3 pos = spawnPosPin.position + new Vector3(x, 0, z);
 
                 GameObject pinObject = Instantiate(pin, pos, spawnPosPin.rotation);
+                pinObject.GetComponent<Rigidbody>().useGravity = true;
 
                 PinStatus pinStatus = new PinStatus()
                 {
