@@ -45,6 +45,8 @@ public class Shutter : MonoBehaviour
         {
             Debug.Log("開いた！");
             StartCoroutine(OpenShutter());
+
+            //全員に通知
         }
         else
         {

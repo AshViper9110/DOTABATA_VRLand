@@ -36,23 +36,20 @@ public class LaneManager : MonoBehaviour
 
         Debug.Log($"レーン番号：{lane}");
 
-        // NetworkManagerにプレイヤーが存在しない場合は終了
-        if (NetworkManager.I == null ||
-            NetworkManager.I.player == null)
-        {
-            Debug.LogError("プレイヤーが取得できません。");
-            yield break;
-        }
-
-        // レーン番号が範囲外の場合は終了
+        // レーン番号が範囲外なら終了
         if (lane < 0 || lane >= spawnPoints.Length)
         {
             Debug.LogError("レーン番号が不正です。");
             yield break;
         }
 
-        // プレイヤーを指定レーンへ移動
-        NetworkManager.I.player.transform.position =
+        // プレイヤー取得待ち
+        yield return new WaitUntil(() =>
+            InRoomPlayerData.I.MySelf != null &&
+            InRoomPlayerData.I.MySelf.playerObj != null);
+
+        // レーンへ移動
+        InRoomPlayerData.I.MySelf.playerObj.transform.position =
             spawnPoints[lane].position;
     }
 }
