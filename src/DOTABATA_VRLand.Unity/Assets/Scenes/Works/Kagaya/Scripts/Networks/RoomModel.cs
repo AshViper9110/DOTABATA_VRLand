@@ -153,7 +153,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// プレイヤーのステータス同期通知
     /// </summary>
-    public Action<Guid, float> OnSyncdPlayerStatus { get; set; }
+    public Action<Guid, int> OnSyncdPlayerStatus { get; set; }
 
     public Action<int> OnBallingNexted { get; set; }
 
@@ -760,7 +760,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// プレイヤーのステータス同期
     /// </summary>
-    public async UniTask SyncPlayerStatusAsync(float hp) {
+    public async UniTask SyncPlayerStatusAsync(int hp) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
@@ -772,7 +772,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// プレイヤーのステータス同期通知
     /// </summary>
-    public void OnSyncPlayerStatus(Guid playerConId, float hp) {
+    public void OnSyncPlayerStatus(Guid playerConId, int hp) {
         if (OnSyncdPlayerStatus  != null) {
             OnSyncdPlayerStatus(playerConId, hp);
         }

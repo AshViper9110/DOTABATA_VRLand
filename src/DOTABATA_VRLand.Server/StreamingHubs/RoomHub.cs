@@ -753,7 +753,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// プレイヤーのステータス同期
         /// </summary>
-        public Task SyncPlayerStatusAsync(float hp) {
+        public Task SyncPlayerStatusAsync(int hp) {
             // 自分以外に通知
             this._roomContext.Group.Except([this.ConnectionId]).OnSyncPlayerStatus(this.ConnectionId, hp);
 
