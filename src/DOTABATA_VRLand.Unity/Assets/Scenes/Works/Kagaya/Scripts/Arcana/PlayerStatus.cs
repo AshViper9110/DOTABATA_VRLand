@@ -14,12 +14,36 @@ public class PlayerStatus : MonoBehaviour {
 
     // シールドのエフェクト
     private GameObject shieldEffect;
+    // シールド状況スライダー
+    private Slider shieldInfoSlider;
+    // シールドスライダーのFill
+    private Image shieldSliderFill;
 
     [SerializeField] private int maxHp = 3;
     [SerializeField] private int hp;
 
+    // 最大シールド量
+    [SerializeField] private float maxShieldAmount = 100;
+    // シールド量
+    [SerializeField] private float shieldAmount = 100;
+    // 使用シールド量
+    [SerializeField] private float useShieldAmount = 30;
+    // シールド回復量
+    [SerializeField] private float healShieldAmount = 6;
+
+    // シールド復活時間
+    [SerializeField] private float shieldResurrection = 30f;
+
     // シールド中か
-    private bool isShield = false;
+    [SerializeField] private bool isShield = false;
+
+    // シールドを使い果たしたか
+    private bool isUseShieldAllUp = false;
+
+    // シールドの使用フレーム数
+    [SerializeField] private int useShieldFlameTimer = 0;
+    // ジャストシールド受付フレーム
+    [SerializeField] private int justShieldFlame = 5;
 
     private void Awake() {
         RoomModel.I.OnSyncdPlayerStatus += OnSyncdPlayerStatus;
@@ -43,12 +67,41 @@ public class PlayerStatus : MonoBehaviour {
         hp = maxHp;
     }
 
+    private void Update() {
+        if (!isShield) {
+            useShieldFlameTimer = 0;
+            shieldAmount += Time.deltaTime * healShieldAmount;
+            if (shieldAmount > maxShieldAmount) {
+                shieldAmount = maxShieldAmount;
+            }
+            else if (isUseShieldAllUp && shieldAmount >= shieldResurrection) {
+                isUseShieldAllUp = false;
+            }
+            UpdateShieldInfoSlider(shieldAmount, maxShieldAmount);
+        }
+        else {
+            useShieldFlameTimer++;
+        }
+
+        if (isUseShieldAllUp) {
+            SetShieldSliderColor(Color.red);
+        }
+        else {
+            SetShieldSliderColor(Color.cyan);
+        }
+    }
+
     /// <summary>
     /// フィールド設定
     /// </summary>
-    public void SetField(ArcanaGameManager gameManager, GameObject shieldEffect) {
+    public void SetField(ArcanaGameManager gameManager, GameObject shieldEffect, Slider sieldInfoSlider) {
         this.arcanaGameManager = gameManager;
-        this.shieldEffect = shieldEffect;
+        this.shieldEffect = Instantiate(shieldEffect, this.transform.position, Quaternion.identity, this.transform);
+        DisenableShield();
+        
+        this.shieldInfoSlider = sieldInfoSlider;
+        this.shieldSliderFill = this.shieldInfoSlider.GetComponentsInChildren<Image>().First(_ => _.gameObject.name == "Fill");
+        this.shieldSliderFill.color = Color.cyan;
     }
 
     /// <summary>
@@ -57,9 +110,18 @@ public class PlayerStatus : MonoBehaviour {
     public async void OnDamage() {
         if (!syncPlayer.IsOwner()) return;
 
+        // シールド中かつ 5flame以下
+        // ジャストシールド
+        if (isShield && useShieldFlameTimer >= justShieldFlame) {
+
+            return;
+        }
         // シールド中だったら
-        if (isShield) {
-            DisenableShield();
+        else if (isShield) {
+            shieldAmount -= useShieldAmount;
+            if (shieldAmount < 0) {
+                shieldAmount = 0;
+            }
             return;
         }
 
@@ -100,22 +162,47 @@ public class PlayerStatus : MonoBehaviour {
     /// <summary>
     /// シールドを有効か
     /// </summary>
-    public async void EnableShield() {
-        if (isShield) return;
+    public void EnableShield() {
+        if (!isShield && isUseShieldAllUp) {
+            return;
+        }
+        else if (isShield && shieldAmount <= 0) {
+            isUseShieldAllUp = true;
+            isShield = false;
+            DisenableShield();
+            return;
+        }
 
+        shieldAmount -= Time.deltaTime * useShieldAmount;
+        UpdateShieldInfoSlider(shieldAmount, maxShieldAmount);
+
+        shieldEffect.SetActive(true);
         isShield = true;
-        Instantiate(shieldEffect, this.transform.position, Quaternion.identity, this.transform);
-
-        await UniTask.WaitForSeconds(4);
-
-        DisenableShield();
     }
 
     /// <summary>
     /// シールド無効化
     /// </summary>
-    private void DisenableShield() {
+    public void DisenableShield() {
+        shieldEffect.SetActive(false);
         isShield = false;
+    }
+
+    /// <summary>
+    /// シールド情報スライダーを更新
+    /// </summary>
+    private void UpdateShieldInfoSlider(float timer, float time) {
+        if (!shieldInfoSlider) return;
+
+        shieldInfoSlider.value = timer / time;
+    }
+
+    /// <summary>
+    /// シールドスライダーカラー変更
+    /// </summary>
+    private void SetShieldSliderColor(Color color) {
+        if (!shieldSliderFill) return;
+        shieldSliderFill.color = color;
     }
 
     /// <summary>

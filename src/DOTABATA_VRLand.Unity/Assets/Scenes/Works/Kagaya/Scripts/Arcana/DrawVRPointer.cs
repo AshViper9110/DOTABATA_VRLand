@@ -75,7 +75,7 @@ public class DrawVRPointer : MonoBehaviour {
     /// ポインター移動
     /// </summary>
     private void MovePointer() {
-        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 10f, layerMask)) {
+        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 5f, layerMask)) {
             // ポインターを円に
             pointer.GetComponentsInChildren<Transform>(true).First(_ => _.name == "DrawPointer").gameObject.SetActive(true);
             pointer.GetComponentsInChildren<Transform>(true).First(_ => _.name == "CrossHair").gameObject.SetActive(false);
