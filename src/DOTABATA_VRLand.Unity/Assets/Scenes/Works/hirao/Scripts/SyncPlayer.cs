@@ -1,9 +1,12 @@
 ﻿using Cysharp.Threading.Tasks;
 using DOTABATA_VRLand.Shared.Models.Entities;
+using System;
 using UnityEngine;
 
 public class SyncPlayer : MonoBehaviour
 {
+    public Guid ConnectionId { get; private set; }
+
     [Header("Components")]
     [SerializeField] private PlayerTransform playerTransform;
 
@@ -48,5 +51,19 @@ public class SyncPlayer : MonoBehaviour
         data.RightHand.localScale = playerTransform.RightHand.localScale;
         data.Body.localScale = playerTransform.Body.localScale;
         playerTransform.ApplyPlayerTransform(data);
+    }
+
+    /// <summary>
+    /// ConnectionIdをセット
+    /// </summary>
+    public void SetConnectionId(Guid conId) {
+        ConnectionId = conId;
+    }
+
+    /// <summary>
+    /// 自分の自身か
+    /// </summary>
+    public bool IsOwner() {
+        return ConnectionId == RoomModel.I.ConnectionId;
     }
 }

@@ -71,6 +71,10 @@ public class RoomInfoCanvas : MonoBehaviour {
     // パスワード入力先
     private TMP_InputField targetInputFirld;
 
+    //見た目のobject
+    [SerializeField] private GameObject tournamentObject;
+    [SerializeField] private GameObject miniGameObject;
+
     private void OnEnable()
     {
         if (RoomModel.I == null) return;
@@ -97,6 +101,9 @@ public class RoomInfoCanvas : MonoBehaviour {
             playerName = "Guest";
             Debug.LogError("Steam is not initialized.");
         }
+
+        tournamentObject.SetActive(false);
+        miniGameObject.SetActive(false);
 
         SetMyRoomName(playerName);
         usePasswordToggle.onValueChanged.AddListener(UsePasswordToggleOnValueChanged);
@@ -237,6 +244,18 @@ public class RoomInfoCanvas : MonoBehaviour {
             GameModeId = gameModeId,
         };        
         await NetworkManager.I.JointoRoom(steamId, roomConfig);
+
+        if (gameModeId == 0)
+        {
+            tournamentObject.SetActive(false);
+            miniGameObject.SetActive(true);
+        }
+        else if (gameModeId == 1)
+        {
+            tournamentObject.SetActive(true);
+            miniGameObject.SetActive(false);
+        }
+
         standyPanel.SetActive(true);
         lobbyPanel.SetActive(false);
     }
@@ -306,6 +325,16 @@ public class RoomInfoCanvas : MonoBehaviour {
                 Password = passwordString,
             };
             await NetworkManager.I.JointoRoom(steamId, roomConfig);
+
+            if (gameModeId == 0)
+            {
+                tournamentObject.SetActive(false);
+                miniGameObject.SetActive(true);
+            }
+            else if (gameModeId == 1) {
+                tournamentObject.SetActive(true);
+                miniGameObject.SetActive(false);
+            }
 
             standyPanel.SetActive(true);
             lobbyPanel.SetActive(false);
