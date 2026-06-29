@@ -97,32 +97,8 @@
   </button>
 </div>
 
-<script>
-  async function login() {
-    const username =
-            document.getElementById("username").value;
+<script src="./js/index.js"></script>
 
-    const password =
-            document.getElementById("password").value;
-
-    const res = await fetch("/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        username,
-        password
-      })
-    });
-
-    if (res.ok) {
-      location.href = "/main.html";
-    } else {
-      alert("ログイン失敗");
-    }
-  }
-</script>
 
 </body>
 </html>
