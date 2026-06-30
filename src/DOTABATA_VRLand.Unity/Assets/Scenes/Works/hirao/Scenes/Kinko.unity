@@ -3942,7 +3942,7 @@ MonoBehaviour:
     chackMark: {fileID: 1129339240}
     rot: 0
     isOpen: 0
-  openLockTime: 10
+  openLockTime: 5
   controller: {fileID: 521308411}
   playerPos:
   - {fileID: 489274824}
@@ -3956,7 +3956,7 @@ MonoBehaviour:
   hapticAction:
     actionPath: /actions/default/out/Haptic
     needsReinit: 0
-  maxTimer: 30
+  maxTimer: 60
   timerText: {fileID: 799071027}
 --- !u!4 &521308409
 Transform:
@@ -4571,7 +4571,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 742042271}
   m_LocalRotation: {x: -0, y: 0.28712466, z: -0, w: 0.95789325}
-  m_LocalPosition: {x: 0, y: 0, z: -356}
+  m_LocalPosition: {x: 0, y: 0, z: -211.7}
   m_LocalScale: {x: 0.99960995, y: 0.99960995, z: 0.99960995}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9808,7 +9808,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1442376593}
   m_LocalRotation: {x: -0, y: 0.28712466, z: -0, w: 0.95789325}
-  m_LocalPosition: {x: 0, y: 0, z: -356}
+  m_LocalPosition: {x: 0, y: 0, z: -197.7}
   m_LocalScale: {x: 0.99960995, y: 0.99960995, z: 0.99960995}
   m_ConstrainProportionsScale: 0
   m_Children:

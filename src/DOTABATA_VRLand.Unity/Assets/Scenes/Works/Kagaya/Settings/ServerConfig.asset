@@ -1,25 +1,3 @@
-%YAML 1.1
-%TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae8200f6c874634428868019a3c912aa, type: 3}
-  m_Name: ServerConfig
-  m_EditorClassIdentifier: 
-  debugs:
-  - use: 1
-    saveUse: 1
-    url: http://localhost:5244
-  - use: 0
-    saveUse: 0
-    url: http://10.70.41.29:25565
-  productions:
-  - use: 1
-    saveUse: 1
-    url: http://10.70.41.29:25565
+version https://git-lfs.github.com/spec/v1
+oid sha256:70bfddc071502edc0742b08c25b669cae2e3be6f76d9f9f4511966fe2f9d47da
+size 603
