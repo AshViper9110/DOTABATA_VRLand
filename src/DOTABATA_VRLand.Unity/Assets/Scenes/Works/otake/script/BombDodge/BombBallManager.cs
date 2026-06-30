@@ -53,11 +53,11 @@ public class BombBallManager : MonoBehaviour
                 Quaternion.identity);
             bombDodgeManager.StartCreateBall();
 
-            Destroy(interactable);
+       
 
 
             Destroy(this.gameObject);
-            enabled = false;
+           
             
         }
         

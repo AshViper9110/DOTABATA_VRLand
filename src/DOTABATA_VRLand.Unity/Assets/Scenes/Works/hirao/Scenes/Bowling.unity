@@ -1903,12 +1903,12 @@ MonoBehaviour:
   titleText: {fileID: 41977677}
   descriptionText: {fileID: 1043815335}
   readyText: {fileID: 2003405843}
-  readyButton: {fileID: 0}
+  readyButton: {fileID: 710764941}
   waitingText: {fileID: 1982162789}
   UserReadyObject: {fileID: 798400365}
   playerNamePrefab: {fileID: 4155457069273173121, guid: b80be885ae5b66344aee1d13d1f8ec4c, type: 3}
   UserReadyText: []
-  StartButton: {fileID: 0}
+  StartButton: {fileID: 2104067826}
   countdownText: {fileID: 1804425248}
   info: {fileID: 11400000, guid: 8a311d35ed99440438e28ee0edfbe575, type: 2}
   isGameStarted: 0
@@ -1940,7 +1940,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f674f2663d7ece43ab548755b23eab0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ball: {fileID: 8853051802891841419, guid: ef0815e92ad74a2459b1b69506fbd9e3, type: 3}
+  ball: {fileID: 4774931027071449210, guid: ef0815e92ad74a2459b1b69506fbd9e3, type: 3}
   pin: {fileID: 8717942940662034437, guid: c6b027ce0defdef47a859abcb087f964, type: 3}
   spawnPosBall: {fileID: 1871683538}
   spawnPosPin: {fileID: 73146000}

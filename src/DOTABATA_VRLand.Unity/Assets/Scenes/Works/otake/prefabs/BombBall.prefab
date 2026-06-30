@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 99.3
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: e78bdce89e498a442a3cdc576a73c787, type: 2}
-  m_sharedMaterial: {fileID: 1165798615718270221, guid: e78bdce89e498a442a3cdc576a73c787, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3f16199a4ab8f944187126f6072fc875, type: 2}
+  m_sharedMaterial: {fileID: 3479451763465585559, guid: 3f16199a4ab8f944187126f6072fc875, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -666,7 +666,8 @@ PrefabInstance:
       value: 0.1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1568518749535582, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 96b2ec0239d11fa4b9792311efceb8ed, type: 3}
