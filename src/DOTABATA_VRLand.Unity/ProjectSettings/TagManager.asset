@@ -8,6 +8,10 @@ TagManager:
   - KeyBoard
   - Undefined
   - ArcanaUI
+  - projectile
+  - FxTemporaire
+  - ArcnaUI
+  - ArcanaMagicBall
   layers:
   - Default
   - TransparentFX

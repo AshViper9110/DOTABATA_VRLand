@@ -18,6 +18,10 @@ public class MagicController : MonoBehaviour {
 
     // ヒットVFX
     [SerializeField] private GameObject hitVFX;
+    // シールドヒットVFX
+    [SerializeField] private GameObject shieldHitVFX;
+    // ジャストシールドヒットVFX
+    [SerializeField] private GameObject justShieldHitVFX;
 
 
     private bool isAttacked = false;
@@ -144,12 +148,13 @@ public class MagicController : MonoBehaviour {
 
             isAttacked = true;
             // ダメージを付与
-            otherStatus.OnDamage();
+            otherStatus.OnDamage(this.transform.position, hitVFX, shieldHitVFX, justShieldHitVFX);
 
             Destroy(this.gameObject);
         }
         // 他のオブジェクト
         else {
+            Instantiate(hitVFX, transform.position, Quaternion.identity);
             Destroy(this.gameObject);
         }
     }

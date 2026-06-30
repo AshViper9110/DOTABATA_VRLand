@@ -92,13 +92,14 @@ public class ArcanaPlayerController : MonoBehaviour {
     /// ターゲットに追従
     /// </summary>
     private void TrackingTargetPlayer() {
-        if (targetPlayer) {
+        if (targetPlayer && targetPlayer.gameObject.activeSelf) {
             if (!createdTargetCircle) {
                 createdTargetCircle = Instantiate(targetCircle);
             }
             createdTargetCircle.transform.position = targetPlayer.transform.position;
         }
         else {
+            targetPlayer = null;
             Destroy(createdTargetCircle);
         }
     }

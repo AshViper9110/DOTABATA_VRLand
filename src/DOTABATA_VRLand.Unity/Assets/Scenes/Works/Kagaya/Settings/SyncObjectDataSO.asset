@@ -39,3 +39,7 @@ MonoBehaviour:
     syncObject: {fileID: 2965222256817593503, guid: ea37cec364598b9488100e950c48a687, type: 3}
   - objectListId: 13
     syncObject: {fileID: 358637981425055526, guid: c9242bb6153f73e418f2423b573f88dd, type: 3}
+  - objectListId: 14
+    syncObject: {fileID: 2944396702758532163, guid: 6f322039892021745bfa8cabf513e0f0, type: 3}
+  - objectListId: 15
+    syncObject: {fileID: 4535006216103734310, guid: f422a24e4ac1ff642b28c64f775bf1a9, type: 3}
