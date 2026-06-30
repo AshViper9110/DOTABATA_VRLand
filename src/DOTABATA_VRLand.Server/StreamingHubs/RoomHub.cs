@@ -713,6 +713,15 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// シールドのアクティブ状態同期
+        /// </summary>
+        public Task ShieldActiveStateAsync(bool activeState) {
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnShieldActiveState(this.ConnectionId, activeState);
+
+            return Task.CompletedTask;
+        }
 
         //steamIDのハッシュ化
         private static string HashSteamId(ulong steamId)

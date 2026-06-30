@@ -1332,7 +1332,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 7257923993404688, guid: 32c5da58fb29e6b499d5832b1fc1bc1d, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5013589809677917021, guid: 32c5da58fb29e6b499d5832b1fc1bc1d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1407,7 +1407,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1317902976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1422,11 +1422,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHp: 3
   hp: 3
-  shieldTime: 4
-  shieldTimer: 4
-  shieldChargeTime: 7
-  shieldChargeTimer: 0
+  maxShieldAmount: 100
+  shieldAmount: 100
+  useShieldAmount: 30
+  healShieldAmount: 6
+  shieldResurrection: 30
   isShield: 0
+  useShieldFlameTimer: 0
+  justShieldFlame: 18
 --- !u!136 &1317902977
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2266,7 +2269,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &3530352490166389533
 GameObject:
   m_ObjectHideFlags: 0
@@ -2293,7 +2296,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 7257923993404688, guid: 32c5da58fb29e6b499d5832b1fc1bc1d, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5013589809677917021, guid: 32c5da58fb29e6b499d5832b1fc1bc1d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2748,11 +2751,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHp: 3
   hp: 3
-  shieldTime: 4
-  shieldTimer: 4
-  shieldChargeTime: 7
-  shieldChargeTimer: 0
+  maxShieldAmount: 100
+  shieldAmount: 100
+  useShieldAmount: 30
+  healShieldAmount: 6
+  shieldResurrection: 30
   isShield: 0
+  useShieldFlameTimer: 0
+  justShieldFlame: 18
 --- !u!4 &9078379174968050357
 Transform:
   m_ObjectHideFlags: 0

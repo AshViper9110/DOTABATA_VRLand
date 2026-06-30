@@ -94,7 +94,9 @@ public class ArcanaGameManager : MonoBehaviour {
                 drawVR.SetField(drawBoadObj, drawPointer, lineMaterial, recognizeVFX);
             }
 
-            playerData.playerObj.AddComponent<PlayerStatus>().SetField(this, shieldEffect, pCamUI.GetComponentsInChildren<Slider>().First(_=>_.gameObject.name == "ShieldInfoSlider"));
+            GameObject createdShield = Instantiate(shieldEffect, playerData.playerObj.transform.position, Quaternion.identity, playerData.playerObj.transform);
+            createdShield.SetActive(false);
+            playerData.playerObj.AddComponent<PlayerStatus>().SetField(this, createdShield, pCamUI.GetComponentsInChildren<Slider>().First(_=>_.gameObject.name == "ShieldInfoSlider"));
             playerData.playerObj.AddComponent<SyncDrawBoad>().SetField(drawBoadObj);
         }
 

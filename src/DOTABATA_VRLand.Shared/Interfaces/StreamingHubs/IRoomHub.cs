@@ -172,6 +172,12 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// プレイヤーのステータス同期
         /// </summary>
         Task SyncPlayerStatusAsync(int hp);
+
+        /// <summary>
+        /// シールドのアクティブ状態同期
+        /// </summary>
+        Task ShieldActiveStateAsync(bool activeState);
+
         /// <summary>
         /// シャッターの開放同期
         /// </summary>

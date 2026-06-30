@@ -155,6 +155,12 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid, int> OnSyncdPlayerStatus { get; set; }
 
+    /// <summary>
+    /// [サーバー通知]
+    /// シールドのアクティブ状態通知
+    /// </summary>
+    public Action<Guid, bool> OnShieldActivedState { get; set; }
+
     public Action<int> OnBallingNexted { get; set; }
 
     public Action<Guid> OnHitingDodgeBall { get; set; }
@@ -776,6 +782,27 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnSyncPlayerStatus(Guid playerConId, int hp) {
         if (OnSyncdPlayerStatus  != null) {
             OnSyncdPlayerStatus(playerConId, hp);
+        }
+    }
+
+    /// <summary>
+    /// シールドのアクティブ状態同期
+    /// </summary>
+    public async UniTask ShieldActiveStateAsync(bool activeState) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.ShieldActiveStateAsync(activeState);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// シールドのアクティブ状態通知
+    /// </summary>
+    public void OnShieldActiveState(Guid playerConId, bool activeState) {
+        if (OnShieldActivedState != null) {
+            OnShieldActivedState(playerConId, activeState);
         }
     }
 
