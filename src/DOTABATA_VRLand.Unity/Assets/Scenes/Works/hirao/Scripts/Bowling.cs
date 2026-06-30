@@ -41,38 +41,42 @@ public class Bowling : MonoBehaviour
 
     private void OnBallingNexted(int order)
     {
-        UpdatePlayerPosition();
-
-        if (InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.JoinOrder == order)
-        {
-            SpawnBall();
-        }
+        UpdatePlayerPosition(order);
     }
 
     private void Start()
     {
-        UpdatePlayerPosition();
-
-        if (InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.JoinOrder == 1)
-        {
-            SpawnBall();
-        }
+        UpdatePlayerPosition(1);
     }
 
-    private void UpdatePlayerPosition()
+    private void UpdatePlayerPosition(int currentOrder)
     {
         var myId = NetworkManager.I.myConnectionId;
-
         if (!InRoomPlayerData.I.PlayerList.TryGetValue(myId, out var playerData))
             return;
 
-        int index = playerData.joinedUser.JoinOrder - 1;
+        int myOrder = playerData.joinedUser.JoinOrder;
+
+        int index;
+
+        if (myOrder == currentOrder)
+        {
+            index = 0;
+            SpawnBall();
+        }
+        else if (myOrder < currentOrder)
+        {
+            index = myOrder;
+        }
+        else
+        {
+            index = myOrder - 1;
+        }
 
         if (index < 0 || index >= playerPos.Count)
             return;
 
         playerData.playerObj.transform.position = playerPos[index].position;
-        playerData.playerObj.transform.rotation = playerPos[index].rotation; // •K—v‚È‚çŒü‚«‚à
     }
 
     private async void FixedUpdate()
