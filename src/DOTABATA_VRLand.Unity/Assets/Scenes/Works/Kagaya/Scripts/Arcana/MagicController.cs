@@ -9,8 +9,6 @@ public class MagicController : MonoBehaviour {
 
     // 生成したプレイヤー
     private Guid attackerConId;
-    // ダメージ
-    private float attackDamage;
     // ライフ
     [SerializeField] private float life;
     private float lifeTimer = 0;
@@ -60,7 +58,7 @@ public class MagicController : MonoBehaviour {
     /// </summary>
     public void Init(Guid playerConId, GestureClass gesture) {
         attackerConId = playerConId;
-        attackDamage = GetDamage(gesture);
+        SetStatus(gesture);
         
         syncObject = GetComponent<SyncObject>();
     }
@@ -73,27 +71,55 @@ public class MagicController : MonoBehaviour {
     }
 
     /// <summary>
-    /// ダメージ値取得
+    /// 魔法のステータス設定
     /// </summary>
-    private float GetDamage(GestureClass gesture) {
+    private void SetStatus(GestureClass gesture) {
         float rnd = UnityEngine.Random.Range(5, 10);
 
         switch (gesture) {
             case GestureClass.Circle:
-                return 5;
+                Speed = 5;
+                MaxForce = 7;
+                Kp = 6;
+                Ki = 0.01f;
+                Kd = 0.5f;
+                return;
             case GestureClass.Star:
-                return 15;
+                Speed = 10;
+                MaxForce = 20;
+                Kp = 3;
+                Ki = 0.05f;
+                Kd = 0.6f;
+                return;
             case GestureClass.Diamond:
-                return 6;
+                Speed = 4;
+                MaxForce = 5;
+                Kp = 7;
+                Ki = 0.02f;
+                Kd = 0.5f;
+                return;
             case GestureClass.Square:
-                return 5;
+                Speed = 2;
+                MaxForce = 2;
+                Kp = 6;
+                Ki = 0;
+                Kd = 0.5f;
+                return;
             case GestureClass.Triangle:
-                return 5;
+                Speed = 3;
+                MaxForce = 5;
+                Kp = 5.5f;
+                Ki = 0;
+                Kd = 0.5f;
+                return;
             case GestureClass.Heart:
-                return 8;
+                Speed = 7;
+                MaxForce = 14;
+                Kp = 7;
+                Ki = 0.01f;
+                Kd = 0.6f;
+                return;
         }
-
-        return default;
     }
 
     /// <summary>
@@ -174,7 +200,7 @@ public class MagicController : MonoBehaviour {
     public void OnSyncdMagicBall(Guid objectId, Guid createrConId, string gestureClassName) {
         if (objectId != syncObject.ObjectId) return;
         attackerConId = createrConId;
-        attackDamage = GetDamage(EnumExs.ParseFromString<GestureClass>(gestureClassName, true));
+        SetStatus(EnumExs.ParseFromString<GestureClass>(gestureClassName, true));
         isHand = false;
     }
 }
