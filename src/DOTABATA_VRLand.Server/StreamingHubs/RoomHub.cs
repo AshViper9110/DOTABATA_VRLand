@@ -466,7 +466,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// オブジェクト作成
         /// </summary>
-        public Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, int objectListId)
+        public Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, int minigameId, int objectListId)
         {
             // id作成
             Guid objId = Guid.NewGuid();
@@ -484,7 +484,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             this._roomContext.RoomObjectDataList[objId] = roomObjectData;
 
             // 自分以外に通知
-            this._roomContext.Group.Except([this.ConnectionId]).OnCreateObject(objId, this.ConnectionId, createdTransform, objectListId);
+            this._roomContext.Group.Except([this.ConnectionId]).OnCreateObject(objId, this.ConnectionId, createdTransform, minigameId, objectListId);
 
             return Task.FromResult<Guid>(objId);
         }
@@ -492,7 +492,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// オブジェクトリストに追加
         /// </summary>
-        public Task AddObjectListAsync(Guid objectId, int objectListId, SimpleTransform simpleTransform)
+        public Task AddObjectListAsync(Guid objectId, int minigameId, int objectListId, SimpleTransform simpleTransform)
         {
             // 情報作成
             RoomObjectData roomObjectData = new RoomObjectData()

@@ -16,6 +16,8 @@ public class ArcanaGameManager : MonoBehaviour {
     private PlayerData mySelf;
     private Transform rightHand;
 
+    // 中心
+    [SerializeField] private Transform centerTransform;
     // スポーツ位置
     [SerializeField] private List<Transform> spawnPoints;
 
@@ -57,6 +59,9 @@ public class ArcanaGameManager : MonoBehaviour {
     // 判定VFX
     [SerializeField] private GameObject recognizeVFX;
 
+    // プレイヤーが持ってるオブジェクト
+    private Dictionary<Guid, List<GameObject>> playerObjectList;
+
     private void Awake() {
         gestureRecognizer.CompleteRecognize += CreateMagic;
     }
@@ -75,17 +80,27 @@ public class ArcanaGameManager : MonoBehaviour {
             await RoomModel.I.ArcanaInitGameAsync();
         }
 
+        // スポーン位置に移動
+        mySelf.playerObj.transform.position = spawnPoints[mySelf.joinedUser.JoinOrder - 1].position;
+        mySelf.playerObj.transform.LookAt(centerTransform);
+
+        await UniTask.DelayFrame(5);
+
         // 自身にScriptを付与
         myController = mySelf.playerObj.AddComponent<ArcanaPlayerController>();
 
         // 全員にCanvasとオブジェクトを配置してScriptを付与
-        foreach (PlayerData playerData in InRoomPlayerData.I.PlayerList.Values) {
-            GameObject myUI = Instantiate(playerUICanvas, playerData.playerObj.transform);
-            GameObject pCamUI = Instantiate(playerCameraUI, playerData.playerObj.transform);
+        foreach (var playerData in InRoomPlayerData.I.PlayerList) {
+            GameObject myUI = Instantiate(playerUICanvas, playerData.Value.playerObj.transform);
+            GameObject pCamUI = Instantiate(playerCameraUI, playerData.Value.playerObj.transform);
             GameObject drawBoadObj = pCamUI.transform.GetChild(0).gameObject;
+            GameObject createdShield = Instantiate(shieldEffect, playerData.Value.playerObj.transform);
+
+            // 保持
+            playerObjectList[playerData.Key] = new List<GameObject> { myUI, pCamUI, createdShield };
 
             // 自分だったら
-            if (playerData.joinedUser.ConnectionId == mySelf.joinedUser.ConnectionId) {
+            if (playerData.Value.joinedUser.ConnectionId == mySelf.joinedUser.ConnectionId) {
                 drawBoadObj.layer = LayerMask.NameToLayer("DrawBoad");
                 myUI.layer = LayerMask.NameToLayer("MyUI");
                 rightHand = mySelf.playerObj.GetComponentsInChildren<Transform>().First(_ => _.transform.name == "RightHand");
@@ -94,14 +109,10 @@ public class ArcanaGameManager : MonoBehaviour {
                 drawVR.SetField(drawBoadObj, drawPointer, lineMaterial, recognizeVFX);
             }
 
-            GameObject createdShield = Instantiate(shieldEffect, playerData.playerObj.transform.position, Quaternion.identity, playerData.playerObj.transform);
             createdShield.SetActive(false);
-            playerData.playerObj.AddComponent<PlayerStatus>().SetField(this, createdShield, pCamUI.GetComponentsInChildren<Slider>().First(_=>_.gameObject.name == "ShieldInfoSlider"));
-            playerData.playerObj.AddComponent<SyncDrawBoad>().SetField(drawBoadObj);
+            playerData.Value.playerObj.AddComponent<PlayerStatus>().SetField(this, createdShield, pCamUI.GetComponentsInChildren<Slider>().First(_=>_.gameObject.name == "ShieldInfoSlider"));
+            playerData.Value.playerObj.AddComponent<SyncDrawBoad>().SetField(drawBoadObj);
         }
-
-        // スポーン位置に移動
-        mySelf.playerObj.transform.position = spawnPoints[mySelf.joinedUser.JoinOrder - 1].position;
     }
 
     private void OnDisable() {
@@ -116,7 +127,15 @@ public class ArcanaGameManager : MonoBehaviour {
     }
 
     private void Update() {
-        
+        // オブジェクトの位置固定
+        foreach (var playerData in InRoomPlayerData.I.PlayerList) {
+            playerObjectList[playerData.Key][0].transform.localPosition = playerUICanvas.transform.position;
+            playerObjectList[playerData.Key][0].transform.LookAt(centerTransform);
+            playerObjectList[playerData.Key][1].transform.localPosition = playerCameraUI.transform.position;
+            playerObjectList[playerData.Key][1].transform.LookAt(centerTransform);
+            playerObjectList[playerData.Key][2].transform.localPosition = shieldEffect.transform.position;
+            playerObjectList[playerData.Key][2].transform.LookAt(centerTransform);
+        }
     }
 
     /// <summary>

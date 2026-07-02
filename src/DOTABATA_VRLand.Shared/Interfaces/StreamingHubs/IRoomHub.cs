@@ -52,12 +52,12 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// オブジェクト生成
         /// </summary>
-        Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, int objectListId);
+        Task<Guid> CreateObjectAsync(SimpleTransform createdTransform, int minigameId, int objectListId);
 
         /// <summary>
         /// オブジェクトリストに追加
         /// </summary>
-        Task AddObjectListAsync(Guid objectId, int objectListId, SimpleTransform simpleTransform);
+        Task AddObjectListAsync(Guid objectId, int minigameId, int objectListId, SimpleTransform simpleTransform);
 
         /// <summary>
         /// オブジェクトのTransform同期
