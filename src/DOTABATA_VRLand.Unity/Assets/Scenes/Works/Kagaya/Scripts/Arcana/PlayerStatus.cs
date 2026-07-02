@@ -111,14 +111,21 @@ public class PlayerStatus : MonoBehaviour {
     /// <summary>
     /// ダメージ受ける処理
     /// </summary>
-    public void OnDamage(Vector3 pos, GameObject hit, GameObject shieldHit, GameObject justHit) {
-        if (!syncPlayer.IsOwner()) return;
+    public async UniTask<bool> OnDamage(GameObject magicBall, GameObject hit, GameObject shieldHit, GameObject justHit) {
+        if (!syncPlayer.IsOwner()) return true;
 
         // シールド中かつ 5flame以下
         // ジャストシールド
         if (isShield && useShieldFlameTimer >= justShieldFlame) {
-            Instantiate(justHit, pos, Quaternion.identity);
-            return;
+            Instantiate(justHit, magicBall.transform.position, Quaternion.identity);
+
+            bool result = await magicBall.GetComponent<SyncObject>().GetOwnership(true);
+            if (result) {
+                MagicController mc = magicBall.GetComponent<MagicController>();
+                mc.JustShield(syncPlayer.ConnectionId);
+            }
+
+            return true;
         }
         // シールド中だったら
         else if (isShield) {
@@ -126,14 +133,14 @@ public class PlayerStatus : MonoBehaviour {
             if (shieldAmount < 0) {
                 shieldAmount = 0;
             }
-            Instantiate(shieldHit, pos, Quaternion.identity);
-            return;
+            Instantiate(shieldHit, magicBall.transform.position, Quaternion.identity);
+            return false;
         }
 
         hp--;
         UpdateHpSlider();
 
-        Instantiate(hit, pos, Quaternion.identity);
+        Instantiate(hit, magicBall.transform.position, Quaternion.identity);
 
         RoomModel.I.SyncPlayerStatusAsync(hp).Forget();
 
@@ -141,6 +148,8 @@ public class PlayerStatus : MonoBehaviour {
             this.gameObject.SetActive(false);
             arcanaGameManager.DeathAsync();
         }
+
+        return false;
     }
 
     /// <summary>

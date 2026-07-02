@@ -39,7 +39,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// オブジェクト作成通知
         /// </summary>
-        public void OnCreateObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, int objecListId);
+        public void OnCreateObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, int minigameId, int objecListId);
 
         /// <summary>
         /// オブジェクトのTransform通知

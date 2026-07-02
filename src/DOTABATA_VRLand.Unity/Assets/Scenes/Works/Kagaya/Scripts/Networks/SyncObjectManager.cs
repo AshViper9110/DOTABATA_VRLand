@@ -5,10 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static SyncObjectDataSO;
 
 public class SyncObjectManager : MonoBehaviour {
     // 同期するオブジェクト
-    [SerializeField] private SyncObjectDataSO syncObjectData;
+    [SerializeField] private List<SyncObjectDataSO> syncObjectData;
 
     // 同期するオブジェクトリスト
     private Dictionary<Guid, SyncObject> syncObjectDataList = new Dictionary<Guid, SyncObject>();
@@ -35,8 +36,9 @@ public class SyncObjectManager : MonoBehaviour {
     /// [サーバー通知]
     /// オブジェクト作成通知
     /// </summary>
-    public void OnCreatedObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, int objectListId) {
-        GameObject createSyncObject = syncObjectData.syncObjectDataList.First(_=> _.objectListId == objectListId).syncObject;
+    public void OnCreatedObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, Minigames minigame, int objectListId) {
+        List<ObjectData> syncObjectDataList = syncObjectData.First(_ => _.minigame == minigame).syncObjectDataList;
+        GameObject createSyncObject = syncObjectDataList.First(_=> _.objectListId == objectListId).syncObject;
         GameObject createdObj = Instantiate(
             createSyncObject,
             createdTransform.localPosition,
