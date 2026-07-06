@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using static SyncObjectDataSO;
 using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
@@ -65,7 +66,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// オブジェクト作成通知
     /// </summary>
-    public Action<Guid, Guid, SimpleTransform, int> OnCreatedObject { get; set; }
+    public Action<Guid, Guid, SimpleTransform, Minigames, int> OnCreatedObject { get; set; }
 
     /// <summary>
     /// オブジェクトのTransform通知
@@ -154,6 +155,12 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// プレイヤーのステータス同期通知
     /// </summary>
     public Action<Guid, int> OnSyncdPlayerStatus { get; set; }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// シールドのアクティブ状態通知
+    /// </summary>
+    public Action<Guid, bool> OnShieldActivedState { get; set; }
 
     public Action<int> OnBallingNexted { get; set; }
 
@@ -508,33 +515,34 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// オブジェクト生成
     /// </summary>
-    public async UniTask<Guid> CreateObjectAsync(SimpleTransform createdTransform, int objectListId) {
+    public async UniTask<Guid> CreateObjectAsync(SimpleTransform createdTransform, Minigames minigame, int objectListId) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
 
-        return await roomHub.CreateObjectAsync(createdTransform, objectListId);
+        return await roomHub.CreateObjectAsync(createdTransform, (int)minigame, objectListId);
     }
 
     /// <summary>
     /// [サーバー通知]
     /// オブジェクト作成通知
     /// </summary>
-    public void OnCreateObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, int objectListId) {
+    public void OnCreateObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, int minigameId, int objectListId) {
         if (OnCreatedObject != null) {
-            OnCreatedObject(objectId, createrConnectionId, createdTransform, objectListId);
+            Minigames minigame = EnumExs.ParseFromInt<Minigames>(minigameId);
+            OnCreatedObject(objectId, createrConnectionId, createdTransform, minigame, objectListId);
         }
     }
 
     /// <summary>
     /// オブジェクトリストに追加
     /// </summary>
-    public async UniTask AddObjectListAsync(Guid objectId, int objectListId, SimpleTransform simpleTransform) {
+    public async UniTask AddObjectListAsync(Guid objectId, Minigames minigame, int objectListId, SimpleTransform simpleTransform) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
 
-        await roomHub.AddObjectListAsync(objectId, objectListId, simpleTransform);
+        await roomHub.AddObjectListAsync(objectId, (int)minigame, objectListId, simpleTransform);
     }
 
     /// <summary>
@@ -779,6 +787,27 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnSyncPlayerStatus(Guid playerConId, int hp) {
         if (OnSyncdPlayerStatus  != null) {
             OnSyncdPlayerStatus(playerConId, hp);
+        }
+    }
+
+    /// <summary>
+    /// シールドのアクティブ状態同期
+    /// </summary>
+    public async UniTask ShieldActiveStateAsync(bool activeState) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.ShieldActiveStateAsync(activeState);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// シールドのアクティブ状態通知
+    /// </summary>
+    public void OnShieldActiveState(Guid playerConId, bool activeState) {
+        if (OnShieldActivedState != null) {
+            OnShieldActivedState(playerConId, activeState);
         }
     }
 

@@ -1,5 +1,7 @@
 ﻿using DG.Tweening;
+using PDollarGestureRecognizer;
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using static GestureRecognizer;
 
@@ -16,8 +18,14 @@ public class MagicController : MonoBehaviour {
     // 追尾するプレイヤー
     private Transform targetPlayer;
 
+    private GestureClass myGesture;
+
     // ヒットVFX
     [SerializeField] private GameObject hitVFX;
+    // シールドヒットVFX
+    [SerializeField] private GameObject shieldHitVFX;
+    // ジャストシールドヒットVFX
+    [SerializeField] private GameObject justShieldHitVFX;
 
 
     private bool isAttacked = false;
@@ -74,6 +82,8 @@ public class MagicController : MonoBehaviour {
     /// 魔法のステータス設定
     /// </summary>
     private void SetStatus(GestureClass gesture) {
+        myGesture = gesture;
+
         float rnd = UnityEngine.Random.Range(5, 10);
 
         switch (gesture) {
@@ -129,7 +139,7 @@ public class MagicController : MonoBehaviour {
         isHand = false;
     }
 
-    private void OnTriggerEnter(Collider other) {
+    private async void OnTriggerEnter(Collider other) {
         if (isAttacked || isHand) return;
 
         // プレイヤーに当たったら
@@ -144,12 +154,14 @@ public class MagicController : MonoBehaviour {
 
             isAttacked = true;
             // ダメージを付与
-            otherStatus.OnDamage();
-
-            Destroy(this.gameObject);
+            bool result = await otherStatus.OnDamage(this.gameObject, hitVFX, shieldHitVFX, justShieldHitVFX);
+            if (!result) {
+                Destroy(this.gameObject);
+            }
         }
         // 他のオブジェクト
         else {
+            Instantiate(hitVFX, transform.position, Quaternion.identity);
             Destroy(this.gameObject);
         }
     }
@@ -191,6 +203,19 @@ public class MagicController : MonoBehaviour {
         }
 
         myRb.AddForce(force, ForceMode.Force);
+    }
+
+    /// <summary>
+    /// ジャストシールド
+    /// </summary>
+    public async void JustShield(Guid justPlayer) {
+        if (InRoomPlayerData.I.PlayerList[attackerConId].playerObj && InRoomPlayerData.I.PlayerList[attackerConId].playerObj.activeSelf) {
+            targetPlayer = InRoomPlayerData.I.PlayerList[attackerConId].playerObj.transform;
+            attackerConId = justPlayer;
+
+            // オブジェクトのフィールド同期
+            await RoomModel.I.SyncMagicBallAsync(syncObject.ObjectId, myGesture.ToString());
+        }
     }
 
     /// <summary>

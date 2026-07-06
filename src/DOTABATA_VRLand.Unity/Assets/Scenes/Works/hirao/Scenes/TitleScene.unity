@@ -13419,7 +13419,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b008c1dcdfc1774fb04d79cfb5066e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncObjectData: {fileID: 11400000, guid: a50e130a897fe2942a448218ed4c444e, type: 2}
+  syncObjectData:
+  - {fileID: 11400000, guid: 54b08d6ba98097743a8679db6a7f6884, type: 2}
+  - {fileID: 11400000, guid: 1a77d82cb11eded4b960f734e830dd97, type: 2}
+  - {fileID: 11400000, guid: f694861aab3209c4a84a502807367549, type: 2}
 --- !u!114 &1596988698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17854,7 +17857,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.27
+      value: 6.44
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
       propertyPath: m_LocalRotation.w
