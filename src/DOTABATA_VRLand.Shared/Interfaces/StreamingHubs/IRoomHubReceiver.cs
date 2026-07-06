@@ -39,7 +39,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// オブジェクト作成通知
         /// </summary>
-        public void OnCreateObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, int objecListId);
+        public void OnCreateObject(Guid objectId, Guid createrConnectionId, SimpleTransform createdTransform, int minigameId, int objecListId);
 
         /// <summary>
         /// オブジェクトのTransform通知
@@ -156,7 +156,20 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// プレイヤーのステータス同期通知
         /// </summary>
-        public void OnSyncPlayerStatus(Guid playerConId, float hp);
+        public void OnSyncPlayerStatus(Guid playerConId, int hp);
+
+        /// <summary>
+        /// シールドのアクティブ状態同期
+        /// </summary>
+        public void OnShieldActiveState(Guid playerConId, bool activeState);
+
+        /// <summary>
+        /// シャッターの開放通知
+        /// </summary>
+        public void OnOpenShutter(Guid connectionID);
+
+
+        public void OnSelectFreeMinigame(string name);
     }
 
 }

@@ -25,6 +25,7 @@ public class Bowling : MonoBehaviour
 
     private List<PinStatus> pinList = new List<PinStatus>();
     private GameObject currentBall;
+    [SerializeField] private List<Transform> playerPos = new List<Transform>();
 
     private void OnEnable()
     {
@@ -40,18 +41,42 @@ public class Bowling : MonoBehaviour
 
     private void OnBallingNexted(int order)
     {
-        if (InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.JoinOrder == order)
-        {
-            SpawnBall();
-        }
+        UpdatePlayerPosition(order);
     }
 
     private void Start()
     {
-        if (InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.JoinOrder == 1)
+        UpdatePlayerPosition(1);
+    }
+
+    private void UpdatePlayerPosition(int currentOrder)
+    {
+        var myId = NetworkManager.I.myConnectionId;
+        if (!InRoomPlayerData.I.PlayerList.TryGetValue(myId, out var playerData))
+            return;
+
+        int myOrder = playerData.joinedUser.JoinOrder;
+
+        int index;
+
+        if (myOrder == currentOrder)
         {
+            index = 0;
             SpawnBall();
         }
+        else if (myOrder < currentOrder)
+        {
+            index = myOrder;
+        }
+        else
+        {
+            index = myOrder - 1;
+        }
+
+        if (index < 0 || index >= playerPos.Count)
+            return;
+
+        playerData.playerObj.transform.position = playerPos[index].position;
     }
 
     private async void FixedUpdate()
@@ -116,6 +141,7 @@ public class Bowling : MonoBehaviour
             Destroy(currentBall);
         }
         currentBall = Instantiate(ball, spawnPosBall);
+        currentBall.GetComponent<Rigidbody>().useGravity = true;
         SetPin();
         defeatedPinCount = 0;
     }
@@ -150,6 +176,7 @@ public class Bowling : MonoBehaviour
                 Vector3 pos = spawnPosPin.position + new Vector3(x, 0, z);
 
                 GameObject pinObject = Instantiate(pin, pos, spawnPosPin.rotation);
+                pinObject.GetComponent<Rigidbody>().useGravity = true;
 
                 PinStatus pinStatus = new PinStatus()
                 {

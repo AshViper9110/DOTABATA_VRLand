@@ -8,6 +8,7 @@ using static GestureRecognizer;
 
 public class ArcanaPlayerController : MonoBehaviour {
     private SyncPlayer syncPlayer;
+    private PlayerStatus playerStatus;
 
     // 魔法を当てるターゲット
     private Transform targetPlayer;
@@ -35,7 +36,7 @@ public class ArcanaPlayerController : MonoBehaviour {
     private SteamVR_Action_Boolean drawBoadAction;
 
     // ターゲット選定
-    private SteamVR_Action_Boolean selectTargetAction;
+    private SteamVR_Action_Boolean grabGripAction;
 
     // 右手のうで振り
     private SteamVR_Behaviour_Pose controllerPose;
@@ -45,8 +46,9 @@ public class ArcanaPlayerController : MonoBehaviour {
 
     private void Start() {
         syncPlayer = GetComponent<SyncPlayer>();
+        playerStatus = GetComponent<PlayerStatus>();
 
-        selectTargetAction = SteamVR_Actions.default_GrabGrip;
+        grabGripAction = SteamVR_Actions.default_GrabGrip;
         rightHandType = SteamVR_Input_Sources.RightHand;
         drawBoadAction = SteamVR_Actions.default_InteractUI;
         leftHandType = SteamVR_Input_Sources.LeftHand;
@@ -59,6 +61,7 @@ public class ArcanaPlayerController : MonoBehaviour {
         TrackingTargetPlayer();
         ShotMagic();
         SwitchDrawBoadActive();
+        ControllShield();
     }
 
     /// <summary>
@@ -75,7 +78,7 @@ public class ArcanaPlayerController : MonoBehaviour {
     /// ターゲット選定
     /// </summary>
     private void SelectTarget() {
-        if (!selectTargetAction.GetState(rightHandType)) return;
+        if (!grabGripAction.GetState(rightHandType)) return;
         RaycastHit[] hits = Physics.RaycastAll(rightHand.position, Camera.main.transform.forward, 50f, targetLayerMask);
         hits = hits.OrderBy(hit => hit.distance).ToArray();
         foreach (RaycastHit hit in hits) {
@@ -89,13 +92,14 @@ public class ArcanaPlayerController : MonoBehaviour {
     /// ターゲットに追従
     /// </summary>
     private void TrackingTargetPlayer() {
-        if (targetPlayer) {
+        if (targetPlayer && targetPlayer.gameObject.activeSelf) {
             if (!createdTargetCircle) {
                 createdTargetCircle = Instantiate(targetCircle);
             }
             createdTargetCircle.transform.position = targetPlayer.transform.position;
         }
         else {
+            targetPlayer = null;
             Destroy(createdTargetCircle);
         }
     }
@@ -163,6 +167,18 @@ public class ArcanaPlayerController : MonoBehaviour {
         if (drawBoadAction.GetStateDown(leftHandType) && drawBoadObj) {
             drawBoadObj.SetActive(!drawBoadObj.activeSelf);
             RoomModel.I.SwitchDrawBoadActiveAsync(drawBoadObj.activeSelf).Forget();
+        }
+    }
+
+    /// <summary>
+    /// シールド操作
+    /// </summary>
+    private void ControllShield() {
+        if (grabGripAction.GetState(leftHandType)) {
+            playerStatus.EnableShield();
+        }
+        else if (grabGripAction.GetStateUp(leftHandType)) {
+            playerStatus.DisenableShield();
         }
     }
 }

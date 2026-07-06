@@ -6,8 +6,10 @@ using System;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
+using static SyncObjectDataSO;
 
 public class SyncObject : MonoBehaviour {
+    [ReadOnly] public Minigames minigame = Minigames.None;
     [ReadOnly] public int objectListId = 0;
 
     [SerializeField, Header("作成通知を送信")] private bool SendCreate;
@@ -72,9 +74,10 @@ public class SyncObject : MonoBehaviour {
     }
 
     /// <summary>
-    /// オブジェクトリストIdセット
+    /// ミニゲームとオブジェクトリストIdセット
     /// </summary>
-    public void SetSyncObjectListId(int indexNum) {
+    public void SetMinigameAndListId(Minigames minigame,int indexNum) {
+        this.minigame = minigame;
         objectListId = indexNum;
     }
 
@@ -124,14 +127,14 @@ public class SyncObject : MonoBehaviour {
             if (InRoomPlayerData.I.MySelf.joinedUser.JoinOrder == 1) {
                 CreaterId = RoomModel.I.ConnectionId;
                 IsOwner = true;
-                await RoomModel.I.AddObjectListAsync(objectId, objectListId, this.transform.ToSimpleTransform());
+                await RoomModel.I.AddObjectListAsync(objectId, minigame, objectListId, this.transform.ToSimpleTransform());
             }
         }
         else if (SendCreate &&
             objectId == Guid.Empty) {
             createrId = RoomModel.I.ConnectionId;
             IsOwner = true;
-            objectId = await RoomModel.I.CreateObjectAsync(this.transform.ToSimpleTransform(), objectListId);
+            objectId = await RoomModel.I.CreateObjectAsync(this.transform.ToSimpleTransform(), minigame, objectListId);
             ApplyGuidToInspector();
         }
     }

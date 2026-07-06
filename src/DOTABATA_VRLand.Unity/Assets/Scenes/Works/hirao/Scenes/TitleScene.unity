@@ -13419,7 +13419,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b008c1dcdfc1774fb04d79cfb5066e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncObjectData: {fileID: 11400000, guid: a50e130a897fe2942a448218ed4c444e, type: 2}
+  syncObjectData:
+  - {fileID: 11400000, guid: 54b08d6ba98097743a8679db6a7f6884, type: 2}
+  - {fileID: 11400000, guid: 1a77d82cb11eded4b960f734e830dd97, type: 2}
+  - {fileID: 11400000, guid: f694861aab3209c4a84a502807367549, type: 2}
+  - {fileID: 11400000, guid: d5e8a30c5e1f9884c9992c6c236c5001, type: 2}
 --- !u!114 &1596988698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13460,6 +13464,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SyncPlayerPrefab: {fileID: 2695971188869603538, guid: b3bb59fc974cdae4e8656ed2430c4c0f, type: 3}
   isJoin: 0
+  gameModeId: 0
 --- !u!4 &1596988701
 Transform:
   m_ObjectHideFlags: 0
@@ -15408,7 +15413,19 @@ MonoBehaviour:
   m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_IsOn: 1
 --- !u!1 &1891144478
 GameObject:
@@ -17842,7 +17859,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.27
+      value: 6.44
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
       propertyPath: m_LocalRotation.w

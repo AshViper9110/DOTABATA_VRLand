@@ -59,6 +59,7 @@ public class BombDodgeManager : MonoBehaviour
                 obj.playerObj.transform.LookAt(center);
                 introCanvas.transform.LookAt(obj.playerObj.transform);
                 introCanvas.transform.Rotate(0,180,0);
+                introCanvas.transform.rotation = new Quaternion(0, introCanvas.transform.rotation.y,0, introCanvas.transform.rotation.w);
                     }
             index++;
 
@@ -184,11 +185,15 @@ public class BombDodgeManager : MonoBehaviour
             }
         }
 
-        GameObject gameObject = Instantiate(BombPrefab,
-                   BombStartpos[index].position,
-                   Quaternion.identity);
-        BombBallManager bombBallManager = gameObject.GetComponent<BombBallManager>();
-        bombBallManager.RestartPos = gameObject.transform.position;
-        bombBallManager.InitBall();
+        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == index + 1)
+        {
+
+            GameObject gameObject = Instantiate(BombPrefab,
+                       BombStartpos[index].position,
+                       Quaternion.identity);
+            BombBallManager bombBallManager = gameObject.GetComponent<BombBallManager>();
+            bombBallManager.RestartPos = gameObject.transform.position;
+            bombBallManager.InitBall();
+        }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 using Valve.VR;
 using static GestureRecognizer;
 
@@ -15,6 +16,8 @@ public class ArcanaGameManager : MonoBehaviour {
     private PlayerData mySelf;
     private Transform rightHand;
 
+    // 中心
+    [SerializeField] private Transform centerTransform;
     // スポーツ位置
     [SerializeField] private List<Transform> spawnPoints;
 
@@ -33,6 +36,12 @@ public class ArcanaGameManager : MonoBehaviour {
     // ターゲットにつける魔法人
     [SerializeField] private GameObject targetCircle;
 
+    // シールドのエフェクト
+    [SerializeField] private GameObject shieldEffect;
+
+    // 死亡時のエッフェクト
+    [SerializeField] private GameObject deathEffect;
+
     // 本のオブジェクトリスト
     [SerializeField] private List<GameObject> magicBookObjects;
     // 杖のオブジェクトリスト
@@ -41,14 +50,17 @@ public class ArcanaGameManager : MonoBehaviour {
     // 自分のコントロ
     private ArcanaPlayerController myController;
 
-    // 線を描くためのオブジェクト
-    [SerializeField] private GameObject drawBoad;
+    // playerのカメラUI
+    [SerializeField] private GameObject playerCameraUI;
 
     [SerializeField] private GameObject drawPointer;
     [SerializeField] private Material lineMaterial;
 
     // 判定VFX
     [SerializeField] private GameObject recognizeVFX;
+
+    // プレイヤーが持ってるオブジェクト
+    private Dictionary<Guid, List<GameObject>> playerObjectList;
 
     private void Awake() {
         gestureRecognizer.CompleteRecognize += CreateMagic;
@@ -58,6 +70,9 @@ public class ArcanaGameManager : MonoBehaviour {
         RoomModel.I.OnDead += OnDead;
         RoomModel.I.OnArcanaGameSeted += OnArcanaGameSeted;
 
+        AudioManager.StopBgm();
+        SteamVR_Fade.View(new Color(0, 0, 0, 0), 1.0f);
+
         // 自分のインスタンスを保持
         mySelf = InRoomPlayerData.I.MySelf;
         if (mySelf.joinedUser.JoinOrder == 1) {
@@ -65,16 +80,27 @@ public class ArcanaGameManager : MonoBehaviour {
             await RoomModel.I.ArcanaInitGameAsync();
         }
 
+        // スポーン位置に移動
+        mySelf.playerObj.transform.position = spawnPoints[mySelf.joinedUser.JoinOrder - 1].position;
+        mySelf.playerObj.transform.LookAt(centerTransform);
+
+        await UniTask.DelayFrame(5);
+
         // 自身にScriptを付与
         myController = mySelf.playerObj.AddComponent<ArcanaPlayerController>();
 
         // 全員にCanvasとオブジェクトを配置してScriptを付与
-        foreach (PlayerData playerData in InRoomPlayerData.I.PlayerList.Values) {
-            GameObject myUI = Instantiate(playerUICanvas, playerData.playerObj.transform);
-            GameObject drawBoadObj = Instantiate(drawBoad, playerData.playerObj.transform);
+        foreach (var playerData in InRoomPlayerData.I.PlayerList) {
+            GameObject myUI = Instantiate(playerUICanvas, playerData.Value.playerObj.transform);
+            GameObject pCamUI = Instantiate(playerCameraUI, playerData.Value.playerObj.transform);
+            GameObject drawBoadObj = pCamUI.transform.GetChild(0).gameObject;
+            GameObject createdShield = Instantiate(shieldEffect, playerData.Value.playerObj.transform);
+
+            // 保持
+            playerObjectList[playerData.Key] = new List<GameObject> { myUI, pCamUI, createdShield };
 
             // 自分だったら
-            if (playerData.joinedUser.ConnectionId == mySelf.joinedUser.ConnectionId) {
+            if (playerData.Value.joinedUser.ConnectionId == mySelf.joinedUser.ConnectionId) {
                 drawBoadObj.layer = LayerMask.NameToLayer("DrawBoad");
                 myUI.layer = LayerMask.NameToLayer("MyUI");
                 rightHand = mySelf.playerObj.GetComponentsInChildren<Transform>().First(_ => _.transform.name == "RightHand");
@@ -83,12 +109,10 @@ public class ArcanaGameManager : MonoBehaviour {
                 drawVR.SetField(drawBoadObj, drawPointer, lineMaterial, recognizeVFX);
             }
 
-            playerData.playerObj.AddComponent<PlayerStatus>().SetGameManager(this);
-            playerData.playerObj.AddComponent<SyncDrawBoad>().SetField(drawBoadObj);
+            createdShield.SetActive(false);
+            playerData.Value.playerObj.AddComponent<PlayerStatus>().SetField(this, createdShield, pCamUI.GetComponentsInChildren<Slider>().First(_=>_.gameObject.name == "ShieldInfoSlider"));
+            playerData.Value.playerObj.AddComponent<SyncDrawBoad>().SetField(drawBoadObj);
         }
-
-        // スポーン位置に移動
-        mySelf.playerObj.transform.position = spawnPoints[mySelf.joinedUser.JoinOrder - 1].position;
     }
 
     private void OnDisable() {
@@ -103,7 +127,15 @@ public class ArcanaGameManager : MonoBehaviour {
     }
 
     private void Update() {
-        
+        // オブジェクトの位置固定
+        foreach (var playerData in InRoomPlayerData.I.PlayerList) {
+            playerObjectList[playerData.Key][0].transform.localPosition = playerUICanvas.transform.position;
+            playerObjectList[playerData.Key][0].transform.LookAt(centerTransform);
+            playerObjectList[playerData.Key][1].transform.localPosition = playerCameraUI.transform.position;
+            playerObjectList[playerData.Key][1].transform.LookAt(centerTransform);
+            playerObjectList[playerData.Key][2].transform.localPosition = shieldEffect.transform.position;
+            playerObjectList[playerData.Key][2].transform.LookAt(centerTransform);
+        }
     }
 
     /// <summary>
@@ -133,6 +165,8 @@ public class ArcanaGameManager : MonoBehaviour {
     /// 志望動機
     /// </summary>
     public async void DeathAsync() {
+        // VFX
+        Instantiate(deathEffect, mySelf.playerObj.transform.position, Quaternion.identity);
         await RoomModel.I.DeathAsync();
     }
 
@@ -156,10 +190,13 @@ public class ArcanaGameManager : MonoBehaviour {
 
         foreach (PlayerData playerData in InRoomPlayerData.I.PlayerList.Values) {
             foreach (Transform child in playerData.playerObj.transform) {
-                if (!child.CompareTag("ArcanaUI")) return;
-                Destroy(child);
+                if (child.gameObject.name.StartsWith("ArcanaUICanvas") ||
+                    child.gameObject.name.StartsWith("DrawBoad")) {
+                    Destroy(child);
+                }
             }
             Destroy(playerData.playerObj.GetComponent<PlayerStatus>());
+            Destroy(playerData.playerObj.GetComponent<SyncDrawBoad>());
         }
     }
 }
