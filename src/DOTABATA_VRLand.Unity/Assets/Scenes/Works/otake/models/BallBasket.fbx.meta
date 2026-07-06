@@ -1,9 +1,29 @@
 fileFormatVersion: 2
-guid: e8479ad04addebe45b16ddec53b572b0
+guid: a14a846d7789fec4cab8e49c13718f31
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Basket
+    second: {fileID: 2100000, guid: 1ba9ffaa15908c146b1deab861cab47c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ball
+    second: {fileID: 2100000, guid: 344a68de44f410e43b4bb6d5a51475c0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: bomb
+    second: {fileID: 2100000, guid: 1976b243ad9fba24b833baeab1f2dc29, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: string
+    second: {fileID: 2100000, guid: 60d55398068d116409e037c126563c9e, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

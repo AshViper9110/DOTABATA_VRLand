@@ -11,6 +11,8 @@ public class NetworkManager : Singleton<NetworkManager>
     public GameObject SyncPlayerPrefab;
     public Guid myConnectionId;
     public bool isJoin = false;
+    public int gameModeId = 0;//フリープレイ:0/大会モード:1
+
 
     /// <summary>
     /// TextにLogを表示
@@ -90,6 +92,7 @@ public class NetworkManager : Singleton<NetworkManager>
         );
 
         isJoin = true;
+        gameModeId = roomConfig.GameModeId;
         SyncPlayer syncPlayer = GameObject.Find("Player(Clone)").GetComponent<SyncPlayer>();
         syncPlayer.isLocalPlayer = true;
     }

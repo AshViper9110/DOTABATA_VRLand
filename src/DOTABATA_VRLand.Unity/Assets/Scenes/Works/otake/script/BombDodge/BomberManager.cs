@@ -21,6 +21,7 @@ public class BomberManager : MonoBehaviour
 
             if (other.transform.parent.transform.parent.gameObject.GetComponent<PlayerTransform>())
             {
+                if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<BombDogePlayer>().isDead) return;
                 //TODO:©•ª‚¾‚Á‚½ê‡€–S‚µ‚½‚±‚Æ‚ğ’Ê’m
                 RoomModel.I.HitBomber();
 

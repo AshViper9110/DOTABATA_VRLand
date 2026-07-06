@@ -168,6 +168,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public Action<Guid> OnHitingBomber { get; set; }
     public Action<Guid> OnOpenedShutter { get; set; }
 
+    public Action<string> OnSelectedFreeMinigame { get; set; }
+
     /*
      * 処理
      */
@@ -270,6 +272,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         }
 
         isJoinRoom = false;
+        NetworkManager.I.isJoin = false;
 
         await roomHub.LeaveRoomAsync();
     }
@@ -889,6 +892,23 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if (OnOpenedShutter != null)
         {
             OnOpenedShutter(connectionId);
+        }
+    }
+    
+    public async UniTask SelectFreeMinigame(string name)
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.SelectFreeMinigame(name);
+    }
+
+    public void OnSelectFreeMinigame(string name)
+    {
+        if(OnSelectedFreeMinigame != null)
+        {
+            OnSelectedFreeMinigame(name);
         }
     }
 }

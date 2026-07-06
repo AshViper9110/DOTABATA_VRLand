@@ -14,6 +14,10 @@ using Cysharp.Threading.Tasks.Triggers;
 
 public class GameManager : MonoBehaviour
 {
+
+
+    [SerializeField] GameObject RallyObjcts;
+    [SerializeField] GameObject FreeObjects;
     // Inspectorから設定
     public SteamVR_Action_Boolean grabAction;
     public SteamVR_Input_Sources handType;
@@ -31,7 +35,6 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] GameObject CrownPrefab;
     public float crownDistance;
-
 
 
 
@@ -130,6 +133,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioClip RollEnd;
 
   
+    FreePlayManager freePlayManager;
+
 
     private void Awake()
     {
@@ -145,12 +150,33 @@ public class GameManager : MonoBehaviour
         EndProgress = false;
         AudioManager.ChangeBGM(AudioManager.BGM.Main_Normal);
 
+        RallyObjcts.SetActive(false);
+        FreeObjects.SetActive(false);
 
+        if (NetworkManager.I.gameModeId == 0)
+        {
+            freePlay = true;
+            rally = false;
+            FreeObjects.SetActive(true);
+
+        }
+        else
+        {
+            freePlay=false;
+            rally=true;
+            RallyObjcts.SetActive(true);
+        }
 
         if (rally)
         {
             InitRally();
         }
+        else if (freePlay)
+        {
+            InitFreePlay();
+        }
+
+
 
 
 
@@ -161,48 +187,51 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isSpin)
+        if (rally)
         {
-            if (CenterObjRb.angularVelocity.y < 0.29f)
-            {
-                CenterObjRb.angularVelocity = new Vector3(0, 0.3f, 0);
-            }
-        }
-        else if (isSpin && !onSelect)
-        {
-            if (CenterObjRb.angularVelocity.y < 0.01f)
-            {
-                DummyText.text = "";
-                Debug.Log(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました");
-                DummyText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
-
-                audio.Stop();
-                audio.PlayOneShot(RollEnd);
-
-                onSelect = true;
-                onResult = false;
-                onEnd = false;
-
-            }
-        }
-
-        MainText.text = DummyText.text;
-
-
-        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
-        {
-            if (Input.GetMouseButtonDown(0) || grabAction.GetStateDown(handType))
-            {
-                Debug.Log("会話進めます");
-                NetworkManager.I.SendHostProgress();
-
-            }
-
             if (!isSpin)
             {
                 if (CenterObjRb.angularVelocity.y < 0.29f)
                 {
                     CenterObjRb.angularVelocity = new Vector3(0, 0.3f, 0);
+                }
+            }
+            else if (isSpin && !onSelect)
+            {
+                if (CenterObjRb.angularVelocity.y < 0.01f)
+                {
+                    DummyText.text = "";
+                    Debug.Log(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました");
+                    DummyText.DOText(miniGameNames[selPointManager.SelectId] + "にゲームが決まりました", 1.0f);
+
+                    audio.Stop();
+                    audio.PlayOneShot(RollEnd);
+
+                    onSelect = true;
+                    onResult = false;
+                    onEnd = false;
+
+                }
+            }
+
+            MainText.text = DummyText.text;
+
+
+            if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+            {
+                if (Input.GetMouseButtonDown(0) || grabAction.GetStateDown(handType))
+                {
+                    Debug.Log("会話進めます");
+                    NetworkManager.I.SendHostProgress();
+
+                }
+
+                if (!isSpin)
+                {
+                    if (CenterObjRb.angularVelocity.y < 0.29f)
+                    {
+                        CenterObjRb.angularVelocity = new Vector3(0, 0.3f, 0);
+                    }
                 }
             }
         }
@@ -264,6 +293,37 @@ public class GameManager : MonoBehaviour
 
        
         
+    }
+
+    public void InitFreePlay()
+    {
+        freePlayManager = GetComponent<FreePlayManager>();
+
+        freePlayManager.SetMinigames();
+
+
+        //シーン移行後の位置配置
+        var myId = NetworkManager.I.myConnectionId;
+
+        int index =
+            InRoomPlayerData.I.PlayerList[myId].joinedUser.JoinOrder - 1;
+
+        InRoomPlayerData.I.PlayerList[myId].playerObj.transform.position =
+            playerPos[index].position;
+
+        InRoomPlayerData.I.PlayerList[myId].playerObj.transform.rotation =
+           playerPos[index].rotation;
+
+        //ここで全体ランキング、勝利数の取得、王冠の配置
+        NetworkManager.I.ReqestRanking();
+
+        //ここで前回のミニゲーム結果,勝利数を反映
+        foreach (Guid guid in InRoomPlayerData.I.PlayerList.Keys)
+        {
+            NetworkManager.I.ReqestMinigameRanking(guid);
+
+            SetRankText(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+        }
     }
 
     public　void InitResult()
@@ -423,6 +483,14 @@ public class GameManager : MonoBehaviour
                
             }
 
+        }
+
+        if(freePlay)
+        {
+            if (winPlayerId == NetworkManager.I.myConnectionId)
+            {
+                RoomModel.I.RequestWinCountUp(NetworkManager.I.myConnectionId);
+            }
         }
     }
 
