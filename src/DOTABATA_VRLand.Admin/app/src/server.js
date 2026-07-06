@@ -2,7 +2,9 @@ const express = require("express"); // Webサーバーフレームワーク
 const session = require("express-session"); // セッション管理ミドルウェア
 const path = require("path"); // パス操作用（Node標準）
 const db = require("./db");
+const crypto = require("crypto");
 const app = express();
+
 
 // --- ミドルウェア設定 ---
 
@@ -29,7 +31,7 @@ app.use(
 
 // --- 認証系 ---
 
-// ログイン処理（※現在は固定認証）
+// ログイン処理
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -46,8 +48,14 @@ app.post("/login", async (req, res) => {
 
     const user = rows[0];
 
-    // パスワード確認
-    if (user.password !== password) {
+    // 入力されたパスワードをSHA-256でハッシュ化
+    const hashedPassword = crypto
+        .createHash("sha256")
+        .update(password)
+        .digest("hex");
+
+    // ハッシュ値を比較
+    if (user.password !== hashedPassword) {
       return res.status(401).json({ success: false });
     }
 
@@ -154,6 +162,103 @@ app.post("/api/user/add", async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * ミニゲーム一覧取得
+ */
+app.get("/api/minigames/get", async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT
+        id,
+        name,
+        type,
+        playable,
+        updated_at
+      FROM miniGames
+      ORDER BY id
+    `);
+
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * 管理ユーザー詳細
+ */
+app.get("/api/admin-user/detail", async (req, res) => {
+  try {
+    const { id } = req.query;
+
+    const [rows] = await db.query(
+        `SELECT id, name, password, created_at, updated_at
+       FROM admin_users
+       WHERE id = ?`,
+        [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "ユーザーが見つかりません" });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * 管理ユーザー登録
+ */
+app.post("/api/admin-users/add", async (req, res) => {
+  try {
+    const { name, password } = req.body;
+
+    if (!name || !password) {
+      return res.status(400).json({
+        message: "名前とパスワードを入力してください。"
+      });
+    }
+
+    // 同じ名前が存在するか確認
+    const [rows] = await db.query(
+        "SELECT id FROM admin_users WHERE name = ?",
+        [name]
+    );
+
+    if (rows.length > 0) {
+      return res.status(409).json({
+        message: "その管理ユーザーは既に存在します。"
+      });
+    }
+
+    // SHA-256でハッシュ化
+    const hashedPassword = crypto
+        .createHash("sha256")
+        .update(password)
+        .digest("hex");
+
+    await db.query(
+        "INSERT INTO admin_users (name, password) VALUES (?, ?)",
+        [name, hashedPassword]
+    );
+
+    res.json({
+      success: true,
+      message: "管理ユーザーを作成しました。"
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "サーバーエラー"
+    });
   }
 });
 
