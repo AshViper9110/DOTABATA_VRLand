@@ -13423,6 +13423,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 54b08d6ba98097743a8679db6a7f6884, type: 2}
   - {fileID: 11400000, guid: 1a77d82cb11eded4b960f734e830dd97, type: 2}
   - {fileID: 11400000, guid: f694861aab3209c4a84a502807367549, type: 2}
+  - {fileID: 11400000, guid: d5e8a30c5e1f9884c9992c6c236c5001, type: 2}
 --- !u!114 &1596988698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13463,6 +13464,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SyncPlayerPrefab: {fileID: 2695971188869603538, guid: b3bb59fc974cdae4e8656ed2430c4c0f, type: 3}
   isJoin: 0
+  gameModeId: 0
 --- !u!4 &1596988701
 Transform:
   m_ObjectHideFlags: 0
