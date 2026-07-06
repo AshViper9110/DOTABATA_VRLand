@@ -177,5 +177,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
         Task OpenShutter(Guid connectionID);
 
+        /// <summary>
+        /// フリープレイのミニゲーム選択
+        /// </summary>
+       　Task SelectFreeMinigame(string name);
+
     }
 }

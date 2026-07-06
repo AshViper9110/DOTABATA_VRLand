@@ -348,7 +348,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cdc205878620274ab9bfb9804d6c08a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BombTimerMax: 30
+  BombTimerMax: 15
   BombTimerText: {fileID: 1267131730072149264}
   RestartPos: {x: 0, y: 0, z: 0}
   grabAction:

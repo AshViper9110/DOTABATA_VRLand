@@ -89,6 +89,7 @@ public class BombBallManager : MonoBehaviour
                 syncObject.GetOwnership(true);
                 RestartPos = bombDodgeManager.BombStartpos[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].position;
                 Debug.Log("君の物だよ");
+                AudioManager.PlaySE(AudioManager.SE.Bomb_Catch);
             }
 
         }
@@ -122,8 +123,8 @@ public class BombBallManager : MonoBehaviour
 
             if (other.transform.parent.transform.parent.gameObject == InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj)
             {
-                Debug.Log("あててんのよ♡");
-                //TODO:自分が当たったことを通知
+                if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<BombDogePlayer>().isDead) return;
+               
                 RoomModel.I.HitDodgeBall();
             }
         }
