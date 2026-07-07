@@ -87,4 +87,10 @@ PRIMARY KEY (`id`)
 
 -- admin_users MasterUser
 INSERT INTO admin_users (name, password)
-VALUES ('admin', 'Yoshidajobi2024');
+VALUES (
+    'admin',
+    SHA2('Yoshidajobi2024', 256)
+);
+
+-- miniGamesテスト用(本番削除)
+INSERT  INTO miniGames (name, rule, type, scene_number,playable) VALUES ('testGame','test',99,99,1);

@@ -83,20 +83,6 @@
     <div id="message"></div>
 
 </div>
-
-<script>
-    document.getElementById("registerForm").addEventListener("submit", function(event) {
-        event.preventDefault();
-
-        const result = confirm("この内容で管理ユーザーを作成しますか？");
-
-        if (result) {
-            // ここでAPIを呼び出して登録処理を行う
-            document.getElementById("message").textContent =
-                "管理ユーザーを作成しました。";
-        }
-    });
-</script>
-
+<script src="/js/adminUser_create.js"></script>
 </body>
 </html>
