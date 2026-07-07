@@ -323,6 +323,7 @@ public class RoomInfoCanvas : MonoBehaviour {
             RoomConfig roomConfig = new RoomConfig() {
                 Name = roomInfo.Name,
                 Password = passwordString,
+                GameModeId = roomInfo.GameModeId,
             };
             await NetworkManager.I.JointoRoom(steamId, roomConfig);
 

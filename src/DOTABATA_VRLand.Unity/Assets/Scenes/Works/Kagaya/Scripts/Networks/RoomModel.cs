@@ -910,5 +910,9 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         {
             OnSelectedFreeMinigame(name);
         }
+        else
+        {
+            Debug.Log("関数がnullです。");
+        }
     }
 }
