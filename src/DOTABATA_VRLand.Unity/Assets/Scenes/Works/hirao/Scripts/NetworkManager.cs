@@ -177,7 +177,7 @@ public class NetworkManager : Singleton<NetworkManager>
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         gameManager.miniRankingList[user.ConnectionId]= rank;
-        Debug.Log($"{user.JoinOrder}:::{rank}");
+
         
         if (rank != 0)
         {

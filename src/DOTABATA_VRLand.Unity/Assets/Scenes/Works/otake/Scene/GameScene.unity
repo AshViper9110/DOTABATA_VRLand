@@ -2423,6 +2423,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minigame: 0
   objectListId: 10
   SendCreate: 1
   SendTransform: 1
@@ -2508,7 +2509,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 14
   m_CollisionDetection: 0
 --- !u!114 &899546456
 MonoBehaviour:
@@ -5695,6 +5696,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  minigame: 0
   objectListId: 10
   SendCreate: 1
   SendTransform: 1
@@ -5783,10 +5785,10 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 14
   m_CollisionDetection: 0
 --- !u!33 &6502041065876257359
 MeshFilter:

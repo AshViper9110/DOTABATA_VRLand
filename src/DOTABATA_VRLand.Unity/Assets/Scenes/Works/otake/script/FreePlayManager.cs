@@ -40,6 +40,7 @@ public class FreePlayManager : MonoBehaviour
 
     public void OnSelected(string name)
     {
+
         Manager.MoveScene(name);
 
         if(name == "TitleScene")
