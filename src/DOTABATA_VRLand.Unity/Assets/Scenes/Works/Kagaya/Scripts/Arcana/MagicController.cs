@@ -1,16 +1,23 @@
-﻿using DG.Tweening;
+﻿using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using PDollarGestureRecognizer;
 using System;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 using static GestureRecognizer;
 
 public class MagicController : MonoBehaviour {
+    private ArcanaGameManager arcanaGameManager;
     private SyncObject syncObject;
     private Rigidbody myRb;
 
     // 生成したプレイヤー
     private Guid attackerConId;
+
+    [ReadOnly] public string attackerConIdStr;
+
     // ライフ
     [SerializeField] private float life;
     private float lifeTimer = 0;
@@ -27,11 +34,11 @@ public class MagicController : MonoBehaviour {
     // ジャストシールドヒットVFX
     [SerializeField] private GameObject justShieldHitVFX;
 
-
-    private bool isAttacked = false;
+    // 攻撃力したか
+    [ReadOnly] public bool isAttacked = false;
 
     // 手に持たれているか
-    private bool isHand = true;
+    [ReadOnly] public bool isHand = true;
 
     [SerializeField] private float Speed; // 追従速度
     [SerializeField] private float MaxForce; // 最大の力
@@ -41,6 +48,8 @@ public class MagicController : MonoBehaviour {
 
     private Vector3 SpeedErrInteg;
     private Vector3 PresentSpeedErr;
+
+    [ReadOnly] public bool initialized = false;
 
     private void Awake() {
         RoomModel.I.OnSyncdMagicBall += OnSyncdMagicBall;
@@ -59,6 +68,9 @@ public class MagicController : MonoBehaviour {
     private void Start() {
         syncObject = GetComponent<SyncObject>();
         myRb = GetComponent<Rigidbody>();
+        arcanaGameManager = GameObject.Find("ArcanaGameManager").GetComponent<ArcanaGameManager>();
+
+        initialized = true;
     }
 
     /// <summary>
@@ -144,11 +156,28 @@ public class MagicController : MonoBehaviour {
 
         // プレイヤーに当たったら
         if (other.gameObject.CompareTag("Player")) {
+            if (other.gameObject.name != "BodyCollider" && other.gameObject.name != "HeadCollider") {
+                //Debug.Log("頭、体のコライダーではありません");
+                return;
+            }
+
+            Player hitPlayer = other.gameObject.GetComponentInParent<Player>();
+            if (hitPlayer == null) {
+                Debug.Log("プレイヤーコンポーネントがnullです");
+                return;
+            }
+
             // 自分自身のオブジェクトだったら
-            if (other.gameObject.GetComponentInParent<SyncPlayer>().ConnectionId == attackerConId) return;
+            if (hitPlayer.gameObject.GetComponentInParent<SyncPlayer>().ConnectionId == attackerConId) {
+                Debug.Log("自分自身の魔法です");
+                return;
+            }
             
-            PlayerStatus otherStatus = other.gameObject.GetComponent<PlayerStatus>();
-            if (otherStatus == null) return;
+            PlayerStatus otherStatus = hitPlayer.gameObject.GetComponent<PlayerStatus>();
+            if (otherStatus == null) {
+                Debug.Log("PlayerStatusコンポーネントがnullです");
+                return;
+            }
 
             Debug.Log("Hit");
 
@@ -158,6 +187,13 @@ public class MagicController : MonoBehaviour {
             if (!result) {
                 Destroy(this.gameObject);
             }
+            else {
+                isAttacked = false;
+            }
+        }
+        // 手だったらなにもしない
+        else if (other.gameObject.name == "HandColliderLeft(Clone)" || other.gameObject.name == "HandColliderRight(Clone)") {
+
         }
         // 他のオブジェクト
         else {
@@ -167,6 +203,8 @@ public class MagicController : MonoBehaviour {
     }
 
     private void Update() {
+        attackerConIdStr = attackerConId.ToString();
+
         if (!syncObject.IsOwner) return;
         if (isHand) return;
 
@@ -209,12 +247,17 @@ public class MagicController : MonoBehaviour {
     /// ジャストシールド
     /// </summary>
     public async void JustShield(Guid justPlayer) {
+        lifeTimer = 0;
+        bool result = await syncObject.GetComponent<SyncObject>().GetOwnership(true);
+        if (!result) return;
+
         if (InRoomPlayerData.I.PlayerList[attackerConId].playerObj && InRoomPlayerData.I.PlayerList[attackerConId].playerObj.activeSelf) {
             targetPlayer = InRoomPlayerData.I.PlayerList[attackerConId].playerObj.transform;
             attackerConId = justPlayer;
+            lifeTimer = 0;
 
             // オブジェクトのフィールド同期
-            await RoomModel.I.SyncMagicBallAsync(syncObject.ObjectId, myGesture.ToString());
+            await RoomModel.I.SyncMagicBallAsync(syncObject.ObjectId, myGesture.ToString(), -1);
         }
     }
 
@@ -222,10 +265,22 @@ public class MagicController : MonoBehaviour {
     /// [サーバー通知]
     /// 魔法オブジェクトのフィールド同期
     /// </summary>
-    public void OnSyncdMagicBall(Guid objectId, Guid createrConId, string gestureClassName) {
+    public async void OnSyncdMagicBall(Guid objectId, Guid createrConId, string gestureClassName, int rndNum) {
+        await UniTask.WaitUntil(() => initialized == true && syncObject.Initialized == true);
+
         if (objectId != syncObject.ObjectId) return;
+
+        Debug.Log($"魔法オブジェクトのフィールド同期：{objectId}");
+
         attackerConId = createrConId;
         SetStatus(EnumExs.ParseFromString<GestureClass>(gestureClassName, true));
         isHand = false;
+
+        if (rndNum == -1) return;
+
+        // VFX生成
+        Instantiate(arcanaGameManager.magicVFXList[rndNum], this.transform);
+        // Material適応
+        this.GetComponent<MeshRenderer>().material = arcanaGameManager.magicMaterialList[rndNum];
     }
 }

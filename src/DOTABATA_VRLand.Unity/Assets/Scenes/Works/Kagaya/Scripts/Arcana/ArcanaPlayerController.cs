@@ -17,7 +17,7 @@ public class ArcanaPlayerController : MonoBehaviour {
     private GameObject createdTargetCircle;
 
     // 魔法オブジェクト
-    private GameObject myMagicObj;
+    public GameObject myMagicObj { get; private set; }
     // 魔法人
     private GameObject magicCircle;
 
@@ -56,6 +56,8 @@ public class ArcanaPlayerController : MonoBehaviour {
     }
 
     private void Update() {
+        if (playerStatus.IsDead) return;
+
         SelectTarget();
         TrackingHand();
         TrackingTargetPlayer();
@@ -109,7 +111,6 @@ public class ArcanaPlayerController : MonoBehaviour {
     /// </summary>
     public void SetMagicObj(GameObject magicObject, GestureClass gesture, GameObject magicCircleObj) {
         if (!magicObject) return;
-        if (myMagicObj) return;
 
         myMagicObj = magicObject;
         myMagicObj.GetComponent<MagicController>().Init(RoomModel.I.ConnectionId, gesture);
@@ -146,7 +147,6 @@ public class ArcanaPlayerController : MonoBehaviour {
     /// 魔法を手に追従
     /// </summary>
     private void TrackingHand() {
-
         if (!myMagicObj) return;
         // 追従
         myMagicObj.transform.position = rightHand.position + -rightHand.right * 0.2f + -rightHand.up * 0.02f + -rightHand.forward * 0.07f;
@@ -164,6 +164,9 @@ public class ArcanaPlayerController : MonoBehaviour {
     /// DrawBoadのアクティブ変更
     /// </summary>
     private void SwitchDrawBoadActive() {
+        // 描いている途中だったら押させない
+        if (drawBoadAction.GetState(rightHandType)) return;
+
         if (drawBoadAction.GetStateDown(leftHandType) && drawBoadObj) {
             drawBoadObj.SetActive(!drawBoadObj.activeSelf);
             RoomModel.I.SwitchDrawBoadActiveAsync(drawBoadObj.activeSelf).Forget();

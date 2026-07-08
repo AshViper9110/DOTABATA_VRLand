@@ -148,7 +148,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// 魔法オブジェクトのフィールド同期
     /// </summary>
-    public Action<Guid, Guid, string> OnSyncdMagicBall { get; set; }
+    public Action<Guid, Guid, string, int> OnSyncdMagicBall { get; set; }
 
     /// <summary>
     /// [サーバー通知]
@@ -569,12 +569,12 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// オブジェクトの削除
     /// </summary>
-    public async UniTask DestroyObjectAsync(Guid objectId) {
+    public async UniTask DestroyObjectAsync(Guid objectId, bool needOwnerShip = true) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
 
-        await roomHub.DestroyObjectAsync(objectId);
+        await roomHub.DestroyObjectAsync(objectId, needOwnerShip);
     }
 
     /// <summary>
@@ -730,21 +730,21 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// 魔法オブジェクトのフィールド同期
     /// </summary>
-    public async UniTask SyncMagicBallAsync(Guid objectId, string gestureClassName) {
+    public async UniTask SyncMagicBallAsync(Guid objectId, string gestureClassName, int rndNum) {
         if (roomHub == null) {
             throw new Exception("RoomHubがnullです。");
         }
 
-        await roomHub.SyncMagicBallAsync(objectId, gestureClassName);
+        await roomHub.SyncMagicBallAsync(objectId, gestureClassName, rndNum);
     }
 
     /// <summary>
     /// [サーバー通知]
     /// 魔法オブジェクトのフィールド同期
     /// </summary>
-    public void OnSyncMagicBall(Guid objectId, Guid createrConId, string gestureClassName) {
+    public void OnSyncMagicBall(Guid objectId, Guid createrConId, string gestureClassName, int rndNum) {
         if (OnSyncdMagicBall != null) {
-            OnSyncdMagicBall(objectId, createrConId, gestureClassName);
+            OnSyncdMagicBall(objectId, createrConId, gestureClassName, rndNum);
         }
     }
 

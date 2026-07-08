@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,6 +20,8 @@ public class PlayerStatus : MonoBehaviour {
     // シールドスライダーのFill
     private Image shieldSliderFill;
 
+    public bool IsDead = false;
+
     [SerializeField] private int maxHp = 3;
     [SerializeField] private int hp;
 
@@ -27,7 +30,7 @@ public class PlayerStatus : MonoBehaviour {
     // シールド量
     [SerializeField] private float shieldAmount = 100;
     // 使用シールド量
-    [SerializeField] private float useShieldAmount = 30;
+    [SerializeField] private float useShieldAmount = 60;
     // シールド回復量
     [SerializeField] private float healShieldAmount = 6;
 
@@ -46,7 +49,9 @@ public class PlayerStatus : MonoBehaviour {
     [SerializeField] private int justShieldFlame = 18;
     // フレーム待機中か
     private bool isDisenableShieldWaitFlame = false;
-    
+
+    // OherPlayerField
+    private bool other_isUseShield = false;
 
     private void Awake() {
         RoomModel.I.OnSyncdPlayerStatus += OnSyncdPlayerStatus;
@@ -67,32 +72,58 @@ public class PlayerStatus : MonoBehaviour {
     private void Start() {
         syncPlayer = this.GetComponent<SyncPlayer>();
 
-        hpImages = this.GetComponentsInChildren<Transform>().First(_=>_.gameObject.name == "Heats");
-    
+        if (syncPlayer.IsOwner()) {
+            hpImages = this.GetComponentsInChildren<Transform>(true).First(_ => _.gameObject.name == "MyHeats");
+            hpImages.gameObject.SetActive(true);
+        }
+        else {
+            hpImages = this.GetComponentsInChildren<Transform>(true).First(_ => _.gameObject.name == "Heats");
+        }
+
         hp = maxHp;
     }
 
     private void Update() {
-        if (!isShield) {
-            useShieldFlameTimer = 0;
-            shieldAmount += Time.deltaTime * healShieldAmount;
-            if (shieldAmount > maxShieldAmount) {
-                shieldAmount = maxShieldAmount;
-            }
-            else if (isUseShieldAllUp && shieldAmount >= shieldResurrection) {
-                isUseShieldAllUp = false;
-            }
-            UpdateShieldInfoSlider(shieldAmount, maxShieldAmount);
-        }
-        else {
-            useShieldFlameTimer++;
-        }
+        if (IsDead) return;
 
-        if (isUseShieldAllUp) {
-            SetShieldSliderColor(Color.red);
+        if (syncPlayer.IsOwner()) {
+            if (!isShield) {
+                useShieldFlameTimer = 0;
+                shieldAmount += Time.deltaTime * healShieldAmount;
+                if (shieldAmount > maxShieldAmount) {
+                    shieldAmount = maxShieldAmount;
+                }
+                else if (isUseShieldAllUp && shieldAmount >= shieldResurrection) {
+                    isUseShieldAllUp = false;
+                }
+                UpdateShieldInfoSlider(shieldAmount, maxShieldAmount);
+            }
+            else {
+                useShieldFlameTimer++;
+            }
+
+            if (isUseShieldAllUp) {
+                SetShieldSliderColor(Color.red);
+            }
+            else {
+                SetShieldSliderColor(Color.cyan);
+            }
         }
         else {
-            SetShieldSliderColor(Color.cyan);
+            if (other_isUseShield) {
+                shieldAmount -= Time.deltaTime * useShieldAmount;
+                if (shieldAmount < 0) {
+                    shieldAmount = 0;
+                }
+            }
+            else {
+                shieldAmount += Time.deltaTime * healShieldAmount;
+                if (shieldAmount > maxShieldAmount) {
+                    shieldAmount = maxShieldAmount;
+                }
+            }
+
+            UpdateShieldInfoSlider(shieldAmount, maxShieldAmount);
         }
     }
 
@@ -114,21 +145,23 @@ public class PlayerStatus : MonoBehaviour {
     public async UniTask<bool> OnDamage(GameObject magicBall, GameObject hit, GameObject shieldHit, GameObject justHit) {
         if (!syncPlayer.IsOwner()) return true;
 
+        Debug.Log("ダメージ処理");
+
         // シールド中かつ 5flame以下
         // ジャストシールド
-        if (isShield && useShieldFlameTimer >= justShieldFlame) {
+        if (isShield &&
+            useShieldFlameTimer <= justShieldFlame) {
+            Debug.Log("ジャストシールド発動");
             Instantiate(justHit, magicBall.transform.position, Quaternion.identity);
 
-            bool result = await magicBall.GetComponent<SyncObject>().GetOwnership(true);
-            if (result) {
-                MagicController mc = magicBall.GetComponent<MagicController>();
-                mc.JustShield(syncPlayer.ConnectionId);
-            }
+            MagicController mc = magicBall.GetComponent<MagicController>();
+            mc.JustShield(syncPlayer.ConnectionId);
 
             return true;
         }
         // シールド中だったら
         else if (isShield) {
+            Debug.Log("シールド中");
             shieldAmount -= useShieldAmount;
             if (shieldAmount < 0) {
                 shieldAmount = 0;
@@ -137,15 +170,17 @@ public class PlayerStatus : MonoBehaviour {
             return false;
         }
 
+        Debug.Log("ダメージ受ける");
+
         hp--;
         UpdateHpSlider();
 
-        Instantiate(hit, magicBall.transform.position, Quaternion.identity);
-
         RoomModel.I.SyncPlayerStatusAsync(hp).Forget();
 
-        if (hp < 0) {
-            this.gameObject.SetActive(false);
+        Instantiate(hit, magicBall.transform.position, Quaternion.identity);
+
+        if (hp <= 0) {
+            IsDead = true;
             arcanaGameManager.DeathAsync();
         }
 
@@ -244,8 +279,8 @@ public class PlayerStatus : MonoBehaviour {
     /// </summary>
     public void OnSyncdPlayerStatus(Guid playerConId, int hp) {
         if (syncPlayer.ConnectionId != playerConId) return;
+        // HP更新
         this.hp = hp;
-
         UpdateHpSlider();
     }
 
@@ -256,6 +291,7 @@ public class PlayerStatus : MonoBehaviour {
     public void OnShieldActivedState(Guid playerConId, bool activeState) {
         if (syncPlayer.ConnectionId != playerConId) return;
 
+        other_isUseShield = activeState;
         shieldEffect.SetActive(activeState);
     }
 }
