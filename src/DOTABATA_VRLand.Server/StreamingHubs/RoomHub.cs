@@ -240,6 +240,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// 退出処理
         /// </summary>
         public async Task LeaveRoomAsync() {
+            if (this._roomContext == null) return;
             // ルームにいなかったら無視
             if (!this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId)) {
                 return;
@@ -532,14 +533,13 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// オブジェクトの削除
         /// </summary>
-        public Task DestroyObjectAsync(Guid objectId)
-        {
-            // そのオブジェクトIdがあるか所有者のIdが一致しているか
-            if (!this._roomContext.RoomObjectDataList.ContainsKey(objectId) ||
-                this._roomContext.RoomObjectDataList[objectId].ownerConnectionId != this.ConnectionId)
-            {
-                return Task.CompletedTask;
-            }
+        public Task DestroyObjectAsync(Guid objectId, bool needOwnerShip) {
+            // そのオブジェクトがあるか
+            if (!this._roomContext.RoomObjectDataList.ContainsKey(objectId)) return Task.CompletedTask;
+
+            // そのオブジェクトの所有者か
+            if (needOwnerShip &&
+                this._roomContext.RoomObjectDataList[objectId].ownerConnectionId != this.ConnectionId) return Task.CompletedTask;
 
             // サーバーから削除
             this._roomContext.RoomObjectDataList.Remove(objectId);
@@ -669,7 +669,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// アルカナスケッチの初期化
         /// </summary>
         public Task ArcanaInitGameAsync() {
-            this._arcanaContext = new ArcanaContext(this._roomContext.RoomUserDataList);
+            this._roomContext.MiniGameContexts._arcanaContext = new ArcanaContext(this._roomContext.RoomUserDataList);
             return Task.CompletedTask;
         }
 
@@ -680,9 +680,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             // 全員に通知
             this._roomContext.Group.All.OnDeath(this.ConnectionId);
 
-            lock (this._arcanaContext) {
+            lock (this._roomContext.MiniGameContexts._arcanaContext) {
                 // コンテストからプレイヤーを削除
-                Guid resultConId = this._arcanaContext.DeathPlayerAndIsGameSet(this.ConnectionId);
+                Guid resultConId = this._roomContext.MiniGameContexts._arcanaContext.DeathPlayerAndIsGameSet(this.ConnectionId);
                 // 一人になったら
                 if (resultConId != Guid.Empty) {
                     // ゲーム終了と勝者のIdを全員に通知
@@ -706,9 +706,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 魔法オブジェクトのフィールド同期
         /// </summary>
-        public Task SyncMagicBallAsync(Guid objectId, string gestureClassName) {
+        public Task SyncMagicBallAsync(Guid objectId, string gestureClassName, int rndNum) {
             // 自分以外に通知
-            this._roomContext.Group.Except([this.ConnectionId]).OnSyncMagicBall(objectId, this.ConnectionId, gestureClassName);
+            this._roomContext.Group.Except([this.ConnectionId]).OnSyncMagicBall(objectId, this.ConnectionId, gestureClassName, rndNum);
 
             return Task.CompletedTask;
         }

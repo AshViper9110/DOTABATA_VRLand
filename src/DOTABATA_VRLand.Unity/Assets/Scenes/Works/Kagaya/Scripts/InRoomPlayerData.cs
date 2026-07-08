@@ -57,4 +57,17 @@ public class InRoomPlayerData : Singleton<InRoomPlayerData> {
             }
         }
     }
+
+    /// <summary>
+    /// デバッグ用
+    /// </summary>
+    public void ShowPlayerList() {
+        string text = "";
+        foreach (var player in PlayerList) {
+            text +=
+                $"ID：{player.Key}, Name：{player.Value.joinedUser.Name}\n";
+        }
+
+        Debug.Log(text);
+    }
 }

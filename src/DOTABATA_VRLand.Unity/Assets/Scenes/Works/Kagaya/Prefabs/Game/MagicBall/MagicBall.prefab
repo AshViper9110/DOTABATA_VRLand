@@ -150,15 +150,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b02e6754ad4cf84893d088a36c3a01c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackerConIdStr: 
   life: 7
   hitVFX: {fileID: 2965222256817593503, guid: ea37cec364598b9488100e950c48a687, type: 3}
   shieldHitVFX: {fileID: 2944396702758532163, guid: 6f322039892021745bfa8cabf513e0f0, type: 3}
   justShieldHitVFX: {fileID: 4535006216103734310, guid: f422a24e4ac1ff642b28c64f775bf1a9, type: 3}
+  isAttacked: 0
+  isHand: 1
   Speed: 5
   MaxForce: 5
   Kp: 5
   Ki: 0
   Kd: 1
+  initialized: 0
 --- !u!114 &-4489780783996916757
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -171,9 +175,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectListId: 11
+  minigame: 1
+  objectListId: 1
   SendCreate: 1
   SendTransform: 1
   SendSpan: 0.05
   SendDestroy: 1
   stringObjectId: 
+  Initialized: 0

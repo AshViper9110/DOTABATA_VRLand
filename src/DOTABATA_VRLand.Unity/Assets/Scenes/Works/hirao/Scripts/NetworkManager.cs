@@ -130,6 +130,9 @@ public class NetworkManager : Singleton<NetworkManager>
                 playerObj = GameObject.Find("Player(Clone)"),
                 joinedUser = user,
             };
+
+            data.playerObj.GetComponent<SyncPlayer>().SetConnectionId(user.ConnectionId);
+
             InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
             InRoomPlayerData.I.SetMySelf(data);
         }

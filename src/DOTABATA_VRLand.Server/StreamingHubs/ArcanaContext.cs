@@ -13,7 +13,6 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// プレイヤーが死亡して一人になったら勝った人のConnectionId返す
         /// </summary>
-        /// <returns></returns>
         public Guid DeathPlayerAndIsGameSet(Guid connectionId) {
             PlayerConIdList.Remove(connectionId);
 

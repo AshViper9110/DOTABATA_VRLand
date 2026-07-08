@@ -151,7 +151,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// 魔法オブジェクトのフィールド同期
         /// </summary>
-        public void OnSyncMagicBall(Guid objectId, Guid createrConId, string gestureClassName);
+        public void OnSyncMagicBall(Guid objectId, Guid createrConId, string gestureClassName, int rndNum);
 
         /// <summary>
         /// プレイヤーのステータス同期通知

@@ -67,7 +67,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// オブジェクトの削除
         /// </summary>
-        Task DestroyObjectAsync(Guid objectId);
+        Task DestroyObjectAsync(Guid objectId, bool needOwnerShip);
 
         /// <summary>
         /// 所有権を取得する
@@ -166,7 +166,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// 魔法オブジェクトのフィールド同期
         /// </summary>
-        Task SyncMagicBallAsync(Guid objectId, string gestureClassName);
+        Task SyncMagicBallAsync(Guid objectId, string gestureClassName, int rndNum);
 
         /// <summary>
         /// プレイヤーのステータス同期
