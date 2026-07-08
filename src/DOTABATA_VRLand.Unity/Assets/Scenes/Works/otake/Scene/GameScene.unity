@@ -682,6 +682,7 @@ MonoBehaviour:
   - ArcanaSketch
   - ShutterScene
   - BombDodge
+  - SppatoIssen
   miniGameTitleImages:
   - {fileID: 21300000, guid: 424bc4de958d83e40a635d8903e25c90, type: 3}
   - {fileID: 21300000, guid: 73ee9c1bc49f7434c9e209fa345e23f2, type: 3}
@@ -689,6 +690,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 3142883b8c332564c8587767f6f7905d, type: 3}
   - {fileID: 21300000, guid: c1118d367f0ca104094c7a8989e520bb, type: 3}
   - {fileID: 21300000, guid: b5f368549e7af8346937fab2bbdb638a, type: 3}
+  - {fileID: 21300000, guid: 5d47e5032b12c914293920ba1c136c3a, type: 3}
   miniGamesParent: {fileID: 1081529926}
   FreePlayMinigamePrefabs: {fileID: 4256499713822972155, guid: 2d3c376956184324cac393fc5bc85bd3, type: 3}
 --- !u!1 &357523745
@@ -748,7 +750,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u7530\u4E2D"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 55ff2f08d08046e4a9d6bcc34fbe298f, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 89c038d0a5c7a104d8387315364a2a6a, type: 2}
@@ -1678,7 +1680,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u7530\u4E2D"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 55ff2f08d08046e4a9d6bcc34fbe298f, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 54b4be028532047458fae9b695e7af33, type: 2}
@@ -1936,7 +1938,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u7530\u4E2D"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 55ff2f08d08046e4a9d6bcc34fbe298f, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 5f76c6079c803f149908029defff4ffb, type: 2}
@@ -3178,7 +3180,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1221296865
 Transform:
   m_ObjectHideFlags: 0
@@ -4334,7 +4336,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u7530\u4E2D"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 55ff2f08d08046e4a9d6bcc34fbe298f, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: f74f453007ae53645891184a2e2d7681, type: 2}
