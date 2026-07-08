@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Xml.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub : StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub
@@ -778,6 +779,16 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             // 全員に通知
             this._roomContext.Group.All.OnOpenShutter(connectionID);
 
+            return Task.CompletedTask;
+        }
+
+        ///<summary>
+        ///フリープレイのミニゲーム選択
+        /// </summary>
+        public Task SelectFreeMinigame(string name)
+        {
+            // 全員に通知
+            this._roomContext.Group.All.OnSelectFreeMinigame(name);
             return Task.CompletedTask;
         }
     }

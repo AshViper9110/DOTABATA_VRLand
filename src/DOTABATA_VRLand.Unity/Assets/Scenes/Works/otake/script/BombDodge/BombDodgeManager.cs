@@ -185,11 +185,15 @@ public class BombDodgeManager : MonoBehaviour
             }
         }
 
-        GameObject gameObject = Instantiate(BombPrefab,
-                   BombStartpos[index].position,
-                   Quaternion.identity);
-        BombBallManager bombBallManager = gameObject.GetComponent<BombBallManager>();
-        bombBallManager.RestartPos = gameObject.transform.position;
-        bombBallManager.InitBall();
+        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == index + 1)
+        {
+
+            GameObject gameObject = Instantiate(BombPrefab,
+                       BombStartpos[index].position,
+                       Quaternion.identity);
+            BombBallManager bombBallManager = gameObject.GetComponent<BombBallManager>();
+            bombBallManager.RestartPos = gameObject.transform.position;
+            bombBallManager.InitBall();
+        }
     }
 }

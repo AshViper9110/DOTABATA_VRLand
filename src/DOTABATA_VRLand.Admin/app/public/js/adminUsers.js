@@ -20,7 +20,7 @@ async function loadAdminUsers() {
 <td>
     <button
         class="detail-btn"
-        onclick="location.href='/admin-user-detail.html?id=${user.id}'">
+        onclick="location.href='/adminUser_detail.html?id=${user.id}'">
         詳細
     </button>
 </td>

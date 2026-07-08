@@ -9,7 +9,8 @@ public class SyncObjectDataSO : ScriptableObject {
         NitNit,
         Bowling,
         Kinko,
-        BombDodge
+        BombDodge,
+        PanicSoda
     }
 
     public Minigames minigame = Minigames.None;
