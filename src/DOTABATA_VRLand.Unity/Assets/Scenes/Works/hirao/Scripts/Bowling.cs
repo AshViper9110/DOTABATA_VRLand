@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 
 public class Bowling : MonoBehaviour
@@ -19,6 +20,8 @@ public class Bowling : MonoBehaviour
     [SerializeField] private Transform spawnPosPin;
     [SerializeField] private Text defeatedPinText;
     [SerializeField] private Text defeatedPinTextLog;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip pinDown;
     private int defeatedPinCount = 0;
 
     private int currentNextGameTime = -1;
@@ -88,6 +91,7 @@ public class Bowling : MonoBehaviour
                 if (!pinStatus.isDefeated && Vector3.Angle(pinStatus.gameObject.transform.up, Vector3.up) > 30)
                 {
                     defeatedPinCount++;
+                    audioSource.PlayOneShot(pinDown);
                     pinStatus.isDefeated = true;
                     currentNextGameTime = 120;
                 }
