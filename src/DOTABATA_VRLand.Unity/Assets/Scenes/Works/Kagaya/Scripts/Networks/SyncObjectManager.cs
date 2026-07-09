@@ -50,5 +50,7 @@ public class SyncObjectManager : MonoBehaviour {
         syncObject.ObjectId = objectId;
         syncObject.CreaterId = createrConnectionId;
         syncObject.ApplyGuidToInspector();
+
+        syncObject.Initialized = true;
     }
 }

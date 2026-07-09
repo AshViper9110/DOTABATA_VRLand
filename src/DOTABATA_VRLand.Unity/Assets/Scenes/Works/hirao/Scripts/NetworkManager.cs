@@ -128,11 +128,15 @@ public class NetworkManager : Singleton<NetworkManager>
         }
         else
         {
+            GameObject.Find("Player(Clone)").transform.position = new Vector3((user.JoinOrder * 3) - 6.5f, 0, 0);
             PlayerData data = new PlayerData()
             {
                 playerObj = GameObject.Find("Player(Clone)"),
                 joinedUser = user,
             };
+
+            data.playerObj.GetComponent<SyncPlayer>().SetConnectionId(user.ConnectionId);
+
             InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
             InRoomPlayerData.I.SetMySelf(data);
         }

@@ -38,6 +38,8 @@ public class SyncObject : MonoBehaviour {
     /// </summary>
     public bool IsOwner { get; private set; } = false;
 
+    [ReadOnly] public bool Initialized = false;
+
     // 作成者のコネクションId
     private Guid createrId = Guid.Empty;
     public Guid CreaterId {
@@ -137,6 +139,8 @@ public class SyncObject : MonoBehaviour {
             objectId = await RoomModel.I.CreateObjectAsync(this.transform.ToSimpleTransform(), minigame, objectListId);
             ApplyGuidToInspector();
         }
+
+        Initialized = true;
     }
 
     /// <summary>
@@ -180,7 +184,7 @@ public class SyncObject : MonoBehaviour {
             return;
         }
 
-        await RoomModel.I.DestroyObjectAsync(objectId);
+        await RoomModel.I.DestroyObjectAsync(objectId, false);
     }
 
     /// <summary>

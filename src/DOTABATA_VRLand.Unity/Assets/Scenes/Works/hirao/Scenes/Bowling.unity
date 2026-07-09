@@ -2933,6 +2933,8 @@ MonoBehaviour:
   spawnPosPin: {fileID: 73146000}
   defeatedPinText: {fileID: 611069654}
   defeatedPinTextLog: {fileID: 1615631922}
+  audioSource: {fileID: 907905720}
+  pinDown: {fileID: 8300000, guid: 3c9a2661b16fee148b93364c0bf012a1, type: 3}
   playerPos:
   - {fileID: 1246797838}
   - {fileID: 605575087}
@@ -2957,8 +2959,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4, y: 2, z: 0.1}
-  m_Center: {x: 0, y: 1, z: 17.4}
+  m_Size: {x: 11.426313, y: 2.2549446, z: 0.099998474}
+  m_Center: {x: -0.028801918, y: 0.8725277, z: 17.4}
 --- !u!1 &930093406
 GameObject:
   m_ObjectHideFlags: 0

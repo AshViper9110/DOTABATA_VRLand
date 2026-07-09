@@ -32,6 +32,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         //ボーリングの順番
         public int ballingOrder;
 
+        // ミニゲームのコンテスト
+        public MiniGameContexts MiniGameContexts { get; set; } = new MiniGameContexts();
+
         // コンストラクタ
         public RoomContext(IMulticastGroupProvider groupProvider, RoomConfig roomConfig) {
             Id = Guid.NewGuid(); // ルーム毎のデータにIDを付けておく
