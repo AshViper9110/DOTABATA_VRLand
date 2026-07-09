@@ -37,6 +37,23 @@ async function loadAdminUser() {
             location.href = `/adminUser_passwordEdit.html?id=${user.id}`;
         };
 
+        document.getElementById("deleteButton").onclick = async () => {
+
+            if (!confirm("この管理ユーザーを削除しますか？")) {
+                return;
+            }
+
+            const response = await fetch(`/api/admin-user/delete/${user.id}`, {
+                method: "DELETE"
+            });
+
+            if (response.ok) {
+                alert("管理ユーザーを削除しました。");
+                location.href = "/adminUsers.html";
+            } else {
+                alert("削除に失敗しました。");
+            }
+        };
     } catch (err) {
         console.error(err);
         alert("管理ユーザー情報の取得に失敗しました");

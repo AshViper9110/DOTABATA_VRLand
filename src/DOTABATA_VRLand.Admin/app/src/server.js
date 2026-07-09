@@ -17,6 +17,13 @@ app.use(express.urlencoded({ extended: true }));
 // publicフォルダを静的配信
 app.use(express.static("public"));
 
+function hashPassword(password) {
+  return crypto
+      .createHash("sha256")
+      .update(password)
+      .digest("hex");
+}
+
 // セッション設定
 app.use(
   session({
@@ -37,7 +44,7 @@ app.post("/login", async (req, res) => {
 
   try {
     const [rows] = await db.query(
-        "SELECT * FROM admin_users WHERE name = ?",
+        "SELECT * FROM admin_users WHERE BINARY name = ?",
         [username]
     );
 
@@ -165,6 +172,33 @@ app.post("/api/user/add", async (req, res) => {
   }
 });
 
+app.delete("/api/admin-user/delete/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const [result] = await db.query(
+        "DELETE FROM admin_users WHERE id = ?",
+        [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        message: "管理ユーザーが見つかりません。"
+      });
+    }
+
+    res.json({
+      message: "管理ユーザーを削除しました。"
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "サーバーエラー"
+    });
+  }
+});
+
 /**
  * ミニゲーム一覧取得
  */
@@ -256,6 +290,123 @@ app.post("/api/admin-users/add", async (req, res) => {
 
   } catch (err) {
     console.error(err);
+    res.status(500).json({
+      message: "サーバーエラー"
+    });
+  }
+});
+
+/**
+ * 管理ユーザーパスワード変更
+ */
+app.put("/api/admin-user/password/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { currentPassword, newPassword } = req.body;
+
+    const [rows] = await db.query(
+        "SELECT password FROM admin_users WHERE id = ?",
+        [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        message: "管理ユーザーが見つかりません。"
+      });
+    }
+
+    const currentHash = hashPassword(currentPassword);
+
+    if (rows[0].password !== currentHash) {
+      return res.status(400).json({
+        message: "現在のパスワードが正しくありません。"
+      });
+    }
+
+    const newHash = hashPassword(newPassword);
+
+    await db.query(
+        "UPDATE admin_users SET password = ?, updated_at = NOW() WHERE id = ?",
+        [newHash, id]
+    );
+
+    res.json({
+      message: "パスワードを変更しました。"
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      message: "サーバーエラー"
+    });
+  }
+});
+
+/**
+ * 管理ユーザー名前変更
+ */
+app.put("/api/admin-user/name/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { newName, password } = req.body;
+
+    // 入力チェック
+    if (!newName || !password) {
+      return res.status(400).json({
+        message: "入力内容が不足しています。"
+      });
+    }
+
+    // ユーザー取得
+    const [rows] = await db.query(
+        "SELECT name, password FROM admin_users WHERE id = ?",
+        [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        message: "管理ユーザーが見つかりません。"
+      });
+    }
+
+    // パスワードをハッシュ化して照合
+    const hashedPassword = crypto
+        .createHash("sha256")
+        .update(password)
+        .digest("hex");
+
+    if (rows[0].password !== hashedPassword) {
+      return res.status(400).json({
+        message: "パスワードが正しくありません。"
+      });
+    }
+
+    // 同じ名前が存在しないか確認（自分以外）
+    const [exists] = await db.query(
+        "SELECT id FROM admin_users WHERE name = ? AND id <> ?",
+        [newName, id]
+    );
+
+    if (exists.length > 0) {
+      return res.status(409).json({
+        message: "そのユーザー名は既に使用されています。"
+      });
+    }
+
+    // 名前更新
+    await db.query(
+        "UPDATE admin_users SET name = ?, updated_at = NOW() WHERE id = ?",
+        [newName, id]
+    );
+
+    res.json({
+      message: "ユーザー名を変更しました。"
+    });
+
+  } catch (err) {
+    console.error(err);
+
     res.status(500).json({
       message: "サーバーエラー"
     });
