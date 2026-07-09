@@ -1,3 +1,4 @@
+using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
@@ -13,12 +14,14 @@ public class MinigameScript : MonoBehaviour
     {
         if (RoomModel.I == null) return;
         RoomModel.I.OnCountdownAction += StartCountdown;
+        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
     }
 
     private void OnDestroy()
     {
         if (RoomModel.I == null) return;
         RoomModel.I.OnCountdownAction -= StartCountdown;
+        RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
     }
 
     void Start()
@@ -63,5 +66,10 @@ public class MinigameScript : MonoBehaviour
         {
             AudioManager.ChangeBGM(AudioManager.BGM.Bank);
         }
+    }
+
+    void OnReceiveRanking(List<JoinedUser> rankOrder)
+    {
+        //ƒQ[ƒ€I—¹‚É“¯Šú‚µ‚Ä‚¢‚éObject‚È‚Ç‚ğíœ‚µ‚Ä‚­‚¾‚³‚¢B
     }
 }
