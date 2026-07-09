@@ -386,9 +386,23 @@ public class MeshCut : MonoBehaviour
 
         if (originMC != null)
         {
-            originMC.sharedMesh = null;
-            originMC.sharedMesh = originMesh;
-            originMC.convex = true;
+
+
+            originMesh.RecalculateBounds();
+
+            Vector3 size = originMesh.bounds.size;
+
+            if (Mathf.Min(size.x, size.y, size.z) > 0.001f)
+            {
+                originMC.convex = true;
+                originMC.sharedMesh = originMesh;
+            }
+            else
+            {
+                Destroy(originMC);
+                targetGameObject.AddComponent<BoxCollider>();
+            }
+
         }
 
         MeshCollider fragMC =
@@ -408,7 +422,7 @@ public class MeshCut : MonoBehaviour
             fragment.GetComponent<MeshCollider>().sharedMesh = fragMesh;
         }
 
-
+  
 
         return (fragment, targetGameObject);
 

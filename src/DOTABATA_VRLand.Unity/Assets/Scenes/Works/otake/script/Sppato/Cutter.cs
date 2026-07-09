@@ -1,9 +1,11 @@
 using System.Collections;
+using Unity.Multiplayer.Center.NetcodeForGameObjectsExample.DistributedAuthority;
 using UnityEngine;
 
 public class Cutter : MonoBehaviour
 {
     private Vector3 previousPosition;
+    public bool CutOk = false;
 
     void Start()
     {
@@ -17,6 +19,9 @@ public class Cutter : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        if (other.gameObject.tag == "CutOk")
+        { CutOk = true; }
+
         MeshFilter mf = other.GetComponent<MeshFilter>();
         if (mf == null)
             return;
@@ -27,6 +32,10 @@ public class Cutter : MonoBehaviour
 
         // クールダウン中なら切断しない
         if (Time.time < cut.nextCutTime)
+            return;
+
+        //正しい方向から切れていない
+        if(!CutOk)
             return;
 
         Vector3 planePoint =
@@ -68,6 +77,9 @@ public class Cutter : MonoBehaviour
         {
             fragmentCut.nextCutTime = nextTime;
         }
+
+        SppatoManager.Register(original);
+        SppatoManager.Register(fragment);
 
         // Colliderを1物理フレームだけ無効化
         StartCoroutine(EnableColliderNextFrame(original));
