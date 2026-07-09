@@ -7,6 +7,8 @@ public class SyncPlayer : MonoBehaviour
 {
     public Guid ConnectionId { get; private set; }
 
+    [ReadOnly] public string connectionIdStr;
+
     [Header("Components")]
     [SerializeField] private PlayerTransform playerTransform;
 
@@ -58,6 +60,7 @@ public class SyncPlayer : MonoBehaviour
     /// </summary>
     public void SetConnectionId(Guid conId) {
         ConnectionId = conId;
+        connectionIdStr = conId.ToString();
     }
 
     /// <summary>
