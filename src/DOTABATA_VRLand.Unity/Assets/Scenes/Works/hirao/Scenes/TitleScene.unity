@@ -8440,27 +8440,27 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 00ad1ddb806cbf04b98a4ca403592bda, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: bd953a7e8bbe6724eae95088e4154e55, type: 2}
+      objectReference: {fileID: 2100000, guid: 47ce5ed7be93fe14eaa1a6ea97157377, type: 2}
     - target: {fileID: -7511558181221131132, guid: 00ad1ddb806cbf04b98a4ca403592bda, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: bd953a7e8bbe6724eae95088e4154e55, type: 2}
+      objectReference: {fileID: 2100000, guid: 47ce5ed7be93fe14eaa1a6ea97157377, type: 2}
     - target: {fileID: -7511558181221131132, guid: 00ad1ddb806cbf04b98a4ca403592bda, type: 3}
       propertyPath: 'm_Materials.Array.data[2]'
       value: 
-      objectReference: {fileID: 2100000, guid: bd953a7e8bbe6724eae95088e4154e55, type: 2}
+      objectReference: {fileID: 2100000, guid: 47ce5ed7be93fe14eaa1a6ea97157377, type: 2}
     - target: {fileID: -7511558181221131132, guid: 00ad1ddb806cbf04b98a4ca403592bda, type: 3}
       propertyPath: 'm_Materials.Array.data[3]'
       value: 
-      objectReference: {fileID: 2100000, guid: dbbb19adb477aea4ab480acfdf528653, type: 2}
+      objectReference: {fileID: 2100000, guid: abc8bd549435c4a47896b4290ba38a69, type: 2}
     - target: {fileID: -7511558181221131132, guid: 00ad1ddb806cbf04b98a4ca403592bda, type: 3}
       propertyPath: 'm_Materials.Array.data[4]'
       value: 
-      objectReference: {fileID: 2100000, guid: bd953a7e8bbe6724eae95088e4154e55, type: 2}
+      objectReference: {fileID: 2100000, guid: 47ce5ed7be93fe14eaa1a6ea97157377, type: 2}
     - target: {fileID: -7511558181221131132, guid: 00ad1ddb806cbf04b98a4ca403592bda, type: 3}
       propertyPath: 'm_Materials.Array.data[5]'
       value: 
-      objectReference: {fileID: 2100000, guid: bd953a7e8bbe6724eae95088e4154e55, type: 2}
+      objectReference: {fileID: 2100000, guid: 47ce5ed7be93fe14eaa1a6ea97157377, type: 2}
     - target: {fileID: 919132149155446097, guid: 00ad1ddb806cbf04b98a4ca403592bda, type: 3}
       propertyPath: m_Name
       value: InformationBoard
@@ -11693,6 +11693,7 @@ MonoBehaviour:
   SendSpan: 0.04
   SendDestroy: 1
   stringObjectId: a87a648a-1ff0-4fed-916b-352908cf047a
+  Initialized: 0
 --- !u!114 &1381572784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18183,6 +18184,7 @@ MonoBehaviour:
   SendSpan: 0.04
   SendDestroy: 1
   stringObjectId: a87a648a-1ff0-4fed-916b-352908cf047a
+  Initialized: 0
 --- !u!114 &2060101807
 MonoBehaviour:
   m_ObjectHideFlags: 0
