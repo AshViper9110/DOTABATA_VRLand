@@ -128,11 +128,15 @@ public class NetworkManager : Singleton<NetworkManager>
         }
         else
         {
+            GameObject.Find("Player(Clone)").transform.position = new Vector3((user.JoinOrder * 3) - 6.5f, 0, 0);
             PlayerData data = new PlayerData()
             {
                 playerObj = GameObject.Find("Player(Clone)"),
                 joinedUser = user,
             };
+
+            data.playerObj.GetComponent<SyncPlayer>().SetConnectionId(user.ConnectionId);
+
             InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
             InRoomPlayerData.I.SetMySelf(data);
         }
@@ -177,7 +181,7 @@ public class NetworkManager : Singleton<NetworkManager>
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
         gameManager.miniRankingList[user.ConnectionId]= rank;
-        Debug.Log($"{user.JoinOrder}:::{rank}");
+
         
         if (rank != 0)
         {

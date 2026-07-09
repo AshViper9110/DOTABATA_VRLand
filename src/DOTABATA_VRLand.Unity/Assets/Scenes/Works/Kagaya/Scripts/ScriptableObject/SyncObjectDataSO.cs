@@ -9,7 +9,8 @@ public class SyncObjectDataSO : ScriptableObject {
         NitNit,
         Bowling,
         Kinko,
-        BombDodge
+        BombDodge,
+        PanicSoda
     }
 
     public Minigames minigame = Minigames.None;
@@ -18,7 +19,18 @@ public class SyncObjectDataSO : ScriptableObject {
     private void OnValidate() {
         for (int i = 0; i < syncObjectDataList.Count; i++) {
             syncObjectDataList[i].objectListId = i + 1;
-            syncObjectDataList[i].syncObject.GetComponent<SyncObject>().SetMinigameAndListId(minigame, i + 1);
+            if (!syncObjectDataList[i].syncObject) continue;
+            SyncObject syncObject = syncObjectDataList[i].syncObject.GetComponent<SyncObject>();
+            if (syncObject) {
+                syncObject.SetMinigameAndListId(minigame, i + 1);
+            }
+        }
+
+        int listCount = syncObjectDataList.Count;
+        if (listCount < 2) return;
+        
+        if (syncObjectDataList[listCount - 1].syncObject == syncObjectDataList[listCount - 2].syncObject) {
+            syncObjectDataList[listCount - 1].syncObject = null;
         }
     }
 }

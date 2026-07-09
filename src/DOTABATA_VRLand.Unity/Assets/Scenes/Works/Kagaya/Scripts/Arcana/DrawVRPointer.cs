@@ -6,6 +6,8 @@ using Valve.VR;
 
 public class DrawVRPointer : MonoBehaviour {
     private GestureRecognizer gestureRecognizer;
+    private PlayerStatus playerStatus;
+
     // 絵描き板
     private GameObject drawBoadObj;
 
@@ -36,14 +38,17 @@ public class DrawVRPointer : MonoBehaviour {
     // 判定VFX
     private GameObject recognizeVFX;
 
+    private Transform lineParent;
+
     /// <summary>
     /// フィールド設定
     /// </summary>
-    public void SetField(GameObject drawBoad, GameObject pointer, Material material, GameObject recognizeVFX) {
+    public void SetField(GameObject drawBoad, GameObject pointer, Material material, GameObject recognizeVFX, PlayerStatus playerStatus) {
         drawBoadObj = drawBoad;
         this.pointer = Instantiate(pointer);
         lineMaterial = material;
         this.recognizeVFX = recognizeVFX;
+        this.playerStatus = playerStatus;
     }
 
     private void Start() {
@@ -60,9 +65,13 @@ public class DrawVRPointer : MonoBehaviour {
 
         gestureRecognizer = GameObject.Find("GestureRecognizer").GetComponent<GestureRecognizer>();
         layerMask = LayerMask.GetMask("DrawBoad");
+
+        lineParent = GameObject.Find("Lines").transform;
     }
 
     private void Update() {
+        if (playerStatus.IsDead) return;
+
         MovePointer();
         GuideLines();
 
@@ -103,7 +112,7 @@ public class DrawVRPointer : MonoBehaviour {
         if (!drawAction.GetStateDown(drawHandType)) return;
 
         GameObject lineObj = new("Line");
-        lineObj.transform.parent = GameObject.Find("Lines").transform;
+        lineObj.transform.parent = lineParent;
 
         currentLine = lineObj.AddComponent<LineRenderer>();
 
@@ -132,7 +141,8 @@ public class DrawVRPointer : MonoBehaviour {
 
         currentLine.positionCount = points.Count;
         currentLine.SetPositions(points.ToArray());
-        gesturePoints.Add(new Point(drawPos.x, drawPos.y, 0));
+        Vector3 localPos = drawBoadObj.transform.InverseTransformPoint(drawPos);
+        gesturePoints.Add(new Point(localPos.x, localPos.y, 0));
     }
 
     /// <summary>
@@ -143,6 +153,11 @@ public class DrawVRPointer : MonoBehaviour {
         if (!drawAction.GetStateUp(drawHandType)) return;
 
         Destroy(currentLine.gameObject);
+        
+        foreach (Transform child in lineParent) {
+            Destroy(child.gameObject);
+        }
+
         currentLine = null;
         bool result = gestureRecognizer.Recognize(gesturePoints);
         Instantiate(recognizeVFX, drawBoadObj.transform.position, Quaternion.identity);

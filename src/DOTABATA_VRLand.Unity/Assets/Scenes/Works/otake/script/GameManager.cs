@@ -134,7 +134,8 @@ public class GameManager : MonoBehaviour
 
   
     FreePlayManager freePlayManager;
-
+    bool isAddCrown;
+    int GetRankIndex;
 
     private void Awake()
     {
@@ -248,13 +249,7 @@ public class GameManager : MonoBehaviour
         onEnd = false;
 
 
-        //onResult = true;
-        //DummyText.text = "";
-        //textIndex = 0;
-
-
-        //DummyText.DOText(AfterText[textIndex], 1.0f);
-        //SetResult();
+    
 
         SetRanking();
 
@@ -300,8 +295,9 @@ public class GameManager : MonoBehaviour
         freePlayManager = GetComponent<FreePlayManager>();
 
         freePlayManager.SetMinigames();
-
-
+        isAddCrown = false;
+        winPlayerId = Guid.Empty;
+        GetRankIndex = 0;
         //シーン移行後の位置配置
         var myId = NetworkManager.I.myConnectionId;
 
@@ -322,7 +318,7 @@ public class GameManager : MonoBehaviour
         {
             NetworkManager.I.ReqestMinigameRanking(guid);
 
-            SetRankText(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+           
         }
     }
 
@@ -404,12 +400,20 @@ public class GameManager : MonoBehaviour
 
     public void SetCrown(Guid guid,int ID)
     {
-       
+        Debug.Log("SetCrown");
         List<GameObject> crowns = new List<GameObject>();
         
         Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
 
-      
+        if (isAddCrown)
+        {
+            if(guid == winPlayerId)
+            {
+                Debug.Log("追加済みだから減算");
+                playerWinlist[ID]--;
+            }
+        }
+ 
 
         for (int i = 0; i < playerWinlist[ID]; i++)
         {
@@ -430,6 +434,7 @@ public class GameManager : MonoBehaviour
 
     public void AddCrown(Guid guid, int ID)
     {
+        Debug.Log("AddCrown");
         PlayerTransform playerTransform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>();
         Transform transform = playerTransform.crownParent;
         GameObject crown = Instantiate(CrownPrefab,
@@ -447,6 +452,11 @@ public class GameManager : MonoBehaviour
 
         playerWinlist[ID]++;
 
+        if (freePlay) { 
+            isAddCrown = true;
+            winPlayerId = guid;
+            return; 
+        }
 
         if (playerWinlist[RankingList[InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.JoinOrder]] >= 3)
         {
@@ -485,13 +495,26 @@ public class GameManager : MonoBehaviour
 
         }
 
-        if(freePlay)
+        if (freePlay)
         {
-            if (winPlayerId == NetworkManager.I.myConnectionId)
+            GetRankIndex++;
+
+            if (InRoomPlayerData.I.PlayerList.Count >= GetRankIndex)
             {
-                RoomModel.I.RequestWinCountUp(NetworkManager.I.myConnectionId);
+
+
+                if (winPlayerId == NetworkManager.I.myConnectionId)
+                {
+                    if (!isAddCrown)
+                    {
+                        isAddCrown = true;
+                        RoomModel.I.RequestWinCountUp(NetworkManager.I.myConnectionId);
+                    }
+                }
+
             }
         }
+
     }
 
     public void SetRanking()

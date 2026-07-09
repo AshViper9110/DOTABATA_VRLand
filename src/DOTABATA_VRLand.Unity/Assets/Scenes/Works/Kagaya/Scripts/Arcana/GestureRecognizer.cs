@@ -5,10 +5,10 @@ using TMPro;
 using System;
 
 public class GestureRecognizer : MonoBehaviour {
-    [SerializeField] private TextMeshProUGUI resultText;
+    public TextMeshProUGUI resultText;
 
-    [SerializeField] private TMP_InputField shapesType;
-    [SerializeField] private TMP_InputField saveFileName;
+    public TMP_InputField shapesType;
+    public TMP_InputField saveFileName;
 
     public enum GestureClass {
         Circle = 0,
@@ -20,7 +20,7 @@ public class GestureRecognizer : MonoBehaviour {
     }
 
     // 図形判定後コールバック
-    public Action<GestureClass, float> CompleteRecognize;
+    public Action<GestureClass, Result> CompleteRecognize;
 
     /// <summary>
     /// 図形判定
@@ -79,7 +79,7 @@ public class GestureRecognizer : MonoBehaviour {
 
         // ファイルを文字列として読む
         foreach (var xmlName in xmlNames) {
-            string xml = System.IO.File.ReadAllText(Application.dataPath + "/Gestures/" + xmlName);
+            string xml = System.IO.File.ReadAllText(Application.streamingAssetsPath + "/Gestures/" + xmlName);
             gestures.Add(GestureIO.ReadGestureFromXML(xml));
         }
 
@@ -91,12 +91,14 @@ public class GestureRecognizer : MonoBehaviour {
 
         if (result.Score > 0.93f) {
             Debug.Log("成功: " + result.GestureClass);
-            resultText.text = $"{result.GestureClass}\n" +
-                $"Score:{result.Score}";
+            resultText.text = $"Success\n" +
+                $"Try : {result.GestureClass}\n" +
+                $"Score : {result.Score}\n" +
+                $"Points : {gesturePoints.Count}";
 
             bool parseResult = EnumExs.TryParseFromString<GestureClass>(result.GestureClass, true, out GestureClass gestureClass);
             if (CompleteRecognize != null) {
-                CompleteRecognize(gestureClass, result.Score);
+                CompleteRecognize(gestureClass, result);
                 return true;
             }
 
@@ -104,7 +106,10 @@ public class GestureRecognizer : MonoBehaviour {
         }
         else {
             Debug.Log("失敗");
-            resultText.text = "Miss";
+            resultText.text = "Miss\n" +
+                $"Try : {result.GestureClass}\n" +
+                $"Score : {result.Score}\n" +
+                $"Points : {gesturePoints.Count}";
             return false;
         }
     }
@@ -114,7 +119,7 @@ public class GestureRecognizer : MonoBehaviour {
     /// </summary>
     private void SaveGesture(List<Point> gesturePoints) {
         if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.L)) {
-            GestureIO.WriteGesture(gesturePoints.ToArray(), shapesType.text, Application.dataPath + $"/Gestures/{saveFileName.text}.xml");
+            GestureIO.WriteGesture(gesturePoints.ToArray(), shapesType.text, Application.streamingAssetsPath + $"/Gestures/{saveFileName.text}.xml");
             Debug.Log("保存した");
         }
     }

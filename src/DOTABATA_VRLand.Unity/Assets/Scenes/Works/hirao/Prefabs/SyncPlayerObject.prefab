@@ -157,7 +157,7 @@ MonoBehaviour:
   Head: {fileID: 9078379175512380869}
   LeftHand: {fileID: 6797672910003134461}
   RightHand: {fileID: 4066074196696517463}
-  Body: {fileID: 2686945419700391299}
+  Body: {fileID: 1329114768240338678}
   duration: 0.1
   crownParent: {fileID: 4164861838119272964}
   crownsDistance: 0.2
@@ -211,7 +211,7 @@ Transform:
   m_GameObject: {fileID: 3530352491784232045}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.056578524, y: 0.5286961, z: -1.0207231}
+  m_LocalPosition: {x: 0, y: 0.5286961, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

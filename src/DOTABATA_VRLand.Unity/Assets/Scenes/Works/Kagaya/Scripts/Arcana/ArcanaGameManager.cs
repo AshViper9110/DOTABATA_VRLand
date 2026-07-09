@@ -1,16 +1,21 @@
 ﻿using Cysharp.Threading.Tasks;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using Newtonsoft.Json;
+using PDollarGestureRecognizer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using Valve.VR;
+using Valve.VR.InteractionSystem;
 using static GestureRecognizer;
 
 public class ArcanaGameManager : MonoBehaviour {
+    [SerializeField] private MinigameFlowController minigameFlowController;
     [SerializeField] private GestureRecognizer gestureRecognizer;
 
     private PlayerData mySelf;
@@ -27,9 +32,9 @@ public class ArcanaGameManager : MonoBehaviour {
     // 魔法のPrefabList
     [SerializeField] private GameObject magicBallPrefab;
     // 魔法のVFX
-    [SerializeField] private List<GameObject> magicVFXList;
+    [SerializeField] public List<GameObject> magicVFXList;
     // 魔法のマテリアル
-    [SerializeField] private List<Material> magicMaterialList;
+    [SerializeField] public List<Material> magicMaterialList;
 
     // 手用の魔法人のPrefab
     [SerializeField] private List<GameObject> handMagicCircleList;
@@ -60,19 +65,17 @@ public class ArcanaGameManager : MonoBehaviour {
     [SerializeField] private GameObject recognizeVFX;
 
     // プレイヤーが持ってるオブジェクト
-    private Dictionary<Guid, List<GameObject>> playerObjectList;
+    private Dictionary<Guid, ArcanaPlayerHavingObject> playerObjectList = new Dictionary<Guid, ArcanaPlayerHavingObject>();
+
+    private bool completeStart = false;
+
+    private int gameTimer = 0;
 
     private void Awake() {
         gestureRecognizer.CompleteRecognize += CreateMagic;
     }
 
     private async void Start() {
-        RoomModel.I.OnDead += OnDead;
-        RoomModel.I.OnArcanaGameSeted += OnArcanaGameSeted;
-
-        AudioManager.StopBgm();
-        SteamVR_Fade.View(new Color(0, 0, 0, 0), 1.0f);
-
         // 自分のインスタンスを保持
         mySelf = InRoomPlayerData.I.MySelf;
         if (mySelf.joinedUser.JoinOrder == 1) {
@@ -80,9 +83,19 @@ public class ArcanaGameManager : MonoBehaviour {
             await RoomModel.I.ArcanaInitGameAsync();
         }
 
+        await UniTask.WaitUntil(() => minigameFlowController.isGameStarted == true);
+
+        RoomModel.I.OnDead += OnDead;
+        RoomModel.I.OnArcanaGameSeted += OnArcanaGameSeted;
+
+        AudioManager.StopBgm();
+
         // スポーン位置に移動
         mySelf.playerObj.transform.position = spawnPoints[mySelf.joinedUser.JoinOrder - 1].position;
-        mySelf.playerObj.transform.LookAt(centerTransform);
+
+        Player player = Player.instance;
+        player.transform.LookAt(centerTransform);
+        player.transform.eulerAngles = new Vector3(0, player.transform.eulerAngles.y, 0);
 
         await UniTask.DelayFrame(5);
 
@@ -96,23 +109,32 @@ public class ArcanaGameManager : MonoBehaviour {
             GameObject drawBoadObj = pCamUI.transform.GetChild(0).gameObject;
             GameObject createdShield = Instantiate(shieldEffect, playerData.Value.playerObj.transform);
 
+            createdShield.SetActive(false);
+            PlayerStatus playerStatus = playerData.Value.playerObj.AddComponent<PlayerStatus>();
+            playerStatus.SetField(this, createdShield, pCamUI.GetComponentsInChildren<Slider>().First(_ => _.gameObject.name == "ShieldInfoSlider"));
+            playerData.Value.playerObj.AddComponent<SyncDrawBoad>().SetField(drawBoadObj);
+
             // 保持
-            playerObjectList[playerData.Key] = new List<GameObject> { myUI, pCamUI, createdShield };
+            playerObjectList[playerData.Key] = new ArcanaPlayerHavingObject() {
+                playerUICanvas = myUI,
+                playerCameraUI = pCamUI,
+                shieldEffect = createdShield
+            };
 
             // 自分だったら
             if (playerData.Value.joinedUser.ConnectionId == mySelf.joinedUser.ConnectionId) {
                 drawBoadObj.layer = LayerMask.NameToLayer("DrawBoad");
-                myUI.layer = LayerMask.NameToLayer("MyUI");
+                Destroy(myUI);
                 rightHand = mySelf.playerObj.GetComponentsInChildren<Transform>().First(_ => _.transform.name == "RightHand");
                 myController.SetField(rightHand, drawBoadObj, targetCircle);
                 DrawVRPointer drawVR = rightHand.AddComponent<DrawVRPointer>();
-                drawVR.SetField(drawBoadObj, drawPointer, lineMaterial, recognizeVFX);
-            }
+                drawVR.SetField(drawBoadObj, drawPointer, lineMaterial, recognizeVFX, playerStatus);
 
-            createdShield.SetActive(false);
-            playerData.Value.playerObj.AddComponent<PlayerStatus>().SetField(this, createdShield, pCamUI.GetComponentsInChildren<Slider>().First(_=>_.gameObject.name == "ShieldInfoSlider"));
-            playerData.Value.playerObj.AddComponent<SyncDrawBoad>().SetField(drawBoadObj);
+                gestureRecognizer.resultText = pCamUI.GetComponentsInChildren<TextMeshProUGUI>().First(_=>_.gameObject.name == "RecognizeResultText");
+            }
         }
+
+        completeStart = true;
     }
 
     private void OnDisable() {
@@ -126,22 +148,35 @@ public class ArcanaGameManager : MonoBehaviour {
         OnDisable();
     }
 
-    private void Update() {
+    private async void Update() {
+        if (!minigameFlowController.isGameStarted) return;
+        if (!completeStart) return;
+
+        gameTimer++;
+
         // オブジェクトの位置固定
         foreach (var playerData in InRoomPlayerData.I.PlayerList) {
-            playerObjectList[playerData.Key][0].transform.localPosition = playerUICanvas.transform.position;
-            playerObjectList[playerData.Key][0].transform.LookAt(centerTransform);
-            playerObjectList[playerData.Key][1].transform.localPosition = playerCameraUI.transform.position;
-            playerObjectList[playerData.Key][1].transform.LookAt(centerTransform);
-            playerObjectList[playerData.Key][2].transform.localPosition = shieldEffect.transform.position;
-            playerObjectList[playerData.Key][2].transform.LookAt(centerTransform);
+            if (!playerData.Value.playerObj.activeSelf) return;
+
+            if (playerObjectList[playerData.Key].playerCameraUI) {
+                playerObjectList[playerData.Key].playerCameraUI.transform.localPosition = playerCameraUI.transform.position;
+            }
+            if (playerObjectList[playerData.Key].playerUICanvas) {
+                playerObjectList[playerData.Key].playerUICanvas.transform.localPosition = playerUICanvas.transform.position;
+            }
+            if (playerObjectList[playerData.Key].shieldEffect) {
+                playerObjectList[playerData.Key].shieldEffect.transform.localPosition = shieldEffect.transform.position;
+            }
         }
     }
 
     /// <summary>
     /// 魔法生成
     /// </summary>
-    private async void CreateMagic(GestureClass gesture, float score) {
+    private async void CreateMagic(GestureClass gesture, Result result) {
+        // 手に魔法を持ってたら何もしない
+        if (myController.myMagicObj) return;
+
         // 魔法生成
         Transform createdTransform = Instantiate(magicBallPrefab, new Vector3(0, 10, 0), Quaternion.identity).transform;
         int rnd = UnityEngine.Random.Range(0, magicVFXList.Count);
@@ -150,13 +185,20 @@ public class ArcanaGameManager : MonoBehaviour {
         // Material適応
         createdTransform.GetComponent<MeshRenderer>().material = magicMaterialList[rnd];
 
-        await UniTask.DelayFrame(2);
+        SyncObject syncObj = createdTransform.GetComponent<SyncObject>();
+
+        await UniTask.WaitUntil(()=> syncObj.Initialized);
 
         // オブジェクトId取得
-        Guid objectId = createdTransform.GetComponent<SyncObject>().ObjectId;
+        Guid objectId = syncObj.ObjectId;
+
+        Debug.Log($"魔法オブジェクトのフィールド同期送信\n" +
+            $"ObjId：{objectId}\n" +
+            $"Gesture：{gesture.ToString()}\n" +
+            $"Rnd：{rnd}");
 
         // オブジェクトのフィールド同期
-        await RoomModel.I.SyncMagicBallAsync(objectId, gesture.ToString());
+        await RoomModel.I.SyncMagicBallAsync(objectId, gesture.ToString(), rnd);
 
         myController.SetMagicObj(createdTransform.gameObject, gesture, handMagicCircleList[rnd]);
     }
@@ -167,6 +209,7 @@ public class ArcanaGameManager : MonoBehaviour {
     public async void DeathAsync() {
         // VFX
         Instantiate(deathEffect, mySelf.playerObj.transform.position, Quaternion.identity);
+        minigameFlowController.OnSendScore(gameTimer);
         await RoomModel.I.DeathAsync();
     }
 
@@ -188,15 +231,19 @@ public class ArcanaGameManager : MonoBehaviour {
         Destroy(myController);
         Destroy(rightHand.GetComponent<DrawVRPointer>());
 
-        foreach (PlayerData playerData in InRoomPlayerData.I.PlayerList.Values) {
-            foreach (Transform child in playerData.playerObj.transform) {
-                if (child.gameObject.name.StartsWith("ArcanaUICanvas") ||
-                    child.gameObject.name.StartsWith("DrawBoad")) {
-                    Destroy(child);
-                }
-            }
-            Destroy(playerData.playerObj.GetComponent<PlayerStatus>());
-            Destroy(playerData.playerObj.GetComponent<SyncDrawBoad>());
+        foreach (var playerData in InRoomPlayerData.I.PlayerList) {
+            Destroy(playerObjectList[playerData.Key].playerUICanvas);
+            Destroy(playerObjectList[playerData.Key].playerCameraUI);
+            Destroy(playerObjectList[playerData.Key].shieldEffect);
+
+            Destroy(playerData.Value.playerObj.GetComponent<PlayerStatus>());
+            Destroy(playerData.Value.playerObj.GetComponent<SyncDrawBoad>());
+
+            playerData.Value.playerObj.SetActive(true);
+        }
+
+        if (mySelf.joinedUser.ConnectionId == winnerConId) {
+            minigameFlowController.OnSendScore(gameTimer + 100);
         }
     }
 }
