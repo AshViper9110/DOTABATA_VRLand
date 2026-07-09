@@ -1,3 +1,4 @@
+using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
@@ -10,9 +11,10 @@ public class PanicSoda : MonoBehaviour
     [SerializeField] private GameObject bottlePrefab;
     [SerializeField] private float maxTime = 30f;
     [SerializeField] private float targetShake = 10f;
+    [SerializeField] private GameObject panel;
 
     private float elapsedTime;
-    private Interactable bottle;    // 掴むオブジェクト
+    private GameObject bottle;    // 掴むオブジェクト
     private bool isClear;
 
     public float ShakePower { get; private set; }
@@ -21,12 +23,14 @@ public class PanicSoda : MonoBehaviour
     {
         if (RoomModel.I == null) return;
         RoomModel.I.OnCountdownAction += StartCountdown;
+        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
     }
 
     private void OnDestroy()
     {
         if (RoomModel.I == null) return;
         RoomModel.I.OnCountdownAction -= StartCountdown;
+        RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
     }
 
     void Start()
@@ -38,18 +42,19 @@ public class PanicSoda : MonoBehaviour
         int index = InRoomPlayerData.I.PlayerList[myId].joinedUser.JoinOrder - 1;
         var player = InRoomPlayerData.I.PlayerList[myId].playerObj.transform;
 
-        bottle = Instantiate(bottlePrefab, bottlePos[index]).GetComponent<Interactable>();
+        bottle = Instantiate(bottlePrefab, bottlePos[index]);
         player.position = playerPos[index].position;
         player.rotation = playerPos[index].rotation;
+        panel.transform.rotation = playerPos[index].rotation;
     }
 
     void FixedUpdate()
     {
-        //if (!controller.isGameStarted) return;
+        if (!controller.isGameStarted) return;
 
-        if (bottle.attachedToHand != null)
+        if (bottle.GetComponent<Interactable>().attachedToHand != null)
         {
-            Hand hand = bottle.attachedToHand;
+            Hand hand = bottle.GetComponent<Interactable>().attachedToHand;
 
             Vector3 velocity = hand.GetTrackedObjectVelocity();
 
@@ -75,6 +80,12 @@ public class PanicSoda : MonoBehaviour
             Debug.Log($"Clear Time : {elapsedTime:F2}s");
 
             AudioManager.PlaySE(AudioManager.SE.Bank_Open);
+
+
+            if (bottle.GetComponent<Interactable>().attachedToHand != null)
+            {
+                bottle.GetComponent<Interactable>().attachedToHand.DetachObject(bottle);
+            }
         }
     }
 
@@ -89,5 +100,10 @@ public class PanicSoda : MonoBehaviour
         {
             AudioManager.ChangeBGM(AudioManager.BGM.Bank);
         }
+    }
+
+    void OnReceiveRanking(List<JoinedUser> rankOrder)
+    {
+        Destroy(bottle);
     }
 }
