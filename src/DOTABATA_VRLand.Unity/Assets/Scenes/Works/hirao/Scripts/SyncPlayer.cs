@@ -19,6 +19,9 @@ public class SyncPlayer : MonoBehaviour
 
     private float syncTimer;
 
+    // 自分の自身か
+    public bool IsOwner { get; private set; } = false;
+
     private void Awake()
     {
         DontDestroyOnLoad(this.gameObject);
@@ -61,12 +64,7 @@ public class SyncPlayer : MonoBehaviour
     public void SetConnectionId(Guid conId) {
         ConnectionId = conId;
         connectionIdStr = conId.ToString();
-    }
 
-    /// <summary>
-    /// 自分の自身か
-    /// </summary>
-    public bool IsOwner() {
-        return ConnectionId == RoomModel.I.ConnectionId;
+        IsOwner = conId == RoomModel.I.ConnectionId;
     }
 }
