@@ -18,7 +18,7 @@ public class SyncObject : MonoBehaviour {
     [SerializeField, Header("Transform情報を送信")] private bool SendTransform;
 
     // 送る間隔
-    [SerializeField] private float SendSpan = 0.2f;
+    [SerializeField] private float SendSpan = 0.1f;
     private float sendTimer = 0f;
 
     [SerializeField, Header("削除通知を送信")] private bool SendDestroy;

@@ -170,6 +170,11 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
 
 
         public void OnSelectFreeMinigame(string name);
+
+        /// <summary>
+        /// スコア送信通知
+        /// </summary>
+        public void OnBlockBreakSendScore(Guid playerConId, int score);
     }
 
 }

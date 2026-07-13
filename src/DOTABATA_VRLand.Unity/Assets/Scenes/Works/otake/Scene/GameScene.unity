@@ -684,6 +684,7 @@ MonoBehaviour:
   - BombDodge
   - SppatoIssen
   - PanicSoda
+  - BlockBreak
   miniGameTitleImages:
   - {fileID: 21300000, guid: 424bc4de958d83e40a635d8903e25c90, type: 3}
   - {fileID: 21300000, guid: 73ee9c1bc49f7434c9e209fa345e23f2, type: 3}
@@ -693,6 +694,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b5f368549e7af8346937fab2bbdb638a, type: 3}
   - {fileID: 21300000, guid: 5d47e5032b12c914293920ba1c136c3a, type: 3}
   - {fileID: 21300000, guid: 549754ee000feaf449d5fe5f4a4d6dc4, type: 3}
+  - {fileID: 0}
   miniGamesParent: {fileID: 1081529926}
   FreePlayMinigamePrefabs: {fileID: 4256499713822972155, guid: 2d3c376956184324cac393fc5bc85bd3, type: 3}
 --- !u!1 &357523745
