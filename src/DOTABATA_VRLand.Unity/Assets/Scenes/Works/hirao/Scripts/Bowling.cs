@@ -26,7 +26,7 @@ public class Bowling : MonoBehaviour
     [SerializeField] private AudioClip pinDown;
     [SerializeField] private GameObject panel;
     private int defeatedPinCount = 0;
-    private float panelOffset = 5;
+    private float panelOffset = 3;
 
     private int currentNextGameTime = -1;
 
@@ -88,7 +88,7 @@ public class Bowling : MonoBehaviour
             return;
 
         playerData.playerObj.transform.position = playerPos[index].position;
-        Vector3 panelPos = new Vector3(playerPos[index].position.x, playerPos[index].position.y, playerPos[index].position.z + panelOffset);
+        Vector3 panelPos = new Vector3(playerPos[index].position.x, panel.transform.position.y, playerPos[index].position.z + panelOffset);
         panel.transform.position = panelPos;
     }
 
@@ -113,11 +113,8 @@ public class Bowling : MonoBehaviour
         {
             currentNextGameTime = -1;
             DeletePins();
-            var myId = NetworkManager.I.myConnectionId;
-            if (!InRoomPlayerData.I.PlayerList.TryGetValue(myId, out var playerData)) return;
-            JoinedUser joinedUser = playerData.joinedUser;
             RoomModel.I.SendScore(defeatedPinCount);
-            await RoomModel.I.BallingNext(defeatedPinCount, joinedUser);
+            await RoomModel.I.BallingNext(defeatedPinCount, InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser);
         }
         else if (currentNextGameTime > 0)
         {
@@ -152,7 +149,6 @@ public class Bowling : MonoBehaviour
 
     public void SpawnBall()
     {
-        defeatedPinTextLog.text = $"{defeatedPinCount}–{\n" + defeatedPinTextLog.text;
         if (currentBall != null)
         {
             Destroy(currentBall);
