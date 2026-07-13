@@ -19,6 +19,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         private RoomContext? _roomContext;
 
+        /*
+         * ミニゲーム用
+         */
+
+        private ArcanaContext? _arcanaContext;
+
         //public RoomHub(RoomContextRepository roomContextRepository) {
         //    _roomContextRepository = roomContextRepository;
         //}
@@ -436,7 +442,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             var users = rank.Select(r => r.user).ToList();//ユーザーの順位順リストを取得
             var winCounts = rank.Select(r => r.winCount).ToList();//勝利数を取得、//    users[i] と winCounts[i] は必ず同じプレイヤーに対応
 
-            _roomContext.Group.All.OnGetAllRoundRanking(users, winCounts);
+            // 呼び出した本人にだけ送信
+            Client.OnGetAllRoundRanking(users, winCounts);
             return Task.CompletedTask;
             // 順位送信
            
@@ -658,6 +665,54 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// アルカナスケッチの初期化
+        /// </summary>
+        public Task ArcanaInitGameAsync() {
+            this._arcanaContext = new ArcanaContext(this._roomContext.RoomUserDataList);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 死亡同期
+        /// </summary>
+        public Task DeathAsync() {
+            // 全員に通知
+            this._roomContext.Group.All.OnDeath(this.ConnectionId);
+
+            lock (this._arcanaContext) {
+                // コンテストからプレイヤーを削除
+                Guid resultConId = this._arcanaContext.DeathPlayerAndIsGameSet(this.ConnectionId);
+                // 一人になったら
+                if (resultConId != Guid.Empty) {
+                    // ゲーム終了と勝者のIdを全員に通知
+                    this._roomContext.Group.All.OnArcanaGameSet(resultConId);
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 絵描き板の表示非表示同期
+        /// </summary>
+        public Task SwitchDrawBoadActiveAsync(bool active) {
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnSwitchDrawBoadActive(this.ConnectionId, active);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 魔法オブジェクトのフィールド同期
+        /// </summary>
+        public Task SyncMagicBallAsync(Guid objectId, string gestureClassName) {
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnSyncMagicBall(objectId, this.ConnectionId, gestureClassName);
+
+            return Task.CompletedTask;
+        }
+
 
         //steamIDのハッシュ化
         private static string HashSteamId(ulong steamId)
@@ -679,6 +734,41 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         {
             this._roomContext.ballingOrder++;
             this._roomContext.Group.All.OnBallingNext(this._roomContext.ballingOrder);
+            return Task.CompletedTask;
+        }
+
+        //爆弾ドッチボールのヒット処理
+        public Task HitDodgeBall(Guid connectionId)
+        {
+            this._roomContext.Group.All.OnHitDodgeBall(connectionId);
+            return Task.CompletedTask;
+        }
+
+        //爆弾ドッチボールの死亡処理
+        public Task HitBomber(Guid connectionId) {
+            this._roomContext.Group.All.OnHitBomber(connectionId);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// プレイヤーのステータス同期
+        /// </summary>
+        public Task SyncPlayerStatusAsync(int hp) {
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnSyncPlayerStatus(this.ConnectionId, hp);
+
+            return Task.CompletedTask;
+        }
+
+
+        /// <summary>
+        /// シャッターの開放同期
+        /// </summary>
+        public Task OpenShutter(Guid connectionID)
+        {
+            // 全員に通知
+            this._roomContext.Group.All.OnOpenShutter(connectionID);
+
             return Task.CompletedTask;
         }
     }

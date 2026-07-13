@@ -135,5 +135,50 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ボーリングの順番変え
         /// </summary>
         Task BallingNext();
+
+
+        /// <summary>
+        /// 当たったことを通知
+        /// </summary>
+        Task HitDodgeBall(Guid connectionId);
+
+        /// <summary>
+        /// 被爆したことを通知
+        /// </summary>
+        Task HitBomber(Guid connectionId);
+
+        /// <summary>
+        /// アルカナスケッチの初期化
+        /// </summary>
+        Task ArcanaInitGameAsync();
+
+        /// <summary>
+        /// 死亡同期
+        /// </summary>
+        Task DeathAsync();
+
+
+        /// <summary>
+        /// 絵描き板の表示非表示同期
+        /// </summary>
+        Task SwitchDrawBoadActiveAsync(bool active);
+
+        /// <summary>
+        /// 魔法オブジェクトのフィールド同期
+        /// </summary>
+        Task SyncMagicBallAsync(Guid objectId, string gestureClassName);
+
+        /// <summary>
+        /// プレイヤーのステータス同期
+        /// </summary>
+<<<<<<< HEAD
+        Task SyncPlayerStatusAsync(float hp);
+        /// <summary>
+        /// シャッターの開放同期
+        /// </summary>
+        Task OpenShutter(Guid connectionID);
+=======
+        Task SyncPlayerStatusAsync(int hp);
+>>>>>>> main
     }
 }

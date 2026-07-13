@@ -159,7 +159,7 @@ MonoBehaviour:
   Body: {fileID: 2686945419700391299}
   duration: 0.1
   crownParent: {fileID: 4164861838119272964}
-  crownsDistance: 0
+  crownsDistance: 0.2
   SpotLight: {fileID: 7425815740759651945}
   SpotDistans: 3.5
 --- !u!1 &3530352491784232045

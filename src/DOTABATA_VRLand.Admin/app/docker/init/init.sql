@@ -73,3 +73,18 @@ CREATE TABLE `miniGame_logs` (
  CONSTRAINT `fk_ml_miniGame` FOREIGN KEY (`miniGame_id`) REFERENCES `miniGames` (`id`),
  CONSTRAINT `fk_ml_user`     FOREIGN KEY (`user_id`)     REFERENCES `users` (`id`)
 ) ;
+
+-- 7. admin_users
+CREATE TABLE `admin_users` (
+`id` INT NOT NULL AUTO_INCREMENT,
+`name` VARCHAR(255) NOT NULL,
+`password` VARCHAR(255) NOT NULL,
+`created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+`updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+ON UPDATE CURRENT_TIMESTAMP,
+PRIMARY KEY (`id`)
+);
+
+-- admin_users MasterUser
+INSERT INTO admin_users (name, password)
+VALUES ('admin', 'Yoshidajobi2024');

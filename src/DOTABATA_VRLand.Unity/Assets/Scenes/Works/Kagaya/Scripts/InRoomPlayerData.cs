@@ -1,48 +1,60 @@
 ﻿using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class InRoomPlayerData : Singleton<InRoomPlayerData> {
     // 自分
-    private PlayerData mySelf;
-    public PlayerData MySelf { get { return mySelf; } }
+    public PlayerData MySelf { get; private set; }
     // プレイヤーリスト
-    private Dictionary<Guid, PlayerData> playerList;
-    public Dictionary<Guid, PlayerData> PlayerList { get { return playerList; } }
-
-    protected override void Awake() {
-        base.Awake();
-        playerList = new Dictionary<Guid, PlayerData>();
-    }
+    public Dictionary<Guid, PlayerData> PlayerList { get; private set; } = new Dictionary<Guid, PlayerData>();
 
     /// <summary>
     /// 初期化
     /// </summary>
     public void Init() {
-        mySelf = null;
-        playerList.Clear();
+        MySelf = null;
+        PlayerList.Clear();
     }
 
     /// <summary>
     /// 自分の情報を追加
     /// </summary>
     public void SetMySelf(PlayerData self) {
-        mySelf = self;
+        MySelf = self;
     }
 
     /// <summary>
     /// プレイヤーリストに追加
     /// </summary>
     public void AddPlayer(Guid connectionId,  PlayerData playerData) {
-        playerList[connectionId] = playerData;
+        PlayerList[connectionId] = playerData;
     }
 
     /// <summary>
     /// プレイヤーリストから削除
     /// </summary>
     public void RemovePlayer(Guid connectionId) {
-        Destroy(playerList[connectionId].playerObj);
-        playerList.Remove(connectionId);
+        int joinOrder = PlayerList[connectionId].joinedUser.JoinOrder;
+
+        Destroy(PlayerList[connectionId].playerObj);
+        PlayerList.Remove(connectionId);
+
+        // JoinOeder繰り下げ
+        if (MySelf != null &&
+            MySelf.joinedUser != null &&
+            MySelf.joinedUser.JoinOrder > joinOrder) {
+            MySelf.joinedUser.JoinOrder--;
+        }
+
+        foreach (PlayerData player in PlayerList.Values) {
+            if (player == null || player.joinedUser == null)
+                continue;
+
+            if (player.joinedUser.JoinOrder > joinOrder) {
+                player.joinedUser.JoinOrder--;
+            }
+        }
     }
 }

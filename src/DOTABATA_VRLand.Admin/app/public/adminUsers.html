@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理ユーザー管理</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            background-color: #f4f6f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.1);
+        }
+
+        .top-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            padding: 10px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .create-btn {
+            background: #007bff;
+            color: white;
+        }
+
+        .detail-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th,
+        .user-table td {
+            padding: 14px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .user-table th {
+            background-color: #f8f9fa;
+        }
+
+        .user-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>管理ユーザー管理</h1>
+
+    <div class="card">
+
+        <div class="top-area">
+
+            <button class="create-btn" onclick="location.href='/adminUser_create.html'">
+                ＋ 管理ユーザー作成
+            </button>
+
+            <div class="search-box">
+                <input
+                        type="text"
+                        placeholder="ユーザー名を検索">
+                <button>検索</button>
+            </div>
+
+        </div>
+
+        <table class="user-table">
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>ユーザー名</th>
+                <th>作成日</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+
+            <tbody id="admin-user-list">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <a href="/main.html" class="home-link">
+        ホームへ戻る
+    </a>
+
+</div>
+<script src="./js/adminUsers.js"></script>
+</body>
+</html>
