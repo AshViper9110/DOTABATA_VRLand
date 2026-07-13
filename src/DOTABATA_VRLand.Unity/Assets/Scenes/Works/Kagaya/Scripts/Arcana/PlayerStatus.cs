@@ -181,6 +181,11 @@ public class PlayerStatus : MonoBehaviour {
 
         if (hp <= 0) {
             IsDead = true;
+
+            shieldInfoSlider.gameObject.SetActive(false);
+            shieldEffect.SetActive(false);
+            arcanaGameManager.myController.drawBoadObj.SetActive(false);
+
             arcanaGameManager.DeathAsync();
         }
 

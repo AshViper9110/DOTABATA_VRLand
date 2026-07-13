@@ -53,7 +53,7 @@ public class ArcanaGameManager : MonoBehaviour {
     [SerializeField] private List<GameObject> magicStaffObjects;
 
     // 自分のコントロ
-    private ArcanaPlayerController myController;
+    public ArcanaPlayerController myController {  get; private set; }
 
     // playerのカメラUI
     [SerializeField] private GameObject playerCameraUI;
