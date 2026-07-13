@@ -678,8 +678,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// 死亡同期
         /// </summary>
         public Task DeathAsync() {
-            // 全員に通知
-            this._roomContext.Group.All.OnDeath(this.ConnectionId);
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnDeath(this.ConnectionId);
 
             lock (this._roomContext.MiniGameContexts._arcanaContext) {
                 // コンテストからプレイヤーを削除
@@ -789,6 +789,15 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         {
             // 全員に通知
             this._roomContext.Group.All.OnSelectFreeMinigame(name);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// ブロック崩しスコア送信
+        /// </summary>
+        public Task BlockBreakSendScoreAsync(int score) {
+            // 全員に通知
+            this._roomContext.Group.All.OnBlockBreakSendScore(this.ConnectionId, score);
             return Task.CompletedTask;
         }
     }

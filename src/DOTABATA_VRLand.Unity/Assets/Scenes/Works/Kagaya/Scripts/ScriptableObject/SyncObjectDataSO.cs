@@ -10,7 +10,8 @@ public class SyncObjectDataSO : ScriptableObject {
         Bowling,
         Kinko,
         BombDodge,
-        PanicSoda
+        PanicSoda,
+        BlockBreak
     }
 
     public Minigames minigame = Minigames.None;

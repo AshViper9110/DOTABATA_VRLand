@@ -25,7 +25,7 @@ public class ArcanaPlayerController : MonoBehaviour {
     private Transform rightHand;
 
     // 絵描き板
-    private GameObject drawBoadObj;
+    public GameObject drawBoadObj {  get; private set; }
 
     // Input
     // HandType
