@@ -21,7 +21,7 @@ public class AudioManager : MonoBehaviour
         Bank_Open,
         //Click
         Button_Click,
-        Bomb_Catch,
+        Bomb_Catch,n
     }
 
     public enum BGM

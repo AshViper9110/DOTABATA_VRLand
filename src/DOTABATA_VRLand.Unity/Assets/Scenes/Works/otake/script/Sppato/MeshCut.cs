@@ -381,19 +381,20 @@ public class MeshCut : MonoBehaviour
         }
         fragment.GetComponent<MeshRenderer>().sharedMaterials = targetGameObject.GetComponent<MeshRenderer>().sharedMaterials;
 
-        MeshCollider originMC =
-    targetGameObject.GetComponent<MeshCollider>();
+        MeshCollider originMC = targetGameObject.GetComponent<MeshCollider>();
+
 
         if (originMC != null)
         {
-
-
             originMesh.RecalculateBounds();
+            originMesh.RecalculateNormals();
+            originMesh.RecalculateTangents();
 
             Vector3 size = originMesh.bounds.size;
 
             if (Mathf.Min(size.x, size.y, size.z) > 0.001f)
             {
+                originMC.sharedMesh = null;
                 originMC.convex = true;
                 originMC.sharedMesh = originMesh;
             }
@@ -402,32 +403,82 @@ public class MeshCut : MonoBehaviour
                 Destroy(originMC);
                 targetGameObject.AddComponent<BoxCollider>();
             }
-
         }
 
-        MeshCollider fragMC =
-            fragment.GetComponent<MeshCollider>();
+
+
+
+        MeshCollider fragMC = fragment.GetComponent<MeshCollider>();
+
+        // Validate は fragMesh に対して行うべき
+        fragMesh = ValidateMesh(fragMesh);
 
         if (fragMC != null)
         {
-            fragMC.sharedMesh = null;
-            fragMC.sharedMesh = fragMesh;
-            fragMC.convex = true;
+            if (fragMesh.vertexCount >= 4)
+            {
+                fragMesh.RecalculateNormals();
+                fragMesh.RecalculateBounds();
+                fragMesh.RecalculateTangents();
+
+                fragMC.sharedMesh = null;
+                fragMC.convex = true;
+                fragMC.sharedMesh = fragMesh;
+                 
+            }
+            else
+            {
+                Destroy(fragMC);
+            }
         }
 
-        if (targetGameObject.GetComponent<MeshCollider>())
-        {
-            //頂点が1点に重なっている場合にはエラーが出るので, 直したい場合はmesh.RecalculateBoundsのあとでmesh.bounds.size.magnitude<0.00001などで条件分けして対処してください
-            targetGameObject.GetComponent<MeshCollider>().sharedMesh = originMesh;
-            fragment.GetComponent<MeshCollider>().sharedMesh = fragMesh;
-        }
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
 
-  
+        //if (targetGameObject.GetComponent<MeshCollider>())
+        //{
+        //    //頂点が1点に重なっている場合にはエラーが出るので, 直したい場合はmesh.RecalculateBoundsのあとでmesh.bounds.size.magnitude<0.00001などで条件分けして対処してください
+        //    targetGameObject.GetComponent<MeshCollider>().sharedMesh = originMesh;
+        //    fragment.GetComponent<MeshCollider>().sharedMesh = fragMesh;
+        //}
+
+
 
         return (fragment, targetGameObject);
 
     }
 
+
+   static Mesh ValidateMesh(Mesh mesh)
+    {
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        mesh.RecalculateTangents();
+
+        // ゼロ面積の三角形を除去
+        List<int> tris = new List<int>();
+        var vertices = mesh.vertices;
+        var indices = mesh.triangles;
+
+        for (int i = 0; i < indices.Length; i += 3)
+        {
+            Vector3 a = vertices[indices[i]];
+            Vector3 b = vertices[indices[i + 1]];
+            Vector3 c = vertices[indices[i + 2]];
+
+            float area = Vector3.Cross(b - a, c - a).magnitude * 0.5f;
+            if (area > 0.00001f)
+            {
+                tris.Add(indices[i]);
+                tris.Add(indices[i + 1]);
+                tris.Add(indices[i + 2]);
+            }
+        }
+
+        mesh.triangles = tris.ToArray();
+        return mesh;
+    }
 
 
     //ポリゴンを切断

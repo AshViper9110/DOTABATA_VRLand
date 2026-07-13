@@ -10,6 +10,8 @@ public class SppatoManager : MonoBehaviour
     [SerializeField] GameObject prefab;
     [SerializeField] Cutter Cutter;
 
+    [SerializeField] List<GameObject> FoodPrefabs;
+
     public static void Register(GameObject obj)
     {
         MineFragments.Add(obj);
@@ -29,8 +31,14 @@ public class SppatoManager : MonoBehaviour
     public void ResteObject()
     {
         SppatoManager.DestroyAll();
-        Instantiate(prefab,setpos.position,Quaternion.identity);
+
+        int index = Random.Range(0, FoodPrefabs.Count);
+
+        GameObject food =Å@Instantiate(FoodPrefabs[index],setpos.position,Quaternion.identity);
+        
         Cutter.CutOk = false;
+        Cutter.cutCount = 0;
+        SppatoManager.Register(food);
 
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created

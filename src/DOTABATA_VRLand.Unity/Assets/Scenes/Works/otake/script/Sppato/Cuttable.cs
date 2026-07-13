@@ -7,4 +7,7 @@ public class Cuttable : MonoBehaviour
 
     [Tooltip("切断後のクールダウン時間")]
     public float coolTime = 0.1f;
+
+    public int cutCount = 0;
+    public int maxCutCount = 10;
 }
