@@ -137,7 +137,8 @@ public class BombBallManager : MonoBehaviour
             if (other.transform.parent.transform.parent.gameObject == InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj)
             {
                 if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<BombDogePlayer>().isDead) return;
-               
+
+                syncObject.GetOwnership(true);
                 RoomModel.I.HitDodgeBall();
             }
         }

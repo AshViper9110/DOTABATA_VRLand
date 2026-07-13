@@ -151,7 +151,7 @@ public class BombDodgeManager : MonoBehaviour
                     if (!b.isDead)
                     {//Ç‹Çæê∂ë∂é“Ç™Ç¢ÇΩÇÁë±çs
                         Debug.Log("ë±çs");
-                        break;
+                       return ;
                     }
                 }
             }
