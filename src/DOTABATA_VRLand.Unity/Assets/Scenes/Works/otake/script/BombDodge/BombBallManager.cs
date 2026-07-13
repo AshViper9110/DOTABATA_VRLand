@@ -42,9 +42,28 @@ public class BombBallManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        BombTimer -= Time.deltaTime;
+
 
         var hand = GetComponentInParent<Hand>();
+
+        hand = interactable.attachedToHand;
+
+        if (hand != null)
+        {
+            if (!syncObject.IsOwner)
+            {
+                if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<BombDogePlayer>().isDead) return;
+                syncObject.GetOwnership(true);
+                RestartPos = bombDodgeManager.BombStartpos[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].position;
+                Debug.Log("君の物だよ");
+                AudioManager.PlaySE(AudioManager.SE.Bomb_Catch);
+            }
+
+        }
+
+        BombTimer -= Time.deltaTime;
+
+
         if (BombTimer <= 0)
         {
             if (syncObject.IsOwner)
@@ -86,20 +105,7 @@ public class BombBallManager : MonoBehaviour
         BombTimerText.transform.LookAt(Camera.main.transform);
         BombTimerText.transform.Rotate(0, 180, 0);
 
-         hand = interactable.attachedToHand;
-
-        if (hand != null)
-        {
-            if (!syncObject.IsOwner)
-            {
-                if(InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<BombDogePlayer>().isDead)return;
-                syncObject.GetOwnership(true);
-                RestartPos = bombDodgeManager.BombStartpos[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].position;
-                Debug.Log("君の物だよ");
-                AudioManager.PlaySE(AudioManager.SE.Bomb_Catch);
-            }
-
-        }
+        
 
     }
 
