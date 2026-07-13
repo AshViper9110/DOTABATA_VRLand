@@ -7,6 +7,9 @@ public class Cutter : MonoBehaviour
     private Vector3 previousPosition;
     public bool CutOk = false;
 
+    public int cutCount = 0;
+    public int maxCutCount = 100;
+
     void Start()
     {
         previousPosition = transform.position;
@@ -29,6 +32,13 @@ public class Cutter : MonoBehaviour
         Cuttable cut = other.GetComponent<Cuttable>();
         if (cut == null)
             return;
+
+        // ’Ç‰ÁFØ’f‰ñ”§ŒÀ
+        if (cut.cutCount >= cut.maxCutCount)
+            return;
+        if(cutCount >= maxCutCount)
+            return ;
+
 
         // ƒN[ƒ‹ƒ_ƒEƒ“’†‚È‚çØ’f‚µ‚È‚¢
         if (Time.time < cut.nextCutTime)
@@ -63,19 +73,25 @@ public class Cutter : MonoBehaviour
         if (fragment == null || original == null)
             return;
 
-        // Ÿ‚ÉØ’f‚Å‚«‚é‚ğİ’è
+        cut.cutCount++;
+        cutCount++; 
+
+
+        // Ÿ‚ÉØ’f‚Å‚«‚é‚ğİ’è 
         float nextTime = Time.time + cut.coolTime;
 
         Cuttable originalCut = original.GetComponent<Cuttable>();
         if (originalCut != null)
         {
             originalCut.nextCutTime = nextTime;
+            originalCut.cutCount = cut.cutCount;
         }
 
         Cuttable fragmentCut = fragment.GetComponent<Cuttable>();
         if (fragmentCut != null)
         {
             fragmentCut.nextCutTime = nextTime;
+            fragmentCut.cutCount = cut.cutCount;
         }
 
         SppatoManager.Register(original);

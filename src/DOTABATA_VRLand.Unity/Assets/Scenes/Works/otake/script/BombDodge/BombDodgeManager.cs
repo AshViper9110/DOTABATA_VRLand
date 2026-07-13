@@ -54,6 +54,7 @@ public class BombDodgeManager : MonoBehaviour
                     obj.playerObj.transform);
                 dogePlayer.EngelRing.transform.Rotate(90,0,0);
             }
+
             if (obj.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) {
                 obj.playerObj.transform.position = startpos[obj.joinedUser.JoinOrder - 1].position;
                 obj.playerObj.transform.LookAt(center);
@@ -81,9 +82,9 @@ public class BombDodgeManager : MonoBehaviour
                     Quaternion.identity);
                 gameObject.GetComponent<BombBallManager>().RestartPos = gameObject.transform.position;
                 Bomb = gameObject.GetComponent<BombBallManager>();
-                AudioManager.ChangeBGM(AudioManager.BGM.Bom_doge);
-            }
 
+            }
+            AudioManager.ChangeBGM(AudioManager.BGM.Bom_doge);
             isStart = true;
         }
 
@@ -125,8 +126,12 @@ public class BombDodgeManager : MonoBehaviour
     public void OnHitingBomber(Guid ConnectionId)
     {
         BombDogePlayer player = InRoomPlayerData.I.PlayerList[ConnectionId].playerObj.GetComponent<BombDogePlayer>();
-        if (player == null)return;
-        player.isDead = true;
+        if (player == null)
+        {
+            Debug.LogAssertion("マネージャー無かった");
+            return;
+        }
+            player.isDead = true;
 
         if(NetworkManager.I.myConnectionId == ConnectionId)
         {
@@ -145,7 +150,7 @@ public class BombDodgeManager : MonoBehaviour
                 {
                     if (!b.isDead)
                     {//まだ生存者がいたら続行
-                        
+                        Debug.Log("続行");
                         break;
                     }
                 }

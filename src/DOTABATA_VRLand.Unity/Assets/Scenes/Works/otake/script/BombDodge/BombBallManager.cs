@@ -44,17 +44,24 @@ public class BombBallManager : MonoBehaviour
     {
         BombTimer -= Time.deltaTime;
 
+        var hand = GetComponentInParent<Hand>();
         if (BombTimer <= 0)
         {
-            BombTimer = 0;
-    
-            Instantiate(BomberEffectPrefab,
-              transform.position,
-                Quaternion.identity);
-            bombDodgeManager.StartCreateBall();
+            if (syncObject.IsOwner)
+            {
+                BombTimer = 0;
 
-       
+                Instantiate(BomberEffectPrefab,
+                  transform.position,
+                    Quaternion.identity);
+                bombDodgeManager.StartCreateBall();
+            }
 
+
+            if (hand != null)
+            {
+                hand.DetachObject(gameObject);
+            }
 
             Destroy(this.gameObject);
            
@@ -79,7 +86,7 @@ public class BombBallManager : MonoBehaviour
         BombTimerText.transform.LookAt(Camera.main.transform);
         BombTimerText.transform.Rotate(0, 180, 0);
 
-        var hand = interactable.attachedToHand;
+         hand = interactable.attachedToHand;
 
         if (hand != null)
         {

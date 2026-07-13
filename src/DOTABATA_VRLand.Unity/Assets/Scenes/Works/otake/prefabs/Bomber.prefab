@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8828813636615783714}
   - component: {fileID: 1662224552906813655}
   - component: {fileID: 6332147686020699065}
+  - component: {fileID: 6482242115967941432}
   m_Layer: 0
   m_Name: Bomber
   m_TagString: Bomber
@@ -220,6 +221,26 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &6482242115967941432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2720861534154561069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minigame: 0
+  objectListId: 0
+  SendCreate: 1
+  SendTransform: 1
+  SendSpan: 0.2
+  SendDestroy: 1
+  stringObjectId: 
+  Initialized: 0
 --- !u!1001 &4474736943846859590
 PrefabInstance:
   m_ObjectHideFlags: 0
