@@ -188,5 +188,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
        　Task SelectFreeMinigame(string name);
 
+        /// <summary>
+        /// ブロック崩しスコア送信
+        /// </summary>
+        Task BlockBreakSendScoreAsync(int score);
+
     }
 }

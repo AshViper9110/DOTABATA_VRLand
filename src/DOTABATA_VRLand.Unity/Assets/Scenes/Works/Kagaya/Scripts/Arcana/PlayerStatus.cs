@@ -72,7 +72,7 @@ public class PlayerStatus : MonoBehaviour {
     private void Start() {
         syncPlayer = this.GetComponent<SyncPlayer>();
 
-        if (syncPlayer.IsOwner()) {
+        if (syncPlayer.IsOwner) {
             hpImages = this.GetComponentsInChildren<Transform>(true).First(_ => _.gameObject.name == "MyHeats");
             hpImages.gameObject.SetActive(true);
         }
@@ -86,7 +86,7 @@ public class PlayerStatus : MonoBehaviour {
     private void Update() {
         if (IsDead) return;
 
-        if (syncPlayer.IsOwner()) {
+        if (syncPlayer.IsOwner) {
             if (!isShield) {
                 useShieldFlameTimer = 0;
                 shieldAmount += Time.deltaTime * healShieldAmount;
@@ -143,7 +143,7 @@ public class PlayerStatus : MonoBehaviour {
     /// ダメージ受ける処理
     /// </summary>
     public async UniTask<bool> OnDamage(GameObject magicBall, GameObject hit, GameObject shieldHit, GameObject justHit) {
-        if (!syncPlayer.IsOwner()) return true;
+        if (!syncPlayer.IsOwner) return true;
 
         Debug.Log("ダメージ処理");
 
