@@ -134,7 +134,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// ボーリングの順番変え
         /// </summary>
-        Task BallingNext();
+        Task BallingNext(int pinCount, JoinedUser joinedUser);
 
 
         /// <summary>

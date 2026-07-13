@@ -162,7 +162,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid, bool> OnShieldActivedState { get; set; }
 
-    public Action<int> OnBallingNexted { get; set; }
+    public Action<int, JoinedUser, int> OnBallingNexted { get; set; }
 
     public Action<Guid> OnHitingDodgeBall { get; set; }
     public Action<Guid> OnHitingBomber { get; set; }
@@ -827,20 +827,20 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         }
     }
 
-    public async UniTask BallingNext()
+    public async UniTask BallingNext(int pinCount, JoinedUser joinedUser)
     {
         if (roomHub == null)
         {
             throw new Exception("RoomHubがnullです。");
         }
-        await roomHub.BallingNext();
+        await roomHub.BallingNext(pinCount, joinedUser);
     }
 
-    public void OnBallingNext(int order)
+    public void OnBallingNext(int order, JoinedUser joinedUser, int pinCount)
     {
         if (OnBallingNexted != null)
         {
-            OnBallingNexted(order);
+            OnBallingNexted(order, joinedUser, pinCount);
         }
     }
 

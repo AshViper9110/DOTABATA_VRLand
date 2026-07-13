@@ -26,7 +26,7 @@ public class MinigameScript : MonoBehaviour
 
     void Start()
     {
-        AudioManager.StopBgm(); ;
+        AudioManager.StopBgm();
 
         //シーン移行後の位置配置
         var myId = NetworkManager.I.myConnectionId;

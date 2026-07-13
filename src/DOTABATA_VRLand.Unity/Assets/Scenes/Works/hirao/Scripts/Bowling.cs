@@ -1,5 +1,7 @@
+using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
@@ -18,11 +20,13 @@ public class Bowling : MonoBehaviour
     [SerializeField] private GameObject pin;
     [SerializeField] private Transform spawnPosBall;
     [SerializeField] private Transform spawnPosPin;
-    [SerializeField] private Text defeatedPinText;
-    [SerializeField] private Text defeatedPinTextLog;
+    [SerializeField] private TextMeshProUGUI defeatedPinText;
+    [SerializeField] private TextMeshProUGUI defeatedPinTextLog;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip pinDown;
+    [SerializeField] private GameObject panel;
     private int defeatedPinCount = 0;
+    private float panelOffset = 5;
 
     private int currentNextGameTime = -1;
 
@@ -33,22 +37,26 @@ public class Bowling : MonoBehaviour
     private void OnEnable()
     {
         if (RoomModel.I == null) return;
+        RoomModel.I.OnCountdownAction += StartCountdown;
         RoomModel.I.OnBallingNexted += OnBallingNexted;
     }
 
     private void OnDisable()
     {
         if (RoomModel.I == null) return;
+        RoomModel.I.OnCountdownAction -= StartCountdown;
         RoomModel.I.OnBallingNexted -= OnBallingNexted;
     }
 
-    private void OnBallingNexted(int order)
+    private void OnBallingNexted(int order, JoinedUser joinedUser, int pinCount)
     {
         UpdatePlayerPosition(order);
+        defeatedPinTextLog.text += $"{joinedUser.Name} : {pinCount}–{";
     }
 
     private void Start()
     {
+        AudioManager.StopBgm();
         UpdatePlayerPosition(1);
     }
 
@@ -80,6 +88,8 @@ public class Bowling : MonoBehaviour
             return;
 
         playerData.playerObj.transform.position = playerPos[index].position;
+        Vector3 panelPos = new Vector3(playerPos[index].position.x, playerPos[index].position.y, playerPos[index].position.z + panelOffset);
+        panel.transform.position = panelPos;
     }
 
     private async void FixedUpdate()
@@ -96,15 +106,18 @@ public class Bowling : MonoBehaviour
                     currentNextGameTime = 120;
                 }
             }
-            defeatedPinText.text = $"{defeatedPinCount}–{";
+            defeatedPinText.text = $"{InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.Name} : {defeatedPinCount}–{";
         }
 
         if (currentNextGameTime == 0)
         {
             currentNextGameTime = -1;
             DeletePins();
+            var myId = NetworkManager.I.myConnectionId;
+            if (!InRoomPlayerData.I.PlayerList.TryGetValue(myId, out var playerData)) return;
+            JoinedUser joinedUser = playerData.joinedUser;
             RoomModel.I.SendScore(defeatedPinCount);
-            await RoomModel.I.BallingNext();
+            await RoomModel.I.BallingNext(defeatedPinCount, joinedUser);
         }
         else if (currentNextGameTime > 0)
         {
@@ -191,6 +204,14 @@ public class Bowling : MonoBehaviour
                 pinList.Add(pinStatus);
                 pinCount++;
             }
+        }
+    }
+
+    public void StartCountdown(int remain)
+    {
+        if (remain <= 0)
+        {
+            AudioManager.ChangeBGM(AudioManager.BGM.Bowling);
         }
     }
 }

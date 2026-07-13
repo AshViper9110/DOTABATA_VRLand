@@ -740,10 +740,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         //ボーリングの順番変え
-        public Task BallingNext()
+        public Task BallingNext(int pinCount, JoinedUser joinedUser)
         {
             this._roomContext.ballingOrder++;
-            this._roomContext.Group.All.OnBallingNext(this._roomContext.ballingOrder);
+            this._roomContext.Group.All.OnBallingNext(this._roomContext.ballingOrder, joinedUser, pinCount);
             return Task.CompletedTask;
         }
 
