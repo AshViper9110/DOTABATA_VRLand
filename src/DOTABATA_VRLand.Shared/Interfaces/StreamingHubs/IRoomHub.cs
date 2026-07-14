@@ -193,5 +193,9 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
         Task BlockBreakSendScoreAsync(int score);
 
+        /// <summary>
+        /// 音の同期
+        /// </summary>
+        Task AudioAsync(int id);
     }
 }

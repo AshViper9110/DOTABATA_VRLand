@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using UnityEngine;
-
 using static SyncObjectDataSO;
 
 
@@ -176,6 +175,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// スコア送信通知
     /// </summary>
     public Action<Guid, int> OnBlockBreakSendedScore { get; set; }
+
+    public Action<int> OnAudioAsyncAction { get; set; }
 
     /*
      * 処理
@@ -940,6 +941,23 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public void OnBlockBreakSendScore(Guid playerConId, int score) {
         if (OnBlockBreakSendedScore != null) {
             OnBlockBreakSendedScore(playerConId, score);
+        }
+    }
+
+    public async UniTask AudioAsync(int id)
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.AudioAsync(id);
+    }
+
+    public void OnAudioAsync(int id)
+    {
+        if(OnAudioAsyncAction != null)
+        {
+            OnAudioAsyncAction(id);
         }
     }
 }

@@ -26,7 +26,7 @@ public class Bowling : MonoBehaviour
     [SerializeField] private AudioClip pinDown;
     [SerializeField] private GameObject panel;
     private int defeatedPinCount = 0;
-    private float panelOffset = 3;
+    private float panelOffset = 2;
 
     private int currentNextGameTime = -1;
 
@@ -51,7 +51,7 @@ public class Bowling : MonoBehaviour
     private void OnBallingNexted(int order, JoinedUser joinedUser, int pinCount)
     {
         UpdatePlayerPosition(order);
-        defeatedPinTextLog.text += $"{joinedUser.Name} : {pinCount}–{";
+        defeatedPinTextLog.text += $"\n{joinedUser.Name} : {pinCount}–{";
     }
 
     private void Start()
@@ -101,7 +101,8 @@ public class Bowling : MonoBehaviour
                 if (!pinStatus.isDefeated && Vector3.Angle(pinStatus.gameObject.transform.up, Vector3.up) > 30)
                 {
                     defeatedPinCount++;
-                    audioSource.PlayOneShot(pinDown);
+                    //Pin‚Ì“|‚ê‚é‰¹‚Ì“¯Šú
+                    await RoomModel.I.AudioAsync(0);
                     pinStatus.isDefeated = true;
                     currentNextGameTime = 120;
                 }
