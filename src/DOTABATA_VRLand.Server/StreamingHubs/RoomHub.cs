@@ -800,5 +800,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             this._roomContext.Group.All.OnBlockBreakSendScore(this.ConnectionId, score);
             return Task.CompletedTask;
         }
+
+        public Task AudioAsync(int id)
+        {
+            // 全員に通知
+            this._roomContext.Group.All.OnAudioAsync(id);
+            return Task.CompletedTask;
+        }
     }
 }

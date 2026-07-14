@@ -13,6 +13,10 @@ public class NetworkManager : Singleton<NetworkManager>
     public bool isJoin = false;
     public int gameModeId = 0;//フリープレイ:0/大会モード:1
 
+    [Header("Sound Sync")]
+    [SerializeField] private AudioSource myAudioSource;
+    [SerializeField] private List<AudioClip> audioClips;
+
 
     /// <summary>
     /// TextにLogを表示
@@ -37,6 +41,7 @@ public class NetworkManager : Singleton<NetworkManager>
         RoomModel.I.OnGetRanking += OnGetRanking;
         RoomModel.I.OnHostProgressed += OnHostProgress;
         RoomModel.I.onUpdateNit += OnUpdateNit;
+        RoomModel.I.OnAudioAsyncAction += OnAudioAsync;
     }
 
     private void OnDisable()
@@ -45,6 +50,7 @@ public class NetworkManager : Singleton<NetworkManager>
         {
             RoomModel.I.OnJoinedUser -= OnJoinedUser;
             RoomModel.I.OnLeavedUser -= OnLeavedUser;
+            RoomModel.I.OnAudioAsyncAction -= OnAudioAsync;
         }
     }
 
@@ -259,11 +265,11 @@ public class NetworkManager : Singleton<NetworkManager>
         
         NitnitManager nitnitManager = GameObject.Find("GameManager").GetComponent<NitnitManager>();
         MufflerSetManager mufflerSet = nitnitManager.mufflerSets[InRoomPlayerData.I.PlayerList[id].joinedUser.JoinOrder-1];
-     
+        mufflerSet.addNit(point);
+    }
 
-       
-            mufflerSet.addNit(point);
-        
-       
+    public void OnAudioAsync(int id)
+    {
+        myAudioSource.PlayOneShot(audioClips[id]);
     }
 }

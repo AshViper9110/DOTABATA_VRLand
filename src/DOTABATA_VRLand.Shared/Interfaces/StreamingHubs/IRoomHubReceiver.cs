@@ -175,6 +175,11 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// スコア送信通知
         /// </summary>
         public void OnBlockBreakSendScore(Guid playerConId, int score);
+
+        /// <summary>
+        /// 音の同期通知
+        /// </summary>
+        public void OnAudioAsync(int id);
     }
 
 }
