@@ -2,13 +2,13 @@
 using System;
 using UnityEngine;
 
-public class BulletController : MonoBehaviour {
+public class BlockBreakBulletController : MonoBehaviour {
     private SyncObject syncObject;
     private Rigidbody myRb;
 
     private Guid shotPlayerConId;
 
-    [SerializeField] private float maxLife;
+    public float maxLife;
     [SerializeField] private float life;
 
     private void Awake() {
