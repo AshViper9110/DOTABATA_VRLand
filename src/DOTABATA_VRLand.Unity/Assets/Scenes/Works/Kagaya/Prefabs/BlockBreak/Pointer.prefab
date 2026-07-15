@@ -183,8 +183,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3811339871036385914}
+  - component: {fileID: -7656466274207532844}
+  - component: {fileID: -6242373580396598134}
+  - component: {fileID: -2511551719227363655}
   m_Layer: 0
-  m_Name: CrossHair
+  m_Name: Pointer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -200,10 +203,57 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4071667720614100648}
   - {fileID: 5110809278925799725}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-7656466274207532844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6973520567413723669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a65746361cafc64f8c61d81801ab5dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isReverse: 1
+--- !u!114 &-6242373580396598134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6973520567413723669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minigame: 7
+  objectListId: 2
+  SendCreate: 1
+  SendTransform: 1
+  SendSpan: 0.05
+  SendDestroy: 1
+  stringObjectId: 
+  Initialized: 0
+--- !u!114 &-2511551719227363655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6973520567413723669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18b5a0b9ca21a934fa24841e8aff68ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pointer_1: {fileID: 7287333437287946812}
+  pointer_2: {fileID: 7660495507419307121}

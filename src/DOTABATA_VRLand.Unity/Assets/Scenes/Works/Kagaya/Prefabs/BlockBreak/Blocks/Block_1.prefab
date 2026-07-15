@@ -13,10 +13,11 @@ GameObject:
   - component: {fileID: 8460599332577747598}
   - component: {fileID: 746903665663023869}
   - component: {fileID: 2068827502171226860}
-  - component: {fileID: 1586787620130855201}
+  - component: {fileID: -6767722890067044916}
+  - component: {fileID: -2698584689428613395}
   m_Layer: 0
   m_Name: Block_1
-  m_TagString: Untagged
+  m_TagString: BBBlock
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -68,6 +69,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 39f651e340882304fa6f21b321d3bea5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -118,7 +120,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 592557554832215387}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 3
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -136,8 +138,8 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!114 &1586787620130855201
+  m_CollisionDetection: 1
+--- !u!114 &-6767722890067044916
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -149,11 +151,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minigame: 0
-  objectListId: 0
+  minigame: 7
+  objectListId: 3
   SendCreate: 1
   SendTransform: 1
   SendSpan: 0.1
   SendDestroy: 1
   stringObjectId: 
   Initialized: 0
+--- !u!114 &-2698584689428613395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 592557554832215387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dea79193b043b77498018d7db72e549d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blockId: 1

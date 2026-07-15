@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7946802661623111280}
   - component: {fileID: 2354632939160493352}
   - component: {fileID: 6939023688453165088}
+  - component: {fileID: 1427338350781373472}
   m_Layer: 0
   m_Name: Bullet
   m_TagString: BBBullet
@@ -149,5 +150,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e18f17d1e9cc04408ccd38019ff50a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxLife: 0
+  maxLife: 5
   life: 0
+--- !u!114 &1427338350781373472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6396568369772777938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minigame: 7
+  objectListId: 1
+  SendCreate: 1
+  SendTransform: 1
+  SendSpan: 0.1
+  SendDestroy: 1
+  stringObjectId: 
+  Initialized: 0
