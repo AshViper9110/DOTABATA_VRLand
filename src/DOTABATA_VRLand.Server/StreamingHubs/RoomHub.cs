@@ -740,10 +740,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         //ボーリングの順番変え
-        public Task BallingNext()
+        public Task BallingNext(int pinCount, JoinedUser joinedUser)
         {
             this._roomContext.ballingOrder++;
-            this._roomContext.Group.All.OnBallingNext(this._roomContext.ballingOrder);
+            this._roomContext.Group.All.OnBallingNext(this._roomContext.ballingOrder, joinedUser, pinCount);
             return Task.CompletedTask;
         }
 
@@ -798,6 +798,13 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public Task BlockBreakSendScoreAsync(int score) {
             // 全員に通知
             this._roomContext.Group.All.OnBlockBreakSendScore(this.ConnectionId, score);
+            return Task.CompletedTask;
+        }
+
+        public Task AudioAsync(int id)
+        {
+            // 全員に通知
+            this._roomContext.Group.All.OnAudioAsync(id);
             return Task.CompletedTask;
         }
     }

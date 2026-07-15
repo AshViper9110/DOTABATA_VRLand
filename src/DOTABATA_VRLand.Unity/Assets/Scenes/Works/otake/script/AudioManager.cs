@@ -34,6 +34,7 @@ public class AudioManager : MonoBehaviour
         Bom_doge,
         Arcana,
         Bank,
+        Bowling,
     }
 
     [SerializeField] public List<AudioClip> seClips = new List<AudioClip>();

@@ -42,19 +42,45 @@ public class BombBallManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+
+        var hand = GetComponentInParent<Hand>();
+
+        hand = interactable.attachedToHand;
+
+        if (hand != null)
+        {
+            if (!syncObject.IsOwner)
+            {
+                if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<BombDogePlayer>().isDead) return;
+                syncObject.GetOwnership(true);
+                RestartPos = bombDodgeManager.BombStartpos[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].position;
+                Debug.Log("君の物だよ");
+                AudioManager.PlaySE(AudioManager.SE.Bomb_Catch);
+            }
+
+        }
+
         BombTimer -= Time.deltaTime;
+
 
         if (BombTimer <= 0)
         {
-            BombTimer = 0;
-    
-            Instantiate(BomberEffectPrefab,
-              transform.position,
-                Quaternion.identity);
-            bombDodgeManager.StartCreateBall();
+            if (syncObject.IsOwner)
+            {
+                BombTimer = 0;
 
-       
+                Instantiate(BomberEffectPrefab,
+                  transform.position,
+                    Quaternion.identity);
+                bombDodgeManager.StartCreateBall();
+            }
 
+
+            if (hand != null)
+            {
+                hand.DetachObject(gameObject);
+            }
 
             Destroy(this.gameObject);
            
@@ -79,20 +105,7 @@ public class BombBallManager : MonoBehaviour
         BombTimerText.transform.LookAt(Camera.main.transform);
         BombTimerText.transform.Rotate(0, 180, 0);
 
-        var hand = interactable.attachedToHand;
-
-        if (hand != null)
-        {
-            if (!syncObject.IsOwner)
-            {
-                if(InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<BombDogePlayer>().isDead)return;
-                syncObject.GetOwnership(true);
-                RestartPos = bombDodgeManager.BombStartpos[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].position;
-                Debug.Log("君の物だよ");
-                AudioManager.PlaySE(AudioManager.SE.Bomb_Catch);
-            }
-
-        }
+        
 
     }
 
@@ -124,7 +137,8 @@ public class BombBallManager : MonoBehaviour
             if (other.transform.parent.transform.parent.gameObject == InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj)
             {
                 if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<BombDogePlayer>().isDead) return;
-               
+
+                syncObject.GetOwnership(true);
                 RoomModel.I.HitDodgeBall();
             }
         }

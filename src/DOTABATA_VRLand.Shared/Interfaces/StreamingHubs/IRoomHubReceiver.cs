@@ -121,7 +121,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// ボーリングの順番変え通知
         /// </summary>
-        public void OnBallingNext(int order);
+        public void OnBallingNext(int order, JoinedUser joinedUser, int pinCount);
 
         /// <summary>
         /// 爆弾ドッチボールのヒット通知
@@ -175,6 +175,11 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// スコア送信通知
         /// </summary>
         public void OnBlockBreakSendScore(Guid playerConId, int score);
+
+        /// <summary>
+        /// 音の同期通知
+        /// </summary>
+        public void OnAudioAsync(int id);
     }
 
 }
