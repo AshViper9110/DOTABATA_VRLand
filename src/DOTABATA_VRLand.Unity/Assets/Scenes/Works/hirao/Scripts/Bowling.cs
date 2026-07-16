@@ -25,6 +25,7 @@ public class Bowling : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip pinDown;
     [SerializeField] private GameObject panel;
+    [SerializeField] private GameObject monitor;
     private int defeatedPinCount = 0;
     private float panelOffset = 2;
 
@@ -116,6 +117,7 @@ public class Bowling : MonoBehaviour
             DeletePins();
             RoomModel.I.SendScore(defeatedPinCount);
             await RoomModel.I.BallingNext(defeatedPinCount, InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser);
+            defeatedPinCount = 0;
         }
         else if (currentNextGameTime > 0)
         {
@@ -209,6 +211,7 @@ public class Bowling : MonoBehaviour
         if (remain <= 0)
         {
             AudioManager.ChangeBGM(AudioManager.BGM.Bowling);
+            monitor.SetActive(true);
         }
     }
 }
