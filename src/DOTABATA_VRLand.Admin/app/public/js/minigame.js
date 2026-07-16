@@ -21,11 +21,11 @@ async function loadMinigames() {
         <td>${playable}</td>
         <td>${updatedAt}</td>
         <td>
-          <button
+         <button
             class="detail-btn"
-            onclick="location.href='/minigame-detail.html?id=${game.id}'">
+            onclick="location.href='/minigame_detail.html?id=${game.id}'">
             詳細
-          </button>
+        </button>
         </td>
       `;
 
