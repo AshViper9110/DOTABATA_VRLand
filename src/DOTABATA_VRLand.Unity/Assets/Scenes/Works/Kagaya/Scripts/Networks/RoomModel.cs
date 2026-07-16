@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using static SyncObjectDataSO;
-using static UnityEngine.UIElements.UxmlAttributeDescription;
+
 
 public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     [SerializeField] private ServerConfigSO serverConfig;
@@ -162,13 +162,20 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid, bool> OnShieldActivedState { get; set; }
 
-    public Action<int> OnBallingNexted { get; set; }
+    public Action<int, JoinedUser, int> OnBallingNexted { get; set; }
 
     public Action<Guid> OnHitingDodgeBall { get; set; }
     public Action<Guid> OnHitingBomber { get; set; }
     public Action<Guid> OnOpenedShutter { get; set; }
 
     public Action<string> OnSelectedFreeMinigame { get; set; }
+
+    /// <summary>
+    /// スコア送信通知
+    /// </summary>
+    public Action<Guid, int> OnBlockBreakSendedScore { get; set; }
+
+    public Action<int> OnAudioAsyncAction { get; set; }
 
     /*
      * 処理
@@ -827,20 +834,20 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         }
     }
 
-    public async UniTask BallingNext()
+    public async UniTask BallingNext(int pinCount, JoinedUser joinedUser)
     {
         if (roomHub == null)
         {
             throw new Exception("RoomHubがnullです。");
         }
-        await roomHub.BallingNext();
+        await roomHub.BallingNext(pinCount, joinedUser);
     }
 
-    public void OnBallingNext(int order)
+    public void OnBallingNext(int order, JoinedUser joinedUser, int pinCount)
     {
         if (OnBallingNexted != null)
         {
-            OnBallingNexted(order);
+            OnBallingNexted(order, joinedUser, pinCount);
         }
     }
 
@@ -913,6 +920,43 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         else
         {
             Debug.Log("関数がnullです。");
+        }
+    }
+
+    /// <summary>
+    /// ブロック崩しスコア送信
+    /// </summary>
+    public async UniTask BlockBreakSendScoreAsync(int score) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.BlockBreakSendScoreAsync(score);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// スコア送信通知
+    /// </summary>
+    public void OnBlockBreakSendScore(Guid playerConId, int score) {
+        if (OnBlockBreakSendedScore != null) {
+            OnBlockBreakSendedScore(playerConId, score);
+        }
+    }
+
+    public async UniTask AudioAsync(int id)
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.AudioAsync(id);
+    }
+
+    public void OnAudioAsync(int id)
+    {
+        if(OnAudioAsyncAction != null)
+        {
+            OnAudioAsyncAction(id);
         }
     }
 }

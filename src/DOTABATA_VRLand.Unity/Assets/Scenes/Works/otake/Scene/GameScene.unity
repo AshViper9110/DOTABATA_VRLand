@@ -683,6 +683,8 @@ MonoBehaviour:
   - ShutterScene
   - BombDodge
   - SppatoIssen
+  - PanicSoda
+  - BlockBreak
   miniGameTitleImages:
   - {fileID: 21300000, guid: 424bc4de958d83e40a635d8903e25c90, type: 3}
   - {fileID: 21300000, guid: 73ee9c1bc49f7434c9e209fa345e23f2, type: 3}
@@ -691,6 +693,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c1118d367f0ca104094c7a8989e520bb, type: 3}
   - {fileID: 21300000, guid: b5f368549e7af8346937fab2bbdb638a, type: 3}
   - {fileID: 21300000, guid: 5d47e5032b12c914293920ba1c136c3a, type: 3}
+  - {fileID: 21300000, guid: 549754ee000feaf449d5fe5f4a4d6dc4, type: 3}
+  - {fileID: 0}
   miniGamesParent: {fileID: 1081529926}
   FreePlayMinigamePrefabs: {fileID: 4256499713822972155, guid: 2d3c376956184324cac393fc5bc85bd3, type: 3}
 --- !u!1 &357523745
@@ -2432,6 +2436,7 @@ MonoBehaviour:
   SendSpan: 0.04
   SendDestroy: 1
   stringObjectId: a87a648a-1ff0-4fed-916b-352908cf047a
+  Initialized: 0
 --- !u!114 &899546454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5802,6 +5807,7 @@ MonoBehaviour:
   SendSpan: 0.04
   SendDestroy: 1
   stringObjectId: a87a648a-1ff0-4fed-916b-352908cf047a
+  Initialized: 0
 --- !u!23 &5697858758095391308
 MeshRenderer:
   m_ObjectHideFlags: 0

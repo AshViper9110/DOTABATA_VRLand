@@ -15,4 +15,19 @@ public class ButtonAttribute : Editor {
         }
     }
 }
+
+[CustomEditor(typeof(BlockBreakBlockObjectsManager))]
+public class BlockObjectManagerAttribute : Editor {
+    public override void OnInspectorGUI() {
+        DrawDefaultInspector();
+
+        BlockBreakBlockObjectsManager bbBlockObjectManager = (BlockBreakBlockObjectsManager)target;
+        if (GUILayout.Button("SaveJson")) {
+            bbBlockObjectManager.CreateJson();
+        }
+        else if (GUILayout.Button("LoadAllJson")) {
+            bbBlockObjectManager.LoadAllJsonFromProjectsFile();
+        }
+    }
+}
 #endif

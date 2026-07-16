@@ -134,7 +134,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// ボーリングの順番変え
         /// </summary>
-        Task BallingNext();
+        Task BallingNext(int pinCount, JoinedUser joinedUser);
 
 
         /// <summary>
@@ -188,5 +188,14 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
        　Task SelectFreeMinigame(string name);
 
+        /// <summary>
+        /// ブロック崩しスコア送信
+        /// </summary>
+        Task BlockBreakSendScoreAsync(int score);
+
+        /// <summary>
+        /// 音の同期
+        /// </summary>
+        Task AudioAsync(int id);
     }
 }

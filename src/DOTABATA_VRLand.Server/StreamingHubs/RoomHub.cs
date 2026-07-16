@@ -678,8 +678,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// 死亡同期
         /// </summary>
         public Task DeathAsync() {
-            // 全員に通知
-            this._roomContext.Group.All.OnDeath(this.ConnectionId);
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnDeath(this.ConnectionId);
 
             lock (this._roomContext.MiniGameContexts._arcanaContext) {
                 // コンテストからプレイヤーを削除
@@ -740,10 +740,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         //ボーリングの順番変え
-        public Task BallingNext()
+        public Task BallingNext(int pinCount, JoinedUser joinedUser)
         {
             this._roomContext.ballingOrder++;
-            this._roomContext.Group.All.OnBallingNext(this._roomContext.ballingOrder);
+            this._roomContext.Group.All.OnBallingNext(this._roomContext.ballingOrder, joinedUser, pinCount);
             return Task.CompletedTask;
         }
 
@@ -789,6 +789,22 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         {
             // 全員に通知
             this._roomContext.Group.All.OnSelectFreeMinigame(name);
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// ブロック崩しスコア送信
+        /// </summary>
+        public Task BlockBreakSendScoreAsync(int score) {
+            // 全員に通知
+            this._roomContext.Group.All.OnBlockBreakSendScore(this.ConnectionId, score);
+            return Task.CompletedTask;
+        }
+
+        public Task AudioAsync(int id)
+        {
+            // 全員に通知
+            this._roomContext.Group.All.OnAudioAsync(id);
             return Task.CompletedTask;
         }
     }
