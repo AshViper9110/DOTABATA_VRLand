@@ -63,9 +63,10 @@ public class InRoomPlayerData : Singleton<InRoomPlayerData> {
     /// </summary>
     public void ShowPlayerList() {
         string text = "";
+        text += $"PlayerCount : {PlayerList.Count}\n\n";
         foreach (var player in PlayerList) {
             text +=
-                $"ID：{player.Key}, Name：{player.Value.joinedUser.Name}\n";
+                $"ID：{player.Key}, Name：{player.Value.joinedUser.Name}, JoinOrder：{player.Value.joinedUser.JoinOrder}\n";
         }
 
         Debug.Log(text);

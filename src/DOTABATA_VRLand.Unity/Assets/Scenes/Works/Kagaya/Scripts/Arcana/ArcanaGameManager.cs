@@ -212,6 +212,7 @@ public class ArcanaGameManager : MonoBehaviour {
         // VFX
         Instantiate(deathEffect, mySelf.playerObj.transform.position, Quaternion.identity);
         minigameFlowController.OnSendScore(gameTimer);
+        myController.Dead();
         await RoomModel.I.DeathAsync();
     }
 

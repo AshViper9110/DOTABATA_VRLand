@@ -42,7 +42,7 @@ public class ArcanaPlayerController : MonoBehaviour {
     private SteamVR_Behaviour_Pose controllerPose;
 
     // 魔法を撃つ力
-    [SerializeField] private float shotPower = 5f;
+    [SerializeField] private float shotPower = 15f;
 
     private void Start() {
         syncPlayer = GetComponent<SyncPlayer>();
@@ -112,6 +112,8 @@ public class ArcanaPlayerController : MonoBehaviour {
     public void SetMagicObj(GameObject magicObject, GestureClass gesture, GameObject magicCircleObj) {
         if (!magicObject) return;
 
+        SwitchDrawBoadActive(true);
+
         myMagicObj = magicObject;
         myMagicObj.GetComponent<MagicController>().Init(RoomModel.I.ConnectionId, gesture);
 
@@ -140,6 +142,8 @@ public class ArcanaPlayerController : MonoBehaviour {
 
             Destroy(magicCircle);
             magicCircle = null;
+
+            SwitchDrawBoadActive(true);
         }
     }
 
@@ -163,14 +167,16 @@ public class ArcanaPlayerController : MonoBehaviour {
     /// <summary>
     /// DrawBoadのアクティブ変更
     /// </summary>
-    private void SwitchDrawBoadActive() {
-        // 描いている途中だったら押させない
-        if (drawBoadAction.GetState(rightHandType)) return;
-
-        if (drawBoadAction.GetStateDown(leftHandType) && drawBoadObj) {
-            drawBoadObj.SetActive(!drawBoadObj.activeSelf);
-            RoomModel.I.SwitchDrawBoadActiveAsync(drawBoadObj.activeSelf).Forget();
+    private void SwitchDrawBoadActive(bool forcibly = false) {
+        if (!forcibly) {
+            // 描いている途中だったら押させない
+            if (drawBoadAction.GetState(rightHandType)) return;
+            // ボタンを押したら
+            if (!drawBoadAction.GetStateDown(leftHandType) || !drawBoadObj) return;
         }
+
+        drawBoadObj.SetActive(!drawBoadObj.activeSelf);
+        RoomModel.I.SwitchDrawBoadActiveAsync(drawBoadObj.activeSelf).Forget();
     }
 
     /// <summary>
@@ -182,6 +188,18 @@ public class ArcanaPlayerController : MonoBehaviour {
         }
         else if (grabGripAction.GetStateUp(leftHandType)) {
             playerStatus.DisenableShield();
+        }
+    }
+
+    /// <summary>
+    /// 死亡
+    /// </summary>
+    public void Dead() {
+        if (myMagicObj) {
+            Destroy(myMagicObj);
+        }
+        if (magicCircle) {
+            Destroy(magicCircle);
         }
     }
 }

@@ -9,11 +9,11 @@ using UnityEngine;
 public class BlockBreakBlockObjectsManager : MonoBehaviour {
     [SerializeField] private List<GameObject> objectList = new List<GameObject>();
 
+    [SerializeField] private int newCreateBlockNum = 5;
+
     [SerializeField] private List<string> jsonNameList = new List<string>();
 
     [SerializeField] private string saveName;
-
-    [SerializeField] private int newCreateBlockNum = 5;
 
     /// <summary>
     /// オブジェクトをセット
