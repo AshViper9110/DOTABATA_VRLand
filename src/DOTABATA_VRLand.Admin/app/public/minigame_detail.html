@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ミニゲーム詳細</title>
+
+    <style>
+        body{
+            margin:0;
+            font-family:sans-serif;
+            background:#f4f6f9;
+        }
+
+        .container{
+            max-width:700px;
+            margin:50px auto;
+            padding:20px;
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        .card{
+            background:#fff;
+            padding:30px;
+            border-radius:10px;
+            box-shadow:0 2px 8px rgba(0,0,0,.1);
+        }
+
+        .row{
+            display:flex;
+            align-items:flex-start;
+            margin-bottom:18px;
+        }
+
+        .label{
+            width:180px;
+            font-weight:bold;
+        }
+
+        .value{
+            flex:1;
+            white-space:pre-wrap;
+        }
+
+        .button-area{
+            display:flex;
+            gap:10px;
+            margin-top:30px;
+            flex-wrap:wrap;
+        }
+
+        button{
+            padding:10px 16px;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+        }
+
+        .edit-btn{
+            background:#007bff;
+            color:white;
+        }
+
+        .delete-btn{
+            background:#dc3545;
+            color:white;
+        }
+
+        .delete-btn:hover{
+            background:#bb2d3b;
+        }
+
+        .back-btn{
+            background:#6c757d;
+            color:white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>ミニゲーム詳細</h1>
+
+    <div class="card">
+
+        <div class="row">
+            <div class="label">ID</div>
+            <div class="value" id="id"></div>
+        </div>
+
+        <div class="row">
+            <div class="label">ゲーム名</div>
+            <div class="value" id="name"></div>
+        </div>
+
+        <div class="row">
+            <div class="label">ルール</div>
+            <div class="value" id="rule"></div>
+        </div>
+
+        <div class="row">
+            <div class="label">種類</div>
+            <div class="value" id="type"></div>
+        </div>
+
+        <div class="row">
+            <div class="label">シーン番号</div>
+            <div class="value" id="scene_number"></div>
+        </div>
+
+        <div class="row">
+            <div class="label">プレイ可能</div>
+            <div class="value" id="playable"></div>
+        </div>
+
+        <div class="row">
+            <div class="label">作成日時</div>
+            <div class="value" id="created_at"></div>
+        </div>
+
+        <div class="row">
+            <div class="label">更新日時</div>
+            <div class="value" id="updated_at"></div>
+        </div>
+
+        <div class="button-area">
+
+            <button class="edit-btn" id="editButton">
+                編集
+            </button>
+
+            <button class="delete-btn" id="deleteButton">
+                削除
+            </button>
+
+            <button class="back-btn" onclick="history.back()">
+                戻る
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="./js/minigame_detail.js"></script>
+<script src="./js/auth-check.js"></script>
+</body>
+</html>
