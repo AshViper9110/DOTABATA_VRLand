@@ -3033,20 +3033,20 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: TutorialImages.Array.size
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[0]'
       value: 
-      objectReference: {fileID: 21300000, guid: 424bc4de958d83e40a635d8903e25c90, type: 3}
+      objectReference: {fileID: 21300000, guid: e8c0f5c288e3d2645a9f6310bb0ecd21, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[1]'
       value: 
-      objectReference: {fileID: 21300000, guid: c1118d367f0ca104094c7a8989e520bb, type: 3}
+      objectReference: {fileID: 21300000, guid: 03544f44fd7c94e4e92d2ba1d2cd47f7, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[2]'
       value: 
-      objectReference: {fileID: 21300000, guid: 755a493eb2819b947a907004ca3acdb8, type: 3}
+      objectReference: {fileID: 21300000, guid: 8ff4b669efe699d44b8462885846b070, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[3]'
       value: 
@@ -3143,6 +3143,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TutorialBoard
       objectReference: {fileID: 0}
+    - target: {fileID: 5536666827070834702, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: e8c0f5c288e3d2645a9f6310bb0ecd21, type: 3}
     - target: {fileID: 8239783801221648011, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.02109568
