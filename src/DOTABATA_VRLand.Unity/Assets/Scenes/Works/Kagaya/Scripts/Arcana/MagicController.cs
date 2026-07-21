@@ -40,8 +40,8 @@ public class MagicController : MonoBehaviour {
     // 手に持たれているか
     [ReadOnly] public bool isHand = true;
 
-    [SerializeField] private float Speed; // 追従速度
-    [SerializeField] private float MaxForce; // 最大の力
+    public float Speed; // 追従速度
+    public float MaxForce; // 最大の力
     [SerializeField] private float Kp; // P項係数
     [SerializeField] private float Ki; // I項係数
     [SerializeField] private float Kd; // D項係数
@@ -255,6 +255,8 @@ public class MagicController : MonoBehaviour {
             targetPlayer = InRoomPlayerData.I.PlayerList[attackerConId].playerObj.transform;
             attackerConId = justPlayer;
             lifeTimer = 0;
+            Speed *= 2;
+            MaxForce *= 2;
 
             // オブジェクトのフィールド同期
             await RoomModel.I.SyncMagicBallAsync(syncObject.ObjectId, myGesture.ToString(), -1);

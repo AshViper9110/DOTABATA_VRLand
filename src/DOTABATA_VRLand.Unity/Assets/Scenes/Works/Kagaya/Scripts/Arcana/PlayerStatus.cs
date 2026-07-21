@@ -46,7 +46,7 @@ public class PlayerStatus : MonoBehaviour {
     // シールドの使用フレーム数
     [SerializeField] private int useShieldFlameTimer = 0;
     // ジャストシールド受付フレーム
-    [SerializeField] private int justShieldFlame = 18;
+    [SerializeField] private int justShieldFlame = 9; // 0.15秒
     // フレーム待機中か
     private bool isDisenableShieldWaitFlame = false;
 
