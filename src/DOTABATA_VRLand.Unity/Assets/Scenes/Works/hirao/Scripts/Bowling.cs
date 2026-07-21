@@ -103,9 +103,9 @@ public class Bowling : MonoBehaviour
                 {
                     defeatedPinCount++;
                     //Pin‚Ì“|‚ê‚é‰¹‚Ì“¯Šú
-                    await RoomModel.I.AudioAsync(0);
                     pinStatus.isDefeated = true;
                     currentNextGameTime = 120;
+                    RoomModel.I.AudioAsync(0);
                 }
             }
             defeatedPinText.text = $"{InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.Name} : {defeatedPinCount}–{";
