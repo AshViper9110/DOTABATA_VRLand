@@ -65,7 +65,7 @@ public class ArcanaGameManager : MonoBehaviour {
     [SerializeField] private GameObject recognizeVFX;
 
     // プレイヤーが持ってるオブジェクト
-    private Dictionary<Guid, ArcanaPlayerHavingObject> playerObjectList = new Dictionary<Guid, ArcanaPlayerHavingObject>();
+    private Dictionary<Guid, PlayerHavingObject> playerObjectList = new Dictionary<Guid, PlayerHavingObject>();
 
     private bool completeStart = false;
 
@@ -115,10 +115,12 @@ public class ArcanaGameManager : MonoBehaviour {
             playerData.Value.playerObj.AddComponent<SyncDrawBoad>().SetField(drawBoadObj);
 
             // 保持
-            playerObjectList[playerData.Key] = new ArcanaPlayerHavingObject() {
-                playerUICanvas = myUI,
-                playerCameraUI = pCamUI,
-                shieldEffect = createdShield
+            playerObjectList[playerData.Key] = new PlayerHavingObject() {
+                objects = {
+                    { "playerUICanvas", myUI },
+                    { "playerCameraUI", pCamUI },
+                    { "shieldEffect", createdShield },
+                }
             };
 
             // 自分だったら
@@ -158,14 +160,14 @@ public class ArcanaGameManager : MonoBehaviour {
         foreach (var playerData in InRoomPlayerData.I.PlayerList) {
             if (!playerData.Value.playerObj.activeSelf) return;
 
-            if (playerObjectList[playerData.Key].playerCameraUI) {
-                playerObjectList[playerData.Key].playerCameraUI.transform.localPosition = playerCameraUI.transform.position;
+            if ((GameObject)playerObjectList[playerData.Key].objects["playerCameraUI"] is GameObject playerCameraUI) {
+                playerCameraUI.transform.localPosition = playerCameraUI.transform.position;
             }
-            if (playerObjectList[playerData.Key].playerUICanvas) {
-                playerObjectList[playerData.Key].playerUICanvas.transform.localPosition = playerUICanvas.transform.position;
+            if ((GameObject)playerObjectList[playerData.Key].objects["playerUICanvas"] is GameObject playerUICanvas) {
+                playerUICanvas.transform.localPosition = playerUICanvas.transform.position;
             }
-            if (playerObjectList[playerData.Key].shieldEffect) {
-                playerObjectList[playerData.Key].shieldEffect.transform.localPosition = shieldEffect.transform.position;
+            if ((GameObject)playerObjectList[playerData.Key].objects["shieldEffect"] is GameObject shieldEffect) {
+                shieldEffect.transform.localPosition = shieldEffect.transform.position;
             }
         }
     }
@@ -210,6 +212,7 @@ public class ArcanaGameManager : MonoBehaviour {
         // VFX
         Instantiate(deathEffect, mySelf.playerObj.transform.position, Quaternion.identity);
         minigameFlowController.OnSendScore(gameTimer);
+        myController.Dead();
         await RoomModel.I.DeathAsync();
     }
 
@@ -232,9 +235,9 @@ public class ArcanaGameManager : MonoBehaviour {
         Destroy(rightHand.GetComponent<DrawVRPointer>());
 
         foreach (var playerData in InRoomPlayerData.I.PlayerList) {
-            Destroy(playerObjectList[playerData.Key].playerUICanvas);
-            Destroy(playerObjectList[playerData.Key].playerCameraUI);
-            Destroy(playerObjectList[playerData.Key].shieldEffect);
+            Destroy((GameObject)playerObjectList[playerData.Key].objects["playerUICanvas"]);
+            Destroy((GameObject)playerObjectList[playerData.Key].objects["playerCameraUI"]);
+            Destroy((GameObject)playerObjectList[playerData.Key].objects["shieldEffect"]);
 
             Destroy(playerData.Value.playerObj.GetComponent<PlayerStatus>());
             Destroy(playerData.Value.playerObj.GetComponent<SyncDrawBoad>());

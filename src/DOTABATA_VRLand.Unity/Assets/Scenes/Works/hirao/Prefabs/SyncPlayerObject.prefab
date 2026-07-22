@@ -139,6 +139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 780a387f5dc608c42ba7b7c23518e3c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  connectionIdStr: 
   playerTransform: {fileID: 7122395766740284826}
   syncInterval: 0.1
   isLocalPlayer: 0
@@ -260,7 +261,7 @@ GameObject:
   - component: {fileID: 3751582389396383738}
   - component: {fileID: 7947928908227284734}
   m_Layer: 0
-  m_Name: RHand
+  m_Name: RightHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -346,7 +347,7 @@ GameObject:
   - component: {fileID: 8943235281407652118}
   - component: {fileID: 5759807937811307730}
   m_Layer: 0
-  m_Name: LHand
+  m_Name: LeftHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -79,6 +79,7 @@ CREATE TABLE `admin_users` (
 `id` INT NOT NULL AUTO_INCREMENT,
 `name` VARCHAR(255) NOT NULL,
 `password` VARCHAR(255) NOT NULL,
+`can_manage_admin_users` INT NOT NULL ,
 `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ON UPDATE CURRENT_TIMESTAMP,
@@ -86,10 +87,10 @@ PRIMARY KEY (`id`)
 );
 
 -- admin_users MasterUser
-INSERT INTO admin_users (name, password)
+INSERT INTO admin_users (name, password,can_manage_admin_users)
 VALUES (
     'admin',
-    SHA2('Yoshidajobi2024', 256)
+    SHA2('Yoshidajobi2024', 256),2
 );
 
 -- miniGamesテスト用(本番削除)
