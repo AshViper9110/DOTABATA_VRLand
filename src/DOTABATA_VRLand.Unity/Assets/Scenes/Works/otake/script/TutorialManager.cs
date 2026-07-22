@@ -23,11 +23,13 @@ public class TutorialManager : MonoBehaviour
 
     public void NextTutorial()
     {
-        if (index < TutorialImages.Count)
+        // 次に進めるかチェック
+        if (index + 1 >= TutorialImages.Count)
         {
-            index++;
+            return;
         }
 
+        index++;
         tutorialImage.sprite = (Sprite) TutorialImages[index];
 
     }

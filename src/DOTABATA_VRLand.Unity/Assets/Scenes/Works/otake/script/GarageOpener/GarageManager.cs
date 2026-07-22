@@ -33,7 +33,7 @@ public class GarageManager : MonoBehaviour
 
     public LaneSetManager laneSetManager;
 
-    MinigameFlowController controller;
+    public  MinigameFlowController controller;
 
     void Awake()
     {
@@ -81,6 +81,11 @@ public class GarageManager : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (controller == null)
+        {
+            Debug.Log("フローコントローラーがnullです");
+            return;
+        }
         if(!controller.isGameStarted)
         {
             return;
