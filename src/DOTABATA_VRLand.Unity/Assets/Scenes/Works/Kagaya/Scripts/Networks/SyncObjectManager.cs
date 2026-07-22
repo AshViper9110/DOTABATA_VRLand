@@ -19,7 +19,10 @@ public class SyncObjectManager : MonoBehaviour {
     }
 
     private void Awake() {
-        RoomModel.I.OnCreatedObject += OnCreatedObject;
+        if (RoomModel.I != null)
+        {
+            RoomModel.I.OnCreatedObject += OnCreatedObject;
+        }
     }
 
     private void OnDisable() {
