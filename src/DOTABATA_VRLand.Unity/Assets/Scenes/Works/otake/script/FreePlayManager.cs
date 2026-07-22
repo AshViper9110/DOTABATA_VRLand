@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Multiplayer.Center.NetcodeForGameObjectsExample.DistributedAuthority;
 using UnityEngine;
 
@@ -7,6 +8,9 @@ public class FreePlayManager : MonoBehaviour
 {
     public List<string> miniGames = new List<string>();
     [SerializeField] List<Sprite> miniGameTitleImages = new List<Sprite>();
+
+    [SerializeField]public List<TextMeshProUGUI> RankingText = new List<TextMeshProUGUI>();
+    [SerializeField]public GameObject RankingBord;
 
     [SerializeField] GameObject miniGamesParent;
     [SerializeField] GameObject FreePlayMinigamePrefabs;   
@@ -31,6 +35,7 @@ public class FreePlayManager : MonoBehaviour
     void Start()
     {
         Manager = GetComponent<GameManager>();
+        RankingBord.SetActive(false);
     }
 
     // Update is called once per frame
@@ -63,5 +68,10 @@ public class FreePlayManager : MonoBehaviour
             index++;
 
         }
+    }
+
+    public void HideRankingBord()
+    {
+        RankingBord.SetActive(false);
     }
 }

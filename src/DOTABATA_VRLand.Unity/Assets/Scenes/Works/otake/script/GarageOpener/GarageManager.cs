@@ -27,15 +27,35 @@ public class GarageManager : MonoBehaviour
     private Vector3 initialLocalPosition;
     private float grabOffset;
 
+    private float openPosX = -2.0f;
+    bool isOpen;
+
+
+    public LaneSetManager laneSetManager;
+
+    MinigameFlowController controller;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+ 
 
         rb.isKinematic = true;
         rb.useGravity = false;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
 
         initialLocalPosition = transform.localPosition;
+
+        isOpen = false;
+
+        controller = GameObject.Find("Canvas").GetComponent<MinigameFlowController>();
+
+      
+    }
+
+    private void Start()
+    {
+        this.transform.localRotation = Quaternion.Euler(0, 180, 0);
     }
 
     public void BeginGrab(Hand hand)
@@ -61,6 +81,25 @@ public class GarageManager : MonoBehaviour
 
     void FixedUpdate()
     {
+        if(!controller.isGameStarted)
+        {
+            return;
+        }
+
+        if (isOpen) {
+            transform.localPosition = Vector3.MoveTowards(transform.localPosition,
+                new Vector3(openPosX, transform.localPosition.y, transform.localPosition.z)
+                , Time.deltaTime * 2f);
+
+            if(transform.localPosition.x <= openPosX)
+            {
+                laneSetManager.NextMove();
+                Destroy(gameObject.transform.parent.gameObject);
+            }
+
+            return;
+        }
+
         if (!grabbed || currentHand == null)
             return;
 
@@ -91,6 +130,8 @@ public class GarageManager : MonoBehaviour
         }
 
         rb.MovePosition(transform.parent.TransformPoint(target));
+
+        
     }
 
     float GetAxisValue(Vector3 v)
@@ -108,5 +149,11 @@ public class GarageManager : MonoBehaviour
         }
     }
 
-
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "OpenLine")
+        {
+            isOpen = true;
+        }
+    }
 }

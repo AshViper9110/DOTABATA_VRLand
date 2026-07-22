@@ -2260,6 +2260,7 @@ MonoBehaviour:
   followMoveSpeed: 0.1
   followRotateSpeed: 0.5
   rotateSpeedThreshold: 0.9
+  distance: 0.9
   isImmediateMove: 0
   isLockX: 1
   isLockY: 0
@@ -4485,6 +4486,7 @@ GameObject:
   - component: {fileID: 1903847316}
   - component: {fileID: 1903847318}
   - component: {fileID: 1903847317}
+  - component: {fileID: 1903847319}
   m_Layer: 5
   m_Name: CountdownText
   m_TagString: Untagged
@@ -4611,6 +4613,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1903847315}
   m_CullTransparentMesh: 1
+--- !u!114 &1903847319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903847315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1076f59856b42064496791dad52023f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  followMoveSpeed: 0.1
+  followRotateSpeed: 0.02
+  rotateSpeedThreshold: 0.9
+  distance: 0.9
+  isImmediateMove: 0
+  isLockX: 0
+  isLockY: 0
+  isLockZ: 0
 --- !u!1 &1991317769
 GameObject:
   m_ObjectHideFlags: 0
@@ -5177,24 +5200,24 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: TutorialImages.Array.size
-      value: 6
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[0]'
       value: 
-      objectReference: {fileID: 21300000, guid: 424bc4de958d83e40a635d8903e25c90, type: 3}
+      objectReference: {fileID: 21300000, guid: 72ddcd852dd90a4428a1a9608f5b01c1, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[1]'
       value: 
-      objectReference: {fileID: 21300000, guid: c1118d367f0ca104094c7a8989e520bb, type: 3}
+      objectReference: {fileID: 21300000, guid: 72a1b9dea462aac449ee2787c73f6c11, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[2]'
       value: 
-      objectReference: {fileID: 21300000, guid: 755a493eb2819b947a907004ca3acdb8, type: 3}
+      objectReference: {fileID: 21300000, guid: 6213f46b75125cb4fb95459cb3461aee, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[3]'
       value: 
-      objectReference: {fileID: 21300000, guid: 5d47e5032b12c914293920ba1c136c3a, type: 3}
+      objectReference: {fileID: 21300000, guid: d60a91d6307322c4495cd12346ca7d53, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[4]'
       value: 
