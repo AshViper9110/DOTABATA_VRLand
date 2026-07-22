@@ -112,7 +112,7 @@ public class ArcanaPlayerController : MonoBehaviour {
     public void SetMagicObj(GameObject magicObject, GestureClass gesture, GameObject magicCircleObj) {
         if (!magicObject) return;
 
-        SwitchDrawBoadActive(true);
+        DrawBoadSetActive(false);
 
         myMagicObj = magicObject;
         myMagicObj.GetComponent<MagicController>().Init(RoomModel.I.ConnectionId, gesture);
@@ -143,7 +143,7 @@ public class ArcanaPlayerController : MonoBehaviour {
             Destroy(magicCircle);
             magicCircle = null;
 
-            SwitchDrawBoadActive(true);
+            DrawBoadSetActive(true);
         }
     }
 
@@ -167,15 +167,21 @@ public class ArcanaPlayerController : MonoBehaviour {
     /// <summary>
     /// DrawBoadのアクティブ変更
     /// </summary>
-    private void SwitchDrawBoadActive(bool forcibly = false) {
-        if (!forcibly) {
-            // 描いている途中だったら押させない
-            if (drawBoadAction.GetState(rightHandType)) return;
-            // ボタンを押したら
-            if (!drawBoadAction.GetStateDown(leftHandType) || !drawBoadObj) return;
-        }
+    private void SwitchDrawBoadActive() {
+        // 描いている途中だったら押させない
+        if (drawBoadAction.GetState(rightHandType)) return;
+        // ボタンを押したら
+        if (!drawBoadAction.GetStateDown(leftHandType) || !drawBoadObj) return;
 
         drawBoadObj.SetActive(!drawBoadObj.activeSelf);
+        RoomModel.I.SwitchDrawBoadActiveAsync(drawBoadObj.activeSelf).Forget();
+    }
+
+    /// <summary>
+    /// DrawBoadのアクティブ変更
+    /// </summary>
+    private void DrawBoadSetActive(bool active) {
+        drawBoadObj.SetActive(active);
         RoomModel.I.SwitchDrawBoadActiveAsync(drawBoadObj.activeSelf).Forget();
     }
 
