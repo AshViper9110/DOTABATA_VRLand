@@ -14,7 +14,7 @@ public class GarageOpenerManager : MonoBehaviour
     void Start()
     {
         SteamVR_Fade.View(new Color(0, 0, 0, 0), 1.0f);
-        LaneSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].SetGarage();
+        LaneSets[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].SetGarage(flowController);
         player = InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj;
    
     }

@@ -70,9 +70,10 @@ public class NetworkManager : Singleton<NetworkManager>
         {
             await UserModel.I.CreateUserModel();
             await RoomModel.I.ConnectAsync();
+
+            myConnectionId = RoomModel.I.ConnectionId;
         }
 
-        myConnectionId = RoomModel.I.ConnectionId;
     }
 
     /// <summary>

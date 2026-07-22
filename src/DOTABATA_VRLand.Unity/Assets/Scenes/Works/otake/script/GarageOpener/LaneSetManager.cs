@@ -51,10 +51,11 @@ public class LaneSetManager : MonoBehaviour
         
     }
 
-    public void SetGarage()
+    public void SetGarage(MinigameFlowController MiniController)
     {
         player = InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj;
         player.transform.position = standPos[0].position;
+        
 
         foreach (Transform t in GaragePos)
         {
@@ -69,6 +70,7 @@ public class LaneSetManager : MonoBehaviour
             GarageManager garageManager = Garage.GetComponentInChildren<GarageManager>();
 
             garageManager.laneSetManager = this;
+            garageManager.controller = MiniController;
 
             switch (rand)
             {
