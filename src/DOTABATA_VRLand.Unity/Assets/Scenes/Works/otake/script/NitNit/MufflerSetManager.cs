@@ -210,25 +210,28 @@ public class MufflerSetManager : MonoBehaviour
     {
         if (RightRod != null)
         {
-            Interactable rightIntara = RightRod.GetComponent<Interactable>();
-            Interactable leftIntara = LeftRod.GetComponent<Interactable>();
+            Interactable rightIntara = RightRod.GetComponent<Interactable>();         
 
             if (rightIntara.attachedToHand != null)
             {
                rightIntara.attachedToHand.DetachObject(RightRod);
             }
+
+            Destroy(RightRod);
+
+        }
+
+        if(LeftRod != null)
+        {
+            Interactable leftIntara = LeftRod.GetComponent<Interactable>();
             if (leftIntara.attachedToHand != null)
             {
                 leftIntara.attachedToHand.DetachObject(LeftRod);
             }
 
-
-
-
-            Destroy(RightRod);
             Destroy(LeftRod);
-
-            enabled = false;
         }
+
+        enabled = false;
     }
 }
