@@ -6210,8 +6210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TutorialImages:
-  - {fileID: 21300000, guid: a19240d8aa9d67c49bae35dd45fca98e, type: 3}
-  - {fileID: 21300000, guid: 333aa2be0e8248d43a9e0d8893e7caae, type: 3}
+  - {fileID: 21300000, guid: 4b8418f3877e3a84ebb01702498a900f, type: 3}
   tutorialImage: {fileID: 5536666827161689499}
 --- !u!23 &766249781463016703
 MeshRenderer:

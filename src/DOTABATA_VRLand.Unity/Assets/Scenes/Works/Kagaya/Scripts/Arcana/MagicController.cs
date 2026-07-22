@@ -1,9 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
-using DG.Tweening;
-using PDollarGestureRecognizer;
 using System;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
 using static GestureRecognizer;
@@ -101,45 +97,45 @@ public class MagicController : MonoBehaviour {
         switch (gesture) {
             case GestureClass.Circle:
                 Speed = 5;
-                MaxForce = 7;
-                Kp = 6;
-                Ki = 0.01f;
-                Kd = 0.5f;
+                MaxForce = 18;
+                Kp = 3;
+                Ki = 0f;
+                Kd = 0.1f;
                 return;
             case GestureClass.Star:
-                Speed = 10;
-                MaxForce = 20;
-                Kp = 3;
-                Ki = 0.05f;
-                Kd = 0.6f;
+                Speed = 15;
+                MaxForce = 40;
+                Kp = 13;
+                Ki = 0.08f;
+                Kd = 1.6f;
                 return;
             case GestureClass.Diamond:
-                Speed = 4;
-                MaxForce = 5;
-                Kp = 7;
-                Ki = 0.02f;
-                Kd = 0.5f;
+                Speed = 6;
+                MaxForce = 16;
+                Kp = 6.5f;
+                Ki = 0.05f;
+                Kd = 0.7f;
                 return;
             case GestureClass.Square:
                 Speed = 2;
-                MaxForce = 2;
-                Kp = 6;
-                Ki = 0;
+                MaxForce = 10;
+                Kp = 8;
+                Ki = 0.02f;
                 Kd = 0.5f;
                 return;
             case GestureClass.Triangle:
-                Speed = 3;
-                MaxForce = 5;
-                Kp = 5.5f;
-                Ki = 0;
-                Kd = 0.5f;
+                Speed = 5;
+                MaxForce = 17;
+                Kp = 5f;
+                Ki = 0.01f;
+                Kd = 0.2f;
                 return;
             case GestureClass.Heart:
-                Speed = 7;
-                MaxForce = 14;
-                Kp = 7;
-                Ki = 0.01f;
-                Kd = 0.6f;
+                Speed = 10;
+                MaxForce = 35;
+                Kp = 10;
+                Ki = 0.1f;
+                Kd = 2.0f;
                 return;
         }
     }
@@ -249,17 +245,30 @@ public class MagicController : MonoBehaviour {
     public async void JustShield(Guid justPlayer) {
         lifeTimer = 0;
         bool result = await syncObject.GetComponent<SyncObject>().GetOwnership(true);
-        if (!result) return;
+        if (!result) {
+            Destroy(this.gameObject);
+            return;
+        }
 
         if (InRoomPlayerData.I.PlayerList[attackerConId].playerObj && InRoomPlayerData.I.PlayerList[attackerConId].playerObj.activeSelf) {
             targetPlayer = InRoomPlayerData.I.PlayerList[attackerConId].playerObj.transform;
             attackerConId = justPlayer;
             lifeTimer = 0;
-            Speed *= 2;
-            MaxForce *= 2;
+
+            Speed += 5f;
+            MaxForce += 13.5f;
+            Kp += 2f;
+            Ki += 0.01f;
+            Kd += 0.3f;
 
             // オブジェクトのフィールド同期
             await RoomModel.I.SyncMagicBallAsync(syncObject.ObjectId, myGesture.ToString(), -1);
+
+            float rX = UnityEngine.Random.Range(0f, 1f);
+            float rY = UnityEngine.Random.Range(0f, 1f);
+            float rZ = UnityEngine.Random.Range(0f, 1f);
+
+            myRb.AddForce(new Vector3(rX, rY, rZ).normalized * 20f, ForceMode.Impulse);
         }
     }
 
@@ -275,10 +284,21 @@ public class MagicController : MonoBehaviour {
         Debug.Log($"魔法オブジェクトのフィールド同期：{objectId}");
 
         attackerConId = createrConId;
-        SetStatus(EnumExs.ParseFromString<GestureClass>(gestureClassName, true));
         isHand = false;
 
-        if (rndNum == -1) return;
+        if (rndNum == -1) {
+            // ジャストシールドで返された時
+            Speed += 5f;
+            MaxForce += 13.5f;
+            Kp += 2f;
+            Ki += 0.01f;
+            Kd += 0.3f;
+
+            return;
+        }
+        else {
+            SetStatus(EnumExs.ParseFromString<GestureClass>(gestureClassName, true));
+        }
 
         // VFX生成
         Instantiate(arcanaGameManager.magicVFXList[rndNum], this.transform);
