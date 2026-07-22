@@ -1863,7 +1863,7 @@ Transform:
   m_GameObject: {fileID: 619225718}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: -2.85, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4749,10 +4749,13 @@ MonoBehaviour:
   - {fileID: 592557554832215387, guid: 1decbc58774508e44881bc0ce6e3536c, type: 3}
   - {fileID: 1380356180716161254, guid: cea562b2f015d1243ac547f72483994e, type: 3}
   - {fileID: 5637438707375780828, guid: cb037f0d423d6b34cb89864f31b61d31, type: 3}
-  newCreateBlockNum: 5
+  newCreateBlockNum: 7
   jsonNameList:
   - Obj_1
-  saveName: Obj_1
+  - Obj_2
+  - Obj_3
+  - Obj_4
+  saveName: Obj_4
 --- !u!4 &1703591153
 Transform:
   m_ObjectHideFlags: 0
