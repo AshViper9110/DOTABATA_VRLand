@@ -6,20 +6,24 @@ public class MiniGameCanvasContoroller : MonoBehaviour
     [SerializeField] private float followMoveSpeed = 0.1f;
     [SerializeField] private float followRotateSpeed = 0.02f;
     [SerializeField] private float rotateSpeedThreshold = 0.9f;
+    [SerializeField] private float distance = 0.9f;
     [SerializeField] private bool isImmediateMove;
     [SerializeField] private bool isLockX;
     [SerializeField] private bool isLockY;
     [SerializeField] private bool isLockZ;
+    [SerializeField] private bool StartSync;
     private Quaternion rot;
     private Quaternion rotDif;
 
     private void Start()
     {
-        if (!target) target = GameObject.Find("Player(Clone)").transform;
+        if (!target) target = InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<PlayerTransform>().Head; ;
     }
 
     private void LateUpdate()
     {
+  
+
         if (isImmediateMove) transform.position = target.position;
         else transform.position = Vector3.Lerp(transform.position, target.position, followMoveSpeed);
 
@@ -32,12 +36,14 @@ public class MiniGameCanvasContoroller : MonoBehaviour
         else transform.rotation = Quaternion.Lerp(transform.rotation, rot, followRotateSpeed);
 
         transform.rotation = new Quaternion(transform.rotation.x,-Camera.main.transform.rotation.y,transform.rotation.z,transform.rotation.w);
+
+        transform.position = target.position + target.forward * distance;
     }
 
     //ã≠êßìIÇ…ìØä˙Ç≥ÇπÇΩÇ¢éû
     public void ImmediateSync(Transform targetTransform)
     {
-        transform.position = targetTransform.position;
+        transform.position = targetTransform.position + targetTransform.forward * distance;
         transform.rotation = targetTransform.rotation;
     }
 }

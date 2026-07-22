@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine.Events;
 using System.Threading;
+using UnityEngine.XR;
 
 namespace Valve.VR.InteractionSystem
 {

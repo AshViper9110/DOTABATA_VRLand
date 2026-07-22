@@ -455,6 +455,7 @@ public class GameManager : MonoBehaviour
         if (freePlay) { 
             isAddCrown = true;
             winPlayerId = guid;
+            playerTransform.StartSpotLight(13);
             return; 
         }
 
@@ -493,11 +494,17 @@ public class GameManager : MonoBehaviour
                
             }
 
+            if(freePlay)
+            {
+                freePlayManager.RankingText[miniRankingList[guid]-1].text = $"{InRoomPlayerData.I.PlayerList[guid].joinedUser.Name}";
+                freePlayManager.RankingBord.SetActive(true);
+            }
         }
 
         if (freePlay)
         {
             GetRankIndex++;
+           
 
             if (InRoomPlayerData.I.PlayerList.Count >= GetRankIndex)
             {
