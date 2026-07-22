@@ -190,8 +190,8 @@ public class BombDodgeManager : MonoBehaviour
             }
         }
 
-        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == index + 1)
-        {
+     
+            if (Bomb != null) yield break;
 
             GameObject gameObject = Instantiate(BombPrefab,
                        BombStartpos[index].position,
@@ -199,6 +199,6 @@ public class BombDodgeManager : MonoBehaviour
             BombBallManager bombBallManager = gameObject.GetComponent<BombBallManager>();
             bombBallManager.RestartPos = gameObject.transform.position;
             bombBallManager.InitBall();
-        }
+        
     }
 }
