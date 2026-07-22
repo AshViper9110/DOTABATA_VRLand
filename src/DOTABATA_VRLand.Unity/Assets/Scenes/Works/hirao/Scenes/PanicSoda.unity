@@ -359,10 +359,6 @@ MonoBehaviour:
   maxTime: 30
   targetShake: 10
   panel: {fileID: 1298220525}
-  audioSource: {fileID: 359120252}
-  soundList:
-  - {fileID: 8300000, guid: 541735f607e139c4ba7e98509c4d70c3, type: 3}
-  cooldown: 0.1
 --- !u!4 &359120251
 Transform:
   m_ObjectHideFlags: 0
@@ -702,7 +698,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1329,6 +1325,7 @@ GameObject:
   - component: {fileID: 785968430}
   - component: {fileID: 785968432}
   - component: {fileID: 785968431}
+  - component: {fileID: 785968433}
   m_Layer: 5
   m_Name: TimerText
   m_TagString: Untagged
@@ -1455,6 +1452,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 785968429}
   m_CullTransparentMesh: 1
+--- !u!114 &785968433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 785968429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1076f59856b42064496791dad52023f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  followMoveSpeed: 0.1
+  followRotateSpeed: 0.02
+  rotateSpeedThreshold: 0.9
+  distance: 0.9
+  isImmediateMove: 0
+  isLockX: 0
+  isLockY: 0
+  isLockZ: 0
+  StartSync: 0
 --- !u!1 &830563316
 GameObject:
   m_ObjectHideFlags: 0
@@ -2095,6 +2114,7 @@ GameObject:
   - component: {fileID: 1240141901}
   - component: {fileID: 1240141903}
   - component: {fileID: 1240141902}
+  - component: {fileID: 1240141904}
   m_Layer: 5
   m_Name: CountdownText
   m_TagString: Untagged
@@ -2221,6 +2241,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1240141900}
   m_CullTransparentMesh: 1
+--- !u!114 &1240141904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240141900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1076f59856b42064496791dad52023f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  followMoveSpeed: 0.1
+  followRotateSpeed: 0.02
+  rotateSpeedThreshold: 0.9
+  distance: 0.9
+  isImmediateMove: 0
+  isLockX: 0
+  isLockY: 0
+  isLockZ: 0
+  StartSync: 0
 --- !u!1 &1256299777
 GameObject:
   m_ObjectHideFlags: 0
@@ -2369,10 +2411,12 @@ MonoBehaviour:
   followMoveSpeed: 0.1
   followRotateSpeed: 0.5
   rotateSpeedThreshold: 0.9
+  distance: 0.9
   isImmediateMove: 0
   isLockX: 1
   isLockY: 0
   isLockZ: 0
+  StartSync: 0
 --- !u!114 &1298220527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3283,7 +3327,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
