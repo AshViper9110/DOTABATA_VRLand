@@ -25,6 +25,8 @@ public class ArcanaGameManager : MonoBehaviour {
     [SerializeField] private Transform centerTransform;
     // スポーツ位置
     [SerializeField] private List<Transform> spawnPoints;
+    // 最初のスポーン位置
+    [SerializeField] private Transform firstSpawnPoint;
 
     // プレイヤーのUI
     [SerializeField] private GameObject playerUICanvas;
@@ -84,6 +86,7 @@ public class ArcanaGameManager : MonoBehaviour {
             // サーバーのArcanaContextを初期化
             await RoomModel.I.ArcanaInitGameAsync();
         }
+        mySelf.playerObj.transform.position = firstSpawnPoint.position;
 
         await UniTask.WaitUntil(() => minigameFlowController.isGameStarted == true);
 
