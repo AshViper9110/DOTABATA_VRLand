@@ -123,6 +123,8 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
         public void OnBallingNext(int order, JoinedUser joinedUser, int pinCount);
 
+        public void OnBallingPinAsync(int pinCount, JoinedUser joinedUser);
+
         /// <summary>
         /// 爆弾ドッチボールのヒット通知
         /// </summary>

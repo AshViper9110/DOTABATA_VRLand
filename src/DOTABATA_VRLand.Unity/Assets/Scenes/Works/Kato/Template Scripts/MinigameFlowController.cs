@@ -51,11 +51,11 @@ public class MinigameFlowController : MonoBehaviour
         //RoomModelイベント購読
         
         //InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position = Vector3.zero;//プレイヤー座標初期化(0,0,0)
-        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)//他プレイヤー非表示
-        {
-            if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
-            player.playerObj.SetActive(false);
-        }
+        //foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)//他プレイヤー非表示
+        //{
+        //    if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
+        //    player.playerObj.SetActive(false);
+        //}
            
         waitingText.gameObject.SetActive(false);
         countdownText.gameObject.SetActive(false);

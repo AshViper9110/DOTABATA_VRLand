@@ -136,6 +136,8 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
         Task BallingNext(int pinCount, JoinedUser joinedUser);
 
+        Task BallingPinAsync(int pinCount, JoinedUser joinedUser);
+
 
         /// <summary>
         /// 当たったことを通知
