@@ -44,6 +44,8 @@ public class MufflerSetManager : MonoBehaviour
     NitnitManager nitManager;
 
 
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -62,6 +64,7 @@ public class MufflerSetManager : MonoBehaviour
         point = 0;
 
 
+
     }
 
     // Update is called once per frame
@@ -73,6 +76,39 @@ public class MufflerSetManager : MonoBehaviour
             RightEffect.Stop();
             LeftEffect.Stop(); 
             nitsAudioSource.Stop();
+
+            if (!nitManager.FlowController.willReady)
+            {
+
+                if (RightInteractable.attachedToHand && LeftInteractable.attachedToHand)
+                //|| InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == order)
+                {
+                    nitManager.FlowController.OnReadyButton();
+                    
+                }
+
+            }
+            else
+            {
+                if (nitManager.FlowController.AllReady && InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+                {
+                    nitManager.FlowController.GameStrat();
+                }
+
+
+                if (!RightInteractable.attachedToHand || !LeftInteractable.attachedToHand)
+                //|| InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == order)
+                {
+                    if (!nitManager.FlowController.OnStarted)
+                    {
+                        nitManager.FlowController.OnReadyButton();
+                       
+                    }
+                    return;
+                }
+
+   
+            }
             return;
         }
    

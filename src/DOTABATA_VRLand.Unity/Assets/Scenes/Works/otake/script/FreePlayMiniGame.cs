@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class FreePlayMiniGame : MonoBehaviour
 {
     public string name;
-    public Image Image;
+    public SpriteRenderer Image;
     GameManager Manager;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
