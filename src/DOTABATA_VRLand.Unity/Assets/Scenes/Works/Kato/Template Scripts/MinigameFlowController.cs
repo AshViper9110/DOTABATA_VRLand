@@ -39,7 +39,9 @@ public class MinigameFlowController : MonoBehaviour
     public bool isGameStarted = false;
 
     public List<string> names;
-    bool willReady = false;
+    public bool willReady = false;
+    public bool AllReady = false;
+    public bool OnStarted = false;
 
     // =====================================================
     // Start
@@ -150,6 +152,7 @@ public class MinigameFlowController : MonoBehaviour
         //äeÉ{É^ÉìêÿÇËë÷Ç¶
         readyButton.gameObject.SetActive(!isAllReady);
         StartButton.gameObject.SetActive(isAllReady);
+        AllReady = isAllReady;
     }
 
     // =====================================================
@@ -158,7 +161,11 @@ public class MinigameFlowController : MonoBehaviour
 
     public void GameStrat()
     {
-        RoomModel.I.OnGameStartAsync();
+        if (!OnStarted)
+        {
+            OnStarted = true;
+            RoomModel.I.OnGameStartAsync();
+        }
     }
 
     // =====================================================
