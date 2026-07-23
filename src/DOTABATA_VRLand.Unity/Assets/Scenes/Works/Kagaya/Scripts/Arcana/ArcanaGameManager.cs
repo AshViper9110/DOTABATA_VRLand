@@ -25,6 +25,8 @@ public class ArcanaGameManager : MonoBehaviour {
     [SerializeField] private Transform centerTransform;
     // スポーツ位置
     [SerializeField] private List<Transform> spawnPoints;
+    // 最初のスポーン位置
+    [SerializeField] private Transform firstSpawnPoint;
 
     // プレイヤーのUI
     [SerializeField] private GameObject playerUICanvas;
@@ -71,6 +73,8 @@ public class ArcanaGameManager : MonoBehaviour {
 
     private int gameTimer = 0;
 
+    private bool gameEnd = false;
+
     private void Awake() {
         gestureRecognizer.CompleteRecognize += CreateMagic;
     }
@@ -82,6 +86,7 @@ public class ArcanaGameManager : MonoBehaviour {
             // サーバーのArcanaContextを初期化
             await RoomModel.I.ArcanaInitGameAsync();
         }
+        mySelf.playerObj.transform.position = firstSpawnPoint.position;
 
         await UniTask.WaitUntil(() => minigameFlowController.isGameStarted == true);
 
@@ -151,6 +156,7 @@ public class ArcanaGameManager : MonoBehaviour {
     }
 
     private async void Update() {
+        if (gameEnd) return;
         if (!minigameFlowController.isGameStarted) return;
         if (!completeStart) return;
 
@@ -161,13 +167,16 @@ public class ArcanaGameManager : MonoBehaviour {
             if (!playerData.Value.playerObj.activeSelf) return;
 
             if ((GameObject)playerObjectList[playerData.Key].objects["playerCameraUI"] is GameObject playerCameraUI) {
-                playerCameraUI.transform.localPosition = playerCameraUI.transform.position;
+                if (!playerCameraUI) return;
+                playerCameraUI.transform.localPosition = this.playerCameraUI.transform.position;
             }
             if ((GameObject)playerObjectList[playerData.Key].objects["playerUICanvas"] is GameObject playerUICanvas) {
-                playerUICanvas.transform.localPosition = playerUICanvas.transform.position;
+                if (!playerUICanvas) return;
+                playerUICanvas.transform.localPosition = this.playerUICanvas.transform.position;
             }
             if ((GameObject)playerObjectList[playerData.Key].objects["shieldEffect"] is GameObject shieldEffect) {
-                shieldEffect.transform.localPosition = shieldEffect.transform.position;
+                if (!shieldEffect) return;
+                shieldEffect.transform.localPosition = this.shieldEffect.transform.position;
             }
         }
     }
@@ -229,6 +238,7 @@ public class ArcanaGameManager : MonoBehaviour {
     /// アルカナスケッチのゲーム終了
     /// </summary>
     public void OnArcanaGameSeted(Guid winnerConId) {
+        gameEnd = true;
         Debug.Log($"勝者は{InRoomPlayerData.I.PlayerList[winnerConId].joinedUser.Name}");
 
         Destroy(myController);
