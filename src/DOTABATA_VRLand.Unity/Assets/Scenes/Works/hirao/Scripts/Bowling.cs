@@ -1,6 +1,7 @@
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -40,6 +41,7 @@ public class Bowling : MonoBehaviour
         if (RoomModel.I == null) return;
         RoomModel.I.OnCountdownAction += StartCountdown;
         RoomModel.I.OnBallingNexted += OnBallingNexted;
+        RoomModel.I.OnBallingPinAsynced += OnBallingPinAsync;
     }
 
     private void OnDisable()
@@ -47,6 +49,7 @@ public class Bowling : MonoBehaviour
         if (RoomModel.I == null) return;
         RoomModel.I.OnCountdownAction -= StartCountdown;
         RoomModel.I.OnBallingNexted -= OnBallingNexted;
+        RoomModel.I.OnBallingPinAsynced -= OnBallingPinAsync;
     }
 
     private void OnBallingNexted(int order, JoinedUser joinedUser, int pinCount)
@@ -55,6 +58,10 @@ public class Bowling : MonoBehaviour
         defeatedPinTextLog.text += $"\n{joinedUser.Name} : {pinCount}–{";
     }
 
+    private void OnBallingPinAsync(int count, JoinedUser joineduser)
+    {
+        defeatedPinText.text = $"{InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.Name} : {defeatedPinCount}–{";
+    }
     private void Start()
     {
         AudioManager.StopBgm();
@@ -74,7 +81,7 @@ public class Bowling : MonoBehaviour
         if (myOrder == currentOrder)
         {
             index = 0;
-            SpawnBall();
+            SpawnBallAsync();
         }
         else if (myOrder < currentOrder)
         {
@@ -106,9 +113,9 @@ public class Bowling : MonoBehaviour
                     pinStatus.isDefeated = true;
                     currentNextGameTime = 120;
                     RoomModel.I.AudioAsync(0);
+                    RoomModel.I.BallingPinAsync(defeatedPinCount, InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser);
                 }
             }
-            defeatedPinText.text = $"{InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.Name} : {defeatedPinCount}–{";
         }
 
         if (currentNextGameTime == 0)
@@ -150,7 +157,7 @@ public class Bowling : MonoBehaviour
         }
     }
 
-    public void SpawnBall()
+    public async Task SpawnBallAsync()
     {
         if (currentBall != null)
         {
@@ -160,6 +167,7 @@ public class Bowling : MonoBehaviour
         currentBall.GetComponent<Rigidbody>().useGravity = true;
         SetPin();
         defeatedPinCount = 0;
+        await RoomModel.I.BallingPinAsync(defeatedPinCount, InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser);
     }
 
     public void SetPin()
