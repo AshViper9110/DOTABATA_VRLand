@@ -150,6 +150,7 @@ public class Kinko : MonoBehaviour
 
     void OnReceiveRanking(List<JoinedUser> rankOrder)
     {
+        if (timerText == null) return;
         timerText.gameObject.SetActive(false);
     }
 }
