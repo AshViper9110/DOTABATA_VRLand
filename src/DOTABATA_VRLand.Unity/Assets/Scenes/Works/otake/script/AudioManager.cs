@@ -22,6 +22,7 @@ public class AudioManager : MonoBehaviour
         //Click
         Button_Click,
         Bomb_Catch,
+        Garage_Open,
     }
 
     public enum BGM

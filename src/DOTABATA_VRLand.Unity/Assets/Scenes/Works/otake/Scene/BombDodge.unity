@@ -903,7 +903,7 @@ MonoBehaviour:
   m_text: "\u30B2\u30FC\u30E0\u30B9\u30BF\u30FC\u30C8"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 55ff2f08d08046e4a9d6bcc34fbe298f, type: 2}
-  m_sharedMaterial: {fileID: -4795938968160391167, guid: 55ff2f08d08046e4a9d6bcc34fbe298f, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 0ee4597c8bfb8c141b37d572f442b9e9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1372,7 +1372,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2265,6 +2265,7 @@ MonoBehaviour:
   isLockX: 1
   isLockY: 0
   isLockZ: 0
+  StartSync: 0
 --- !u!114 &463589211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2594,6 +2595,9 @@ MonoBehaviour:
   info: {fileID: 11400000, guid: 8a311d35ed99440438e28ee0edfbe575, type: 2}
   isGameStarted: 0
   names: []
+  willReady: 0
+  AllReady: 0
+  OnStarted: 0
 --- !u!4 &675000072
 Transform:
   m_ObjectHideFlags: 0
@@ -4395,7 +4399,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4634,6 +4638,7 @@ MonoBehaviour:
   isLockX: 0
   isLockY: 0
   isLockZ: 0
+  StartSync: 0
 --- !u!1 &1991317769
 GameObject:
   m_ObjectHideFlags: 0
