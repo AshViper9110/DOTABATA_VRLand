@@ -3947,7 +3947,7 @@ MonoBehaviour:
     keyValuePairs:
     - Key: BlockBreakPlayerController
       Value: {fileID: 11400000, guid: f200002a86374064c98e81cf1779e622, type: 2}
-  gunPrefab: {fileID: 3434133315478370334, guid: 20be4618cc548224fb5fe921942eb0d7, type: 3}
+  gunPrefab: {fileID: 3256202705641110063, guid: e0ed2204ba329d445a1813d6a81257e9, type: 3}
   scoreUI: {fileID: 933816211}
   initializedPlayer: 0
   currentRound: 1
