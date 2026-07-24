@@ -128,7 +128,7 @@ public class BlockBreakPlayerController : MonoBehaviour {
         await UniTask.WaitUntil(() => bulletSyncObject.Initialized == true);
 
         Rigidbody bulletRb = bulletSyncObject.GetComponent<Rigidbody>();
-        bulletRb.AddForce(rightHandTransform.forward.normalized * 30f, ForceMode.Impulse);
+        bulletRb.AddForce(shotPos.forward.normalized * 30f, ForceMode.Impulse);
 
         uIManager.StartTimer(waitTime);
 
@@ -143,7 +143,7 @@ public class BlockBreakPlayerController : MonoBehaviour {
     /// ポインター移動
     /// </summary>
     private void MovePointer() {
-        pointer.position = shotPos.position + rightHandTransform.forward.normalized * 7f;
+        pointer.position = shotPos.position + shotPos.forward.normalized * 7f;
     }
 
     /// <summary>
