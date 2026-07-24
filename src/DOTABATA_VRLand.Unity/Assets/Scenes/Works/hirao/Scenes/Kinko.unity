@@ -16237,6 +16237,10 @@ PrefabInstance:
       propertyPath: 'TutorialImages.Array.data[1]'
       value: 
       objectReference: {fileID: 21300000, guid: df05cf4b174d37c4188aa6bb5656bc4e, type: 3}
+    - target: {fileID: 1131890229380873952, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BackTutorial
+      objectReference: {fileID: 0}
     - target: {fileID: 2625612587104462061, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: m_LocalScale.x
       value: 94.42219
@@ -16312,6 +16316,10 @@ PrefabInstance:
     - target: {fileID: 6815032603313158370, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: m_WasSpriteAssigned
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604582661442374824, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: NextTutorial
       objectReference: {fileID: 0}
     - target: {fileID: 7996750017532519983, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: m_LocalRotation.w
