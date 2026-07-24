@@ -143,7 +143,7 @@ public class NetworkManager : Singleton<NetworkManager>
         else
         {
             GameObject player = GameObject.Find("Player(Clone)");
-            player.transform.position = new Vector3((user.JoinOrder * 3) - 6.5f, 0, 0);
+            player.transform.position = new Vector3((user.JoinOrder * 2f) - 4.85f, 0, 0);
             TMP_Text text = player.transform.Find("Canvas/NameTag").GetComponent<TMP_Text>();
             text.text = user.Name;
             PlayerData data = new PlayerData()

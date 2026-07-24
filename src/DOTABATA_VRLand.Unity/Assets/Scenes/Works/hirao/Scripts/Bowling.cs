@@ -60,7 +60,7 @@ public class Bowling : MonoBehaviour
 
     private void OnBallingPinAsync(int count, JoinedUser joineduser)
     {
-        defeatedPinText.text = $"{InRoomPlayerData.I.PlayerList[RoomModel.I.ConnectionId].joinedUser.Name} : {defeatedPinCount}–{";
+        defeatedPinText.text = $"{joineduser} : {count}–{";
     }
     private void Start()
     {
