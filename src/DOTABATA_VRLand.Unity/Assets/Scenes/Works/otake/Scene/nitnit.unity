@@ -74745,7 +74745,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: TutorialImages.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[0]'
@@ -74762,7 +74762,7 @@ PrefabInstance:
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[3]'
       value: 
-      objectReference: {fileID: 21300000, guid: 5d47e5032b12c914293920ba1c136c3a, type: 3}
+      objectReference: {fileID: 21300000, guid: 0d7f2281edf8d8641a3bba7c9ec4ceaf, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[4]'
       value: 
