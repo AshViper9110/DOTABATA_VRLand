@@ -5,6 +5,8 @@ using UnityEngine;
 public class BlockBreakPointerController : MonoBehaviour {
     private BlockBreakGameManager gameManager;
 
+    [SerializeField] private float hideAlpha = 0.4f;
+
     [SerializeField] private SpriteRenderer pointer_1;
     [SerializeField] private SpriteRenderer pointer_2;
 
@@ -57,7 +59,7 @@ public class BlockBreakPointerController : MonoBehaviour {
     /// </summary>
     public void Hide() {
         Color color = pointer_1.color;
-        color.a = 0.5f;
+        color.a = hideAlpha;
         pointer_1.color = color;
         pointer_2.color = color;
     }
