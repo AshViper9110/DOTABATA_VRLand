@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 public class BlockBreakBlockObjectsManager : MonoBehaviour {
@@ -147,7 +146,7 @@ public class BlockBreakBlockObjectsManager : MonoBehaviour {
         foreach (var block in blockObjects.blockList) {
             GameObject insObj = objectList[block.id].OrderBy(_ => Random.value).First();
             GameObject created = Instantiate(insObj, block.pos, block.rot, this.transform);
-            Undo.RegisterCreatedObjectUndo(created, "Create Preview Object");
+          //  Undo.RegisterCreatedObjectUndo(created, "Create Preview Object");
         }
     }
 
@@ -156,7 +155,7 @@ public class BlockBreakBlockObjectsManager : MonoBehaviour {
     /// </summary>
     public void DestroyObjects() {
         for (int i = transform.childCount - 1; i >= 0; i--) {
-            Undo.DestroyObjectImmediate(transform.GetChild(i).gameObject);
+            //Undo.DestroyObjectImmediate(transform.GetChild(i).gameObject);
         }
     }
 }
