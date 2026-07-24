@@ -1,22 +1,22 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// ƒVƒŠƒAƒ‹‰»‰Â”\‚ÈDictionaryƒNƒ‰ƒXB
+/// ã‚·ãƒªã‚¢ãƒ«åŒ–å¯èƒ½ãªDictionaryã‚¯ãƒ©ã‚¹ã€‚
 /// </summary>
-/// <typeparam name="TKey">«‘‚ÌƒL[‚ÌŒ^B</typeparam>
-/// <typeparam name="TValue">«‘‚Ì’l‚ÌŒ^B</typeparam>
+/// <typeparam name="TKey">è¾æ›¸ã®ã‚­ãƒ¼ã®å‹ã€‚</typeparam>
+/// <typeparam name="TValue">è¾æ›¸ã®å€¤ã®å‹ã€‚</typeparam>
 [Serializable]
 public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver {
-    // Ä‹A“I‚ÈŒÄ‚Ño‚µ‚ğ–h~‚·‚é‚½‚ß‚Ìƒtƒ‰ƒO
+    // å†å¸°çš„ãªå‘¼ã³å‡ºã—ã‚’é˜²æ­¢ã™ã‚‹ãŸã‚ã®ãƒ•ãƒ©ã‚°
     [NonSerialized]
     private bool isUpdating = false;
 
     /// <summary>
-    /// ƒVƒŠƒAƒ‹‰»‘ÎÛ‚ÌƒL[‚Æ’l‚ÌƒyƒA‚ÌƒŠƒXƒgB
-    /// Unity‚ÌƒVƒŠƒAƒ‹‰»ƒVƒXƒeƒ€‚Å«‘ƒf[ƒ^‚ğƒVƒŠƒAƒ‹‰»‚·‚é‚½‚ß‚Ég—p‚µ‚Ü‚·B
+    /// ã‚·ãƒªã‚¢ãƒ«åŒ–å¯¾è±¡ã®ã‚­ãƒ¼ã¨å€¤ã®ãƒšã‚¢ã®ãƒªã‚¹ãƒˆã€‚
+    /// Unityã®ã‚·ãƒªã‚¢ãƒ«åŒ–ã‚·ã‚¹ãƒ†ãƒ ã§è¾æ›¸ãƒ‡ãƒ¼ã‚¿ã‚’ã‚·ãƒªã‚¢ãƒ«åŒ–ã™ã‚‹ãŸã‚ã«ä½¿ç”¨ã—ã¾ã™ã€‚
     /// </summary>
     [SerializeField]
     private List<SerializableKeyValuePair<TKey, TValue>> keyValuePairs = new List<SerializableKeyValuePair<TKey, TValue>>();
@@ -30,25 +30,25 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
 
 
     /// <summary>
-    /// Unity‚É‚æ‚éƒVƒŠƒAƒ‹‰»‘O‚ÉŒÄ‚Ño‚³‚êA«‘ƒf[ƒ^‚ğƒŠƒXƒg‚É•ÏŠ·‚µ‚Ü‚·B
+    /// Unityã«ã‚ˆã‚‹ã‚·ãƒªã‚¢ãƒ«åŒ–å‰ã«å‘¼ã³å‡ºã•ã‚Œã€è¾æ›¸ãƒ‡ãƒ¼ã‚¿ã‚’ãƒªã‚¹ãƒˆã«å¤‰æ›ã—ã¾ã™ã€‚
     /// </summary>
     public void OnBeforeSerialize() {
         if (isUpdating) {
-            return; // ƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚éê‡AÄ‹A“I‚ÈŒÄ‚Ño‚µ‚ğ–h~
+            return; // ãƒ•ãƒ©ã‚°ãŒç«‹ã£ã¦ã„ã‚‹å ´åˆã€å†å¸°çš„ãªå‘¼ã³å‡ºã—ã‚’é˜²æ­¢
         }
 
         UpdateKeyValuePairs();
     }
 
     /// <summary>
-    /// Unity‚É‚æ‚éƒVƒŠƒAƒ‹‰»Œã‚ÉŒÄ‚Ño‚³‚êAƒŠƒXƒgƒf[ƒ^‚ğ«‘‚É•ÏŠ·‚µ‚Ü‚·B
-    /// d•¡‚·‚éƒL[‚ª‘¶İ‚·‚éê‡‚ÍAƒL[‚ª®”Œ^A—ñ‹“Œ^A‚Ü‚½‚Í•¶š—ñŒ^‚Å‚ ‚ê‚ÎƒL[‚ğ’²®‚µ‚Ä’Ç‰Á‚µ‚Ü‚·B
+    /// Unityã«ã‚ˆã‚‹ã‚·ãƒªã‚¢ãƒ«åŒ–å¾Œã«å‘¼ã³å‡ºã•ã‚Œã€ãƒªã‚¹ãƒˆãƒ‡ãƒ¼ã‚¿ã‚’è¾æ›¸ã«å¤‰æ›ã—ã¾ã™ã€‚
+    /// é‡è¤‡ã™ã‚‹ã‚­ãƒ¼ãŒå­˜åœ¨ã™ã‚‹å ´åˆã¯ã€ã‚­ãƒ¼ãŒæ•´æ•°å‹ã€åˆ—æŒ™å‹ã€ã¾ãŸã¯æ–‡å­—åˆ—å‹ã§ã‚ã‚Œã°ã‚­ãƒ¼ã‚’èª¿æ•´ã—ã¦è¿½åŠ ã—ã¾ã™ã€‚
     /// </summary>
     public void OnAfterDeserialize() {
         if (isUpdating)
-            return; // ƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚éê‡AÄ‹A“I‚ÈŒÄ‚Ño‚µ‚ğ–h~
+            return; // ãƒ•ãƒ©ã‚°ãŒç«‹ã£ã¦ã„ã‚‹å ´åˆã€å†å¸°çš„ãªå‘¼ã³å‡ºã—ã‚’é˜²æ­¢
 
-        isUpdating = true; // ƒtƒ‰ƒO‚ğ—§‚Ä‚ÄÄ‹A“I‚ÈŒÄ‚Ño‚µ‚ğ–h~
+        isUpdating = true; // ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã¦å†å¸°çš„ãªå‘¼ã³å‡ºã—ã‚’é˜²æ­¢
 
         this.Clear();
 
@@ -62,7 +62,7 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
                 }
                 else {
                     Debug.LogWarning($"Cannot resolve duplicate key '{kvp.Key}'. Skipping entry.");
-                    continue; // ƒ†ƒj[ƒN‚ÈƒL[‚ªæ“¾‚Å‚«‚È‚©‚Á‚½ê‡AƒGƒ“ƒgƒŠ[‚ğƒXƒLƒbƒv
+                    continue; // ãƒ¦ãƒ‹ãƒ¼ã‚¯ãªã‚­ãƒ¼ãŒå–å¾—ã§ããªã‹ã£ãŸå ´åˆã€ã‚¨ãƒ³ãƒˆãƒªãƒ¼ã‚’ã‚¹ã‚­ãƒƒãƒ—
                 }
             }
 
@@ -71,15 +71,15 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
 
         UpdateKeyValuePairs();
 
-        isUpdating = false; // ƒtƒ‰ƒO‚ğ‰ğœ
+        isUpdating = false; // ãƒ•ãƒ©ã‚°ã‚’è§£é™¤
     }
 
     /// <summary>
-    /// ƒ†ƒj[ƒN‚ÈƒL[‚ğ¶¬‚µ‚Ü‚·BƒL[‚ª®”Œ^A—ñ‹“Œ^A‚Ü‚½‚Í•¶š—ñŒ^‚Ìê‡‚É‚Ì‚İ‹@”\‚µ‚Ü‚·B
+    /// ãƒ¦ãƒ‹ãƒ¼ã‚¯ãªã‚­ãƒ¼ã‚’ç”Ÿæˆã—ã¾ã™ã€‚ã‚­ãƒ¼ãŒæ•´æ•°å‹ã€åˆ—æŒ™å‹ã€ã¾ãŸã¯æ–‡å­—åˆ—å‹ã®å ´åˆã«ã®ã¿æ©Ÿèƒ½ã—ã¾ã™ã€‚
     /// </summary>
-    /// <param name="originalKey">Œ³‚ÌƒL[B</param>
-    /// <param name="uniqueKey">¶¬‚³‚ê‚½ƒ†ƒj[ƒN‚ÈƒL[B</param>
-    /// <returns>ƒ†ƒj[ƒN‚ÈƒL[‚ğ¶¬‚Å‚«‚½ê‡‚Í trueA‚Å‚«‚È‚©‚Á‚½ê‡‚Í falseB</returns>
+    /// <param name="originalKey">å…ƒã®ã‚­ãƒ¼ã€‚</param>
+    /// <param name="uniqueKey">ç”Ÿæˆã•ã‚ŒãŸãƒ¦ãƒ‹ãƒ¼ã‚¯ãªã‚­ãƒ¼ã€‚</param>
+    /// <returns>ãƒ¦ãƒ‹ãƒ¼ã‚¯ãªã‚­ãƒ¼ã‚’ç”Ÿæˆã§ããŸå ´åˆã¯ trueã€ã§ããªã‹ã£ãŸå ´åˆã¯ falseã€‚</returns>
     private bool TryGetUniqueKey(TKey originalKey, out TKey uniqueKey) {
         uniqueKey = default;
         bool success = false;
@@ -87,7 +87,7 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
         Type keyType = typeof(TKey);
 
         if (keyType.IsEnum) {
-            // —ñ‹“Œ^‚Ìê‡‚Ìˆ—
+            // åˆ—æŒ™å‹ã®å ´åˆã®å‡¦ç†
             Array enumValues = Enum.GetValues(keyType);
             int currentIndex = Array.IndexOf(enumValues, originalKey);
             if (currentIndex < 0) {
@@ -95,7 +95,7 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
                 return false;
             }
 
-            // ƒZƒOƒƒ“ƒg1: originalKey‚ÌŸ‚ÌƒCƒ“ƒfƒbƒNƒX‚©‚çÅŒã‚Ü‚Å
+            // ã‚»ã‚°ãƒ¡ãƒ³ãƒˆ1: originalKeyã®æ¬¡ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‹ã‚‰æœ€å¾Œã¾ã§
             for (int i = currentIndex + 1; i < enumValues.Length; i++) {
                 TKey enumValue = (TKey)enumValues.GetValue(i);
                 if (!this.ContainsKey(enumValue)) {
@@ -104,7 +104,7 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
                 }
             }
 
-            // ƒZƒOƒƒ“ƒg2: æ“ª‚©‚çoriginalKey‚ÌƒCƒ“ƒfƒbƒNƒX‚Ü‚Å
+            // ã‚»ã‚°ãƒ¡ãƒ³ãƒˆ2: å…ˆé ­ã‹ã‚‰originalKeyã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¾ã§
             for (int i = 0; i < currentIndex; i++) {
                 TKey enumValue = (TKey)enumValues.GetValue(i);
                 if (!this.ContainsKey(enumValue)) {
@@ -113,18 +113,18 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
                 }
             }
 
-            // ‚·‚×‚Ä‚Ì—ñ‹“Œ^‚Ì’l‚ªg—p‚³‚ê‚Ä‚¢‚éê‡
+            // ã™ã¹ã¦ã®åˆ—æŒ™å‹ã®å€¤ãŒä½¿ç”¨ã•ã‚Œã¦ã„ã‚‹å ´åˆ
             Debug.LogWarning($"All enum values for key '{keyType}' are already used. Cannot add duplicate key '{originalKey}'.");
         }
         else if (IsIntegralType(keyType)) {
-            // ®”Œ^‚Ìê‡‚Ìˆ—
+            // æ•´æ•°å‹ã®å ´åˆã®å‡¦ç†
             success = TryIncrementIntegralKey(originalKey, keyType, out uniqueKey);
             if (!success) {
                 Debug.LogWarning($"Cannot generate a unique key for '{originalKey}'.");
             }
         }
         else if (typeof(string) == keyType) {
-            // •¶š—ñŒ^‚Ìê‡‚Ìˆ—
+            // æ–‡å­—åˆ—å‹ã®å ´åˆã®å‡¦ç†
             success = TryGenerateUniqueStringKey(originalKey as string, out string newStringKey);
             if (success) {
                 uniqueKey = (TKey)(object)newStringKey;
@@ -141,10 +141,10 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
     }
 
     /// <summary>
-    /// w’è‚³‚ê‚½Œ^‚ª®”Œ^‚©‚Ç‚¤‚©‚ğ”»’è‚µ‚Ü‚·B
+    /// æŒ‡å®šã•ã‚ŒãŸå‹ãŒæ•´æ•°å‹ã‹ã©ã†ã‹ã‚’åˆ¤å®šã—ã¾ã™ã€‚
     /// </summary>
-    /// <param name="type">”»’è‚·‚éŒ^B</param>
-    /// <returns>®”Œ^‚Ìê‡‚Í trueA‚»‚¤‚Å‚È‚¢ê‡‚Í falseB</returns>
+    /// <param name="type">åˆ¤å®šã™ã‚‹å‹ã€‚</param>
+    /// <returns>æ•´æ•°å‹ã®å ´åˆã¯ trueã€ãã†ã§ãªã„å ´åˆã¯ falseã€‚</returns>
     private bool IsIntegralType(Type type) {
         return type == typeof(byte) ||
                type == typeof(sbyte) ||
@@ -157,12 +157,12 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
     }
 
     /// <summary>
-    /// ®”Œ^ƒL[‚Ìƒ†ƒj[ƒN‚ÈƒL[‚ğ¶¬‚µ‚Ü‚·B
+    /// æ•´æ•°å‹ã‚­ãƒ¼ã®ãƒ¦ãƒ‹ãƒ¼ã‚¯ãªã‚­ãƒ¼ã‚’ç”Ÿæˆã—ã¾ã™ã€‚
     /// </summary>
-    /// <param name="originalKey">Œ³‚ÌƒL[B</param>
-    /// <param name="keyType">ƒL[‚ÌŒ^B</param>
-    /// <param name="uniqueKey">¶¬‚³‚ê‚½ƒ†ƒj[ƒN‚ÈƒL[B</param>
-    /// <returns>ƒ†ƒj[ƒN‚ÈƒL[‚ğ¶¬‚Å‚«‚½ê‡‚Í trueA‚Å‚«‚È‚©‚Á‚½ê‡‚Í falseB</returns>
+    /// <param name="originalKey">å…ƒã®ã‚­ãƒ¼ã€‚</param>
+    /// <param name="keyType">ã‚­ãƒ¼ã®å‹ã€‚</param>
+    /// <param name="uniqueKey">ç”Ÿæˆã•ã‚ŒãŸãƒ¦ãƒ‹ãƒ¼ã‚¯ãªã‚­ãƒ¼ã€‚</param>
+    /// <returns>ãƒ¦ãƒ‹ãƒ¼ã‚¯ãªã‚­ãƒ¼ã‚’ç”Ÿæˆã§ããŸå ´åˆã¯ trueã€ã§ããªã‹ã£ãŸå ´åˆã¯ falseã€‚</returns>
     private bool TryIncrementIntegralKey(TKey originalKey, Type keyType, out TKey uniqueKey) {
         uniqueKey = default;
         try {
@@ -282,12 +282,12 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
     }
 
     /// <summary>
-    /// •¶š—ñŒ^ƒL[‚Ìƒ†ƒj[ƒN‚ÈƒL[‚ğ¶¬‚µ‚Ü‚·B
-    /// uav‚©‚çuzv‚Ü‚Å‚µAuzv‚ÌŸ‚Íuaav‚Æ‚µAˆÈ~•K—v‚É‰‚¶‚Äˆê•¶š‚¸‚Â’Ç‰Á‚³‚ê‚Ü‚·B
+    /// æ–‡å­—åˆ—å‹ã‚­ãƒ¼ã®ãƒ¦ãƒ‹ãƒ¼ã‚¯ãªã‚­ãƒ¼ã‚’ç”Ÿæˆã—ã¾ã™ã€‚
+    /// ã€Œaã€ã‹ã‚‰ã€Œzã€ã¾ã§è©¦ã—ã€ã€Œzã€ã®æ¬¡ã¯ã€Œaaã€ã¨ã—ã€ä»¥é™å¿…è¦ã«å¿œã˜ã¦ä¸€æ–‡å­—ãšã¤è¿½åŠ ã•ã‚Œã¾ã™ã€‚
     /// </summary>
-    /// <param name="originalKey">Œ³‚ÌƒL[B</param>
-    /// <param name="newStringKey">¶¬‚³‚ê‚½ƒ†ƒj[ƒN‚È•¶š—ñƒL[B</param>
-    /// <returns>ƒ†ƒj[ƒN‚ÈƒL[‚ğ¶¬‚Å‚«‚½ê‡‚Í trueA‚Å‚«‚È‚©‚Á‚½ê‡‚Í falseB</returns>
+    /// <param name="originalKey">å…ƒã®ã‚­ãƒ¼ã€‚</param>
+    /// <param name="newStringKey">ç”Ÿæˆã•ã‚ŒãŸãƒ¦ãƒ‹ãƒ¼ã‚¯ãªæ–‡å­—åˆ—ã‚­ãƒ¼ã€‚</param>
+    /// <returns>ãƒ¦ãƒ‹ãƒ¼ã‚¯ãªã‚­ãƒ¼ã‚’ç”Ÿæˆã§ããŸå ´åˆã¯ trueã€ã§ããªã‹ã£ãŸå ´åˆã¯ falseã€‚</returns>
     private bool TryGenerateUniqueStringKey(string originalKey, out string newStringKey) {
         newStringKey = null;
 
@@ -296,10 +296,10 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
             return false;
         }
 
-        // ’è‹`Ï‚İ‚ÌÅ‘å’·‚ğİ’èi•K—v‚É‰‚¶‚Ä•ÏX‰Â”\j
+        // å®šç¾©æ¸ˆã¿ã®æœ€å¤§é•·ã‚’è¨­å®šï¼ˆå¿…è¦ã«å¿œã˜ã¦å¤‰æ›´å¯èƒ½ï¼‰
         const int maxLength = 10;
 
-        // ŠÖ”“à‚Åg—p‚·‚éƒ[ƒJƒ‹•Ï”
+        // é–¢æ•°å†…ã§ä½¿ç”¨ã™ã‚‹ãƒ­ãƒ¼ã‚«ãƒ«å¤‰æ•°
         int length = 1;
 
         while (length <= maxLength) {
@@ -318,10 +318,10 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
     }
 
     /// <summary>
-    /// w’è‚³‚ê‚½’·‚³‚ÌƒAƒ‹ƒtƒ@ƒxƒbƒg¬•¶š‚Ì‘g‚İ‡‚í‚¹‚ğ¶¬‚µ‚Ü‚·B
+    /// æŒ‡å®šã•ã‚ŒãŸé•·ã•ã®ã‚¢ãƒ«ãƒ•ã‚¡ãƒ™ãƒƒãƒˆå°æ–‡å­—ã®çµ„ã¿åˆã‚ã›ã‚’ç”Ÿæˆã—ã¾ã™ã€‚
     /// </summary>
-    /// <param name="length">¶¬‚·‚é•¶š—ñ‚Ì’·‚³B</param>
-    /// <returns>w’è‚³‚ê‚½’·‚³‚Ì•¶š—ñ‚Ì—ñ‹“B</returns>
+    /// <param name="length">ç”Ÿæˆã™ã‚‹æ–‡å­—åˆ—ã®é•·ã•ã€‚</param>
+    /// <returns>æŒ‡å®šã•ã‚ŒãŸé•·ã•ã®æ–‡å­—åˆ—ã®åˆ—æŒ™ã€‚</returns>
     private IEnumerable<string> GenerateStringCombinations(int length) {
         if (length == 1) {
             for (char c = 'a'; c <= 'z'; c++) {
@@ -338,42 +338,46 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
     }
 
     /// <summary>
-    /// ƒVƒŠƒAƒ‹‰»—p‚ÌƒL[‚Æ’l‚ÌƒyƒA‚ÌƒŠƒXƒg‚ğæ“¾‚µ‚Ü‚·B
-    /// Unity‚ÌƒCƒ“ƒXƒyƒNƒ^ã‚Å«‘ƒf[ƒ^‚ğ•\¦E•ÒW‚·‚é‚½‚ß‚Ég—p‚³‚ê‚Ü‚·B
+    /// ã‚·ãƒªã‚¢ãƒ«åŒ–ç”¨ã®ã‚­ãƒ¼ã¨å€¤ã®ãƒšã‚¢ã®ãƒªã‚¹ãƒˆã‚’å–å¾—ã—ã¾ã™ã€‚
+    /// Unityã®ã‚¤ãƒ³ã‚¹ãƒšã‚¯ã‚¿ä¸Šã§è¾æ›¸ãƒ‡ãƒ¼ã‚¿ã‚’è¡¨ç¤ºãƒ»ç·¨é›†ã™ã‚‹ãŸã‚ã«ä½¿ç”¨ã•ã‚Œã¾ã™ã€‚
     /// </summary>
     public List<SerializableKeyValuePair<TKey, TValue>> SerializableKeyValuePairs => keyValuePairs;
+
+    public static implicit operator SerializableDictionary<TKey, TValue>(List<GameObject> v) {
+        throw new NotImplementedException();
+    }
 }
 
 /// <summary>
-/// ƒVƒŠƒAƒ‹‰»‰Â”\‚ÈƒL[‚Æ’l‚ÌƒyƒA‚ğ•\‚·ƒNƒ‰ƒXB
+/// ã‚·ãƒªã‚¢ãƒ«åŒ–å¯èƒ½ãªã‚­ãƒ¼ã¨å€¤ã®ãƒšã‚¢ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹ã€‚
 /// </summary>
-/// <typeparam name="TKey">ƒL[‚ÌŒ^B</typeparam>
-/// <typeparam name="TValue">’l‚ÌŒ^B</typeparam>
+/// <typeparam name="TKey">ã‚­ãƒ¼ã®å‹ã€‚</typeparam>
+/// <typeparam name="TValue">å€¤ã®å‹ã€‚</typeparam>
 [Serializable]
 public class SerializableKeyValuePair<TKey, TValue> {
     /// <summary>
-    /// ƒL[B
+    /// ã‚­ãƒ¼ã€‚
     /// </summary>
     public TKey Key;
 
     /// <summary>
-    /// ’lB
+    /// å€¤ã€‚
     /// </summary>
     public TValue Value;
 
     /// <summary>
-    /// ƒfƒtƒHƒ‹ƒgƒRƒ“ƒXƒgƒ‰ƒNƒ^B
+    /// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
     /// </summary>
     public SerializableKeyValuePair() {
-        Key = default;   // TKey‚ÌƒfƒtƒHƒ‹ƒg’l
-        Value = default; // TValue‚ÌƒfƒtƒHƒ‹ƒg’l
+        Key = default;   // TKeyã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤
+        Value = default; // TValueã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤
     }
 
     /// <summary>
-    /// ƒL[‚Æ’l‚ğw’è‚µ‚ÄV‚µ‚¢ƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬‚µ‚Ü‚·B
+    /// ã‚­ãƒ¼ã¨å€¤ã‚’æŒ‡å®šã—ã¦æ–°ã—ã„ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆã—ã¾ã™ã€‚
     /// </summary>
-    /// <param name="key">ƒL[B</param>
-    /// <param name="value">’lB</param>
+    /// <param name="key">ã‚­ãƒ¼ã€‚</param>
+    /// <param name="value">å€¤ã€‚</param>
     public SerializableKeyValuePair(TKey key, TValue value) {
         Key = key;
         Value = value;

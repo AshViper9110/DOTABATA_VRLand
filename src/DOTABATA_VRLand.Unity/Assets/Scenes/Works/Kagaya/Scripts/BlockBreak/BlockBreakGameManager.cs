@@ -177,6 +177,9 @@ public class BlockBreakGameManager : MonoBehaviour {
                 await objectsManager.SetObjects();
                 myPlayerController.canShot = true;
             }
+            else {
+                objectsManager.ChangeKinematic(true);
+            }
         }
         else if (currentRound < 3) {
             currentRound++;

@@ -18,16 +18,36 @@ public class ButtonAttribute : Editor {
 
 [CustomEditor(typeof(BlockBreakBlockObjectsManager))]
 public class BlockObjectManagerAttribute : Editor {
+    SerializedProperty previewJsonName;
+
+    public void OnEnable() {
+        previewJsonName = serializedObject.FindProperty("previewJsonName");
+    }
+
     public override void OnInspectorGUI() {
-        DrawDefaultInspector();
+        serializedObject.Update();
+
+        DrawPropertiesExcluding(serializedObject, "previewJsonName");
 
         BlockBreakBlockObjectsManager bbBlockObjectManager = (BlockBreakBlockObjectsManager)target;
         if (GUILayout.Button("SaveJson")) {
             bbBlockObjectManager.CreateJson();
         }
-        else if (GUILayout.Button("LoadAllJson")) {
+        if (GUILayout.Button("LoadAllJson")) {
             bbBlockObjectManager.LoadAllJsonFromProjectsFile();
         }
+
+        EditorGUILayout.PropertyField(previewJsonName);
+
+        if (GUILayout.Button("PreviewObject")) {
+            bbBlockObjectManager.PreviewJsonObject();
+        }
+
+        if (GUILayout.Button("DestroyObjects")) {
+            bbBlockObjectManager.DestroyObjects();
+        }
+
+        serializedObject.ApplyModifiedProperties();
     }
 }
 #endif
