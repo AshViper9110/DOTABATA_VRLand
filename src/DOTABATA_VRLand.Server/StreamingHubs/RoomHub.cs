@@ -747,6 +747,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             return Task.CompletedTask;
         }
 
+        public Task BallingPinAsync(int pinCount, JoinedUser joinedUser)
+        {
+            this._roomContext.Group.All.OnBallingPinAsync(pinCount, joinedUser);
+            return Task.CompletedTask;
+        }
+
         //爆弾ドッチボールのヒット処理
         public Task HitDodgeBall(Guid connectionId)
         {

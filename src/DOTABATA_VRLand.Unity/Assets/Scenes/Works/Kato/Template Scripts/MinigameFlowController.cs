@@ -39,7 +39,9 @@ public class MinigameFlowController : MonoBehaviour
     public bool isGameStarted = false;
 
     public List<string> names;
-    bool willReady = false;
+    public bool willReady = false;
+    public bool AllReady = false;
+    public bool OnStarted = false;
 
     // =====================================================
     // Start
@@ -51,11 +53,11 @@ public class MinigameFlowController : MonoBehaviour
         //RoomModelイベント購読
         
         //InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position = Vector3.zero;//プレイヤー座標初期化(0,0,0)
-        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)//他プレイヤー非表示
-        {
-            if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
-            player.playerObj.SetActive(false);
-        }
+        //foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)//他プレイヤー非表示
+        //{
+        //    if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
+        //    player.playerObj.SetActive(false);
+        //}
            
         waitingText.gameObject.SetActive(false);
         countdownText.gameObject.SetActive(false);
@@ -150,6 +152,7 @@ public class MinigameFlowController : MonoBehaviour
         //各ボタン切り替え
         readyButton.gameObject.SetActive(!isAllReady);
         StartButton.gameObject.SetActive(isAllReady);
+        AllReady = isAllReady;
     }
 
     // =====================================================
@@ -158,7 +161,11 @@ public class MinigameFlowController : MonoBehaviour
 
     public void GameStrat()
     {
-        RoomModel.I.OnGameStartAsync();
+        if (!OnStarted)
+        {
+            OnStarted = true;
+            RoomModel.I.OnGameStartAsync();
+        }
     }
 
     // =====================================================
