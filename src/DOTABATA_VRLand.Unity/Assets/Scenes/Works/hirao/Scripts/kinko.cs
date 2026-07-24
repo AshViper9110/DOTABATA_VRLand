@@ -1,3 +1,4 @@
+using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,6 +70,7 @@ public class Kinko : MonoBehaviour
         if (RoomModel.I == null) return;
 
         RoomModel.I.OnCountdownAction += StartCountdown;
+        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
     }
 
     // =====================================================
@@ -80,9 +82,10 @@ public class Kinko : MonoBehaviour
         if (RoomModel.I == null) return;
 
         RoomModel.I.OnCountdownAction -= StartCountdown;
+        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
     }
 
-    // Update is called once per frame
+        // Update is called once per frame
     void FixedUpdate()
     {
         if (controller.isGameStarted)
@@ -143,5 +146,10 @@ public class Kinko : MonoBehaviour
         {
             AudioManager.ChangeBGM(AudioManager.BGM.Bank);
         }
+    }
+
+    void OnReceiveRanking(List<JoinedUser> rankOrder)
+    {
+        timerText.gameObject.SetActive(false);
     }
 }
