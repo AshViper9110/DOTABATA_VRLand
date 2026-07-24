@@ -147,7 +147,9 @@ public class BlockBreakBlockObjectsManager : MonoBehaviour {
         foreach (var block in blockObjects.blockList) {
             GameObject insObj = objectList[block.id].OrderBy(_ => Random.value).First();
             GameObject created = Instantiate(insObj, block.pos, block.rot, this.transform);
+#if UNITY_EDITOR
             Undo.RegisterCreatedObjectUndo(created, "Create Preview Object");
+#endif
         }
     }
 
@@ -156,7 +158,9 @@ public class BlockBreakBlockObjectsManager : MonoBehaviour {
     /// </summary>
     public void DestroyObjects() {
         for (int i = transform.childCount - 1; i >= 0; i--) {
+#if UNITY_EDITOR
             Undo.DestroyObjectImmediate(transform.GetChild(i).gameObject);
+#endif
         }
     }
 }
