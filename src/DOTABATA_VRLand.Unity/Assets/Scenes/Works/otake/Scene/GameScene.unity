@@ -1751,31 +1751,21 @@ MonoBehaviour:
     needsReinit: 0
   handType: 2
   miniGames:
+  - nitnit
+  - Kinko
   - Bowling
-  - Bowling
-  - Bowling
-  - Bowling
-  - Bowling
-  - Bowling
-  - Bowling
-  - Bowling
-  - Bowling
-  - Bowling
-  - Bowling
-  - Bowling
+  - ArcanaSketch
+  - BombDodge
+  - BlockBreak
+  - GarageOpener
   miniGameNames:
   - "\u30CB\u30C3\u30C8\u30CB\u30C3\u30C8"
-  - "\u30AC\u30EC\u30FC\u30B8\u30AA\u30FC\u30D7\u30CA\u30FC"
+  - "\u91D1\u5EAB\u7834\u308A"
+  - "100\u30D4\u30F3\u30DC\u30A6\u30EA\u30F3\u30B0"
   - "\u30A2\u30EB\u30AB\u30CA\u30B9\u30B1\u30C3\u30C1"
-  - "\u30B9\u30D1\u30C3\u3068\u4E00\u9583\uFF01"
-  - "\u30DD\u30F3\u30C3\uFF01\u3068\u30B5\u30A4\u30C0\u30FC"
-  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
-  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
-  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
-  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
-  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
-  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
-  - "\u30AF\u30E9\u30A4\u30DF\u30F3\u30B0"
+  - "\u7206\u5F3E\u30C9\u30C3\u30B8\u30DC\u30FC\u30EB"
+  - "\u30D6\u30ED\u30C3\u30AF\u5D29\u3057"
+  - "\u30AC\u30EC\u30FC\u30B8\u30AA\u30FC\u30D7\u30CA\u30FC"
   playerPos:
   - {fileID: 603687270}
   - {fileID: 64529226}
@@ -1800,14 +1790,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 73ee9c1bc49f7434c9e209fa345e23f2, type: 3}
   - {fileID: 21300000, guid: 7411b782905f44247961176aa9d48cf8, type: 3}
   - {fileID: 21300000, guid: 3142883b8c332564c8587767f6f7905d, type: 3}
+  - {fileID: 21300000, guid: c79959d18d3a636459727fe7da765813, type: 3}
+  - {fileID: 21300000, guid: b7457813f6b00bf46ada08505454916a, type: 3}
   - {fileID: 21300000, guid: c1118d367f0ca104094c7a8989e520bb, type: 3}
-  - {fileID: 21300000, guid: b5f368549e7af8346937fab2bbdb638a, type: 3}
-  - {fileID: 21300000, guid: c61dba6769a299443965d6c96331c503, type: 3}
-  - {fileID: 21300000, guid: c61dba6769a299443965d6c96331c503, type: 3}
-  - {fileID: 21300000, guid: c61dba6769a299443965d6c96331c503, type: 3}
-  - {fileID: 21300000, guid: c61dba6769a299443965d6c96331c503, type: 3}
-  - {fileID: 21300000, guid: c61dba6769a299443965d6c96331c503, type: 3}
-  - {fileID: 21300000, guid: c61dba6769a299443965d6c96331c503, type: 3}
   rankingPosList:
   - {fileID: 365872534}
   - {fileID: 2070341042}
@@ -1966,10 +1951,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 7411b782905f44247961176aa9d48cf8, type: 3}
   - {fileID: 21300000, guid: 3142883b8c332564c8587767f6f7905d, type: 3}
   - {fileID: 21300000, guid: c1118d367f0ca104094c7a8989e520bb, type: 3}
-  - {fileID: 21300000, guid: b5f368549e7af8346937fab2bbdb638a, type: 3}
-  - {fileID: 21300000, guid: 5d47e5032b12c914293920ba1c136c3a, type: 3}
-  - {fileID: 21300000, guid: 549754ee000feaf449d5fe5f4a4d6dc4, type: 3}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: c79959d18d3a636459727fe7da765813, type: 3}
+  - {fileID: 21300000, guid: 6d5745fea6ceb914baaab0c4b25ee3a3, type: 3}
+  - {fileID: 21300000, guid: 863649501dc24f7448f77220105cb2ea, type: 3}
+  - {fileID: 21300000, guid: b7457813f6b00bf46ada08505454916a, type: 3}
   RankingText:
   - {fileID: 1511645578}
   - {fileID: 54193787}
@@ -13102,7 +13087,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 1646930109}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
       propertyPath: m_LocalScale.x
@@ -13118,15 +13103,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.17
+      value: 3.7977285
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.51
+      value: 6.9532285
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 14.78
+      value: 6.4708986
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
       propertyPath: m_LocalRotation.w
@@ -13134,7 +13119,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
       propertyPath: m_LocalRotation.y
@@ -13193,6 +13178,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
+--- !u!4 &1638381657 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c6ecde0ebcd7def4c97469d54846d9d4, type: 3}
+  m_PrefabInstance: {fileID: 1638381656}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1646930108
 GameObject:
   m_ObjectHideFlags: 0
@@ -13225,6 +13215,7 @@ Transform:
   - {fileID: 1659079838}
   - {fileID: 838938150}
   - {fileID: 683067691822504042}
+  - {fileID: 1638381657}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1655611827
@@ -17344,7 +17335,6 @@ SceneRoots:
   - {fileID: 750529891}
   - {fileID: 1221296865}
   - {fileID: 1646930109}
-  - {fileID: 1638381656}
   - {fileID: 218277364}
   - {fileID: 1579386592}
   - {fileID: 831455300}
