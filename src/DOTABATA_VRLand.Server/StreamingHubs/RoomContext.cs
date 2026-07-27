@@ -173,8 +173,6 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
              
                 }
 
-
-
                 return ranked;//joinedUser型の順位リストを返す
             }
             return null;
