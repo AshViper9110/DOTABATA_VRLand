@@ -429,6 +429,10 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         await roomHub.RegisterScoreAsync(result);
     }
 
+    public async void SendTime(bool firstWin) {
+        await roomHub.RegisterClearTimeAsync(DateTime.Now, firstWin);
+    }
+
     /// <summary>
     /// [サーバー通知]
     /// ミニゲーム結果順位
