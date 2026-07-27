@@ -159,6 +159,7 @@ public class GarageManager : MonoBehaviour
         if(other.gameObject.tag == "OpenLine")
         {
             isOpen = true;
+            AudioManager.PlaySE(AudioManager.SE.Garage_Open);
         }
     }
 }
