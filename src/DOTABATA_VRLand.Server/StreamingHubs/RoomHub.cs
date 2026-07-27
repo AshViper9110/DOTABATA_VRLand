@@ -20,12 +20,6 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         private RoomContext? _roomContext;
 
-        /*
-         * ミニゲーム用
-         */
-
-        private ArcanaContext? _arcanaContext;
-
         //public RoomHub(RoomContextRepository roomContextRepository) {
         //    _roomContextRepository = roomContextRepository;
         //}
