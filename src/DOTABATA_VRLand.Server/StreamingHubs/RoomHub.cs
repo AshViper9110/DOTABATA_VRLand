@@ -821,5 +821,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             this._roomContext.Group.All.OnAudioAsync(id);
             return Task.CompletedTask;
         }
+
+        public Task MoveSceneAsync(string name)
+        {
+            // 全員に通知
+            this._roomContext.Group.All.OnMoveSceneAsync(name);
+            return Task.CompletedTask;
+        }
     }
 }
