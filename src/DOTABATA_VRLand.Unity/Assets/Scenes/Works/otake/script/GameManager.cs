@@ -10,6 +10,7 @@ using Valve.VR;
 using UnityEditor;
 using TMPro;
 using Cysharp.Threading.Tasks.Triggers;
+using Unity.VisualScripting;
 
 
 public class GameManager : MonoBehaviour
@@ -136,6 +137,20 @@ public class GameManager : MonoBehaviour
     FreePlayManager freePlayManager;
     bool isAddCrown;
     int GetRankIndex;
+
+
+    private void OnEnable()
+    {
+        if (RoomModel.I == null) return;
+        RoomModel.I.OnMovedScene += MoveScene;
+    }
+
+    private void OnDisable()
+    {
+        if (RoomModel.I == null) return;
+        RoomModel.I.OnMovedScene -= MoveScene;
+
+    }
 
     private void Awake()
     {
@@ -337,6 +352,8 @@ public class GameManager : MonoBehaviour
     {
         rankingUis[Id - 1].GetComponent<TextMeshProUGUI>().text = InRoomPlayerData.I.PlayerList[guid].joinedUser.Name + "  win×"+
             playerWinlist[Id];
+
+        SetRanking();
     }
 
     //ミニゲーム抽選開始(ホストのみ実行)
@@ -459,11 +476,12 @@ public class GameManager : MonoBehaviour
             return; 
         }
 
-        if (playerWinlist[RankingList[InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.JoinOrder]] >= 3)
+        if (playerWinlist[ID] >= 3)
         {
             onEnd = true;
             onResult = false;
             textIndex = -1;
+           
         }
 
         SetRankText(guid,ID);
@@ -619,7 +637,7 @@ public class GameManager : MonoBehaviour
             if (textIndex >= FinishText.Count)
             {
                 //タイトルに戻る
-                MoveScene("TitleScene");
+                RoomModel.I.MoveSceneAsync("TitleScene");
                 RoomModel.I.LeaveRoomAsync();
                 EndProgress = true;
                 return;
@@ -640,7 +658,7 @@ public class GameManager : MonoBehaviour
         }
         else if (onSelect)
         {
-            MoveScene(miniGames[selPointManager.SelectId]);
+            RoomModel.I.MoveSceneAsync(miniGames[selPointManager.SelectId]);
             EndProgress = true;
         }
         else
