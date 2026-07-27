@@ -182,6 +182,11 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// 音の同期通知
         /// </summary>
         public void OnAudioAsync(int id);
+
+        /// <summary>
+        /// シーン移動
+        /// </summary>
+        public void OnMoveSceneAsync(string name);
     }
 
 }

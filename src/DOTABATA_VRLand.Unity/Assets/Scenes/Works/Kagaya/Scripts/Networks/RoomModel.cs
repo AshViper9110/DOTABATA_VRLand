@@ -179,6 +179,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action<int> OnAudioAsyncAction { get; set; }
 
+    public Action<string> OnMovedScene { get; set; }
+
     /*
      * 処理
      */
@@ -976,6 +978,23 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if(OnAudioAsyncAction != null)
         {
             OnAudioAsyncAction(id);
+        }
+    }
+
+    public async UniTask MoveSceneAsync(string name)
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.MoveSceneAsync(name);
+    }
+
+    public void OnMoveSceneAsync(string name)
+    {
+        if (OnMovedScene != null)
+        {
+            OnMovedScene(name);
         }
     }
 }
