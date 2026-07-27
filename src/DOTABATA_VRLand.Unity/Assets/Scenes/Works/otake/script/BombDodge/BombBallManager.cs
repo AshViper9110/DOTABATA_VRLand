@@ -55,7 +55,7 @@ public class BombBallManager : MonoBehaviour
                 if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<BombDogePlayer>().isDead) return;
                 syncObject.GetOwnership(true);
                 RestartPos = bombDodgeManager.BombStartpos[InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1].position;
-                Debug.Log("君の物だよ");
+              
                 AudioManager.PlaySE(AudioManager.SE.Bomb_Catch);
             }
 
@@ -66,24 +66,31 @@ public class BombBallManager : MonoBehaviour
 
         if (BombTimer <= 0)
         {
+
+         
+
             if (syncObject.IsOwner)
             {
-                BombTimer = 0;
+                Debug.Log("生成チャレンジ");
+                bombDodgeManager.StartCreateBall();
 
+                BombTimer = 0;
+                Debug.Log("爆発生成");
                 Instantiate(BomberEffectPrefab,
                   transform.position,
                     Quaternion.identity);
-                bombDodgeManager.StartCreateBall();
+
+
+                if (hand != null)
+                {
+                    hand.DetachObject(gameObject);
+                }
+
+                bombDodgeManager.Bomb = null;
+                Destroy(this.gameObject);
+
             }
-
-
-            if (hand != null)
-            {
-                hand.DetachObject(gameObject);
-            }
-
-            Destroy(this.gameObject);
-           
+            enabled = false;
             
         }
         
@@ -139,6 +146,7 @@ public class BombBallManager : MonoBehaviour
                 if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<BombDogePlayer>().isDead) return;
 
                 syncObject.GetOwnership(true);
+                Debug.Log("君の物だよ");
                 RoomModel.I.HitDodgeBall();
             }
         }

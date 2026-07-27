@@ -95,6 +95,11 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         Task RegisterScoreAsync(int result);
 
         /// <summary>
+        /// ミニゲームの結果を反映
+        /// </summary>
+        Task RegisterClearTimeAsync(DateTime time, bool firstWin);
+
+        /// <summary>
         /// ミニゲーム大会順位取得
         /// </summary>
         Task GetAllRoundRankingAsync();
@@ -135,6 +140,8 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// ボーリングの順番変え
         /// </summary>
         Task BallingNext(int pinCount, JoinedUser joinedUser);
+
+        Task BallingPinAsync(int pinCount, JoinedUser joinedUser);
 
 
         /// <summary>
@@ -197,5 +204,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// 音の同期
         /// </summary>
         Task AudioAsync(int id);
+
+        /// <summary>
+        /// シーン移動
+        /// </summary>
+        Task MoveSceneAsync(string name);
     }
 }

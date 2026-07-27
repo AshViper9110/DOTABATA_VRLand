@@ -3,17 +3,19 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 
 public class BlockBreakBlockObjectsManager : MonoBehaviour {
-    [SerializeField] private List<GameObject> objectList = new List<GameObject>();
+    [SerializeField] private SerializableDictionary<int, List<GameObject>> objectList = new SerializableDictionary<int, List<GameObject>>();
+
+    [SerializeField] private int newCreateBlockNum = 5;
 
     [SerializeField] private List<string> jsonNameList = new List<string>();
 
     [SerializeField] private string saveName;
 
-    [SerializeField] private int newCreateBlockNum = 5;
+    [SerializeField] private string previewJsonName;
 
     /// <summary>
     /// オブジェクトをセット
@@ -25,14 +27,18 @@ public class BlockBreakBlockObjectsManager : MonoBehaviour {
             BlockObjects blockObjects = GetBLockObjectsPosLoadJson();
 
             foreach (var block in blockObjects.blockList) {
-                Instantiate(objectList[block.id - 1], block.pos, Quaternion.identity, this.transform);
+                GameObject insObj = objectList[block.id].OrderBy(_=> Random.value).First(); 
+                Instantiate(insObj, block.pos, block.rot, this.transform);
             }
         }
         else {
             foreach (GameObject block in GetCreatedObjectList()) {
+                if (!block) return;
                 await block.GetComponent<SyncObject>().GetOwnership(true);
             }
         }
+
+        ChangeKinematic(false);
     }
 
     /// <summary>
@@ -65,8 +71,17 @@ public class BlockBreakBlockObjectsManager : MonoBehaviour {
         return this.transform.childCount;
     }
 
+    /// <summary>
+    /// ブロックのキネマティックを変更
+    /// </summary>
+    public void ChangeKinematic(bool isKinematic) {
+        foreach (GameObject obj in GetCreatedObjectList()) {
+            obj.GetComponent<Rigidbody>().isKinematic = isKinematic;
+        }
+    }
+
     /// ====================================================================================
-    
+
     /// <summary>
     /// Jsonファイルを生成して保存
     /// </summary>
@@ -82,6 +97,7 @@ public class BlockBreakBlockObjectsManager : MonoBehaviour {
             Block block = new Block() {
                 id = blockCon.blockId,
                 pos = child.position,
+                rot = child.rotation,
             };
             blockObjects.blockList.Add(block);
         }
@@ -118,6 +134,35 @@ public class BlockBreakBlockObjectsManager : MonoBehaviour {
             }
         }
     }
+
+    /// <summary>
+    /// Jsonファイルを読み込み生成
+    /// </summary>
+    public void PreviewJsonObject() {
+        DestroyObjects();
+
+        string json = System.IO.File.ReadAllText(Application.streamingAssetsPath + "/Json/BlockBreak/" + previewJsonName + ".json");
+        BlockObjects blockObjects = JsonConvert.DeserializeObject<BlockObjects>(json);
+
+        foreach (var block in blockObjects.blockList) {
+            GameObject insObj = objectList[block.id].OrderBy(_ => Random.value).First();
+            GameObject created = Instantiate(insObj, block.pos, block.rot, this.transform);
+#if UNITY_EDITOR
+            Undo.RegisterCreatedObjectUndo(created, "Create Preview Object");
+#endif
+        }
+    }
+
+    /// <summary>
+    /// オブジェクトを全削除
+    /// </summary>
+    public void DestroyObjects() {
+        for (int i = transform.childCount - 1; i >= 0; i--) {
+#if UNITY_EDITOR
+            Undo.DestroyObjectImmediate(transform.GetChild(i).gameObject);
+#endif
+        }
+    }
 }
 
 [System.Serializable]
@@ -129,4 +174,5 @@ public class BlockObjects {
 public class Block {
     public int id;
     public Vector3 pos;
+    public Quaternion rot;
 }

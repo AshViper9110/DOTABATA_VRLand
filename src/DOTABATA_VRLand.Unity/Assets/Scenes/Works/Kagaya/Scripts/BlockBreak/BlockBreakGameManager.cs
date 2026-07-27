@@ -62,6 +62,7 @@ public class BlockBreakGameManager : MonoBehaviour {
     }
 
     private async void Start() {
+        InRoomPlayerData.I.ShowPlayerList();
         AudioManager.StopBgm();
         SteamVR_Fade.View(new Color(0, 0, 0, 0), 1.0f);
 
@@ -110,7 +111,10 @@ public class BlockBreakGameManager : MonoBehaviour {
         }
 
         // モニターに名前設定
-        uiManager.SetPlayerNameText(InRoomPlayerData.I.PlayerList.Values.Select(_ => _.joinedUser.Name).ToArray());
+        string[] names = InRoomPlayerData.I.PlayerList.Values
+            .OrderBy(_=>_.joinedUser.JoinOrder)
+            .Select(_=>_.joinedUser.Name).ToArray();
+        uiManager.SetPlayerNameText(names);
 
         await UniTask.WaitUntil(() => initializedPlayer == InRoomPlayerData.I.PlayerList.Count);
 
@@ -173,6 +177,9 @@ public class BlockBreakGameManager : MonoBehaviour {
                 await objectsManager.SetObjects();
                 myPlayerController.canShot = true;
             }
+            else {
+                objectsManager.ChangeKinematic(true);
+            }
         }
         else if (currentRound < 3) {
             currentRound++;
@@ -190,13 +197,16 @@ public class BlockBreakGameManager : MonoBehaviour {
     /// </summary>
     private void EndGame() {
         Debug.Log("ゲーム終了");
+        int lastScore = myPlayerController.MyTotalScore;
+
         Destroy(scoreUI);
         foreach (var playerData in InRoomPlayerData.I.PlayerList) {
             Destroy((GameObject)playerHavingObjectList[playerData.Key].objects["gunObj"]);
+            Destroy((GameObject)playerHavingObjectList[playerData.Key].objects["Pointer"]);
             Destroy(playerControllerList[playerData.Key]);
         }
 
-        minigameFlowController.OnSendScore(myPlayerController.MyTotalScore);
+        minigameFlowController.OnSendScore(lastScore);
     }
 
     /// <summary>

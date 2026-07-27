@@ -239,7 +239,7 @@ MonoBehaviour:
   objectListId: 2
   SendCreate: 1
   SendTransform: 1
-  SendSpan: 0.05
+  SendSpan: 0.1
   SendDestroy: 1
   stringObjectId: 
   Initialized: 0

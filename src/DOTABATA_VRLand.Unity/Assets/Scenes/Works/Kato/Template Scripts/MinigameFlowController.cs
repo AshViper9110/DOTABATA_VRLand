@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,9 +25,9 @@ public class MinigameFlowController : MonoBehaviour
     [Header("Ready")]
     public Button readyButton;
     public TextMeshProUGUI waitingText;
-    public Transform UserReadyObject;//ƒvƒŒƒCƒ„[î•ñ®—ñ—pƒIƒuƒWƒFƒNƒg
-    public GameObject playerNamePrefab;  //ƒvƒŒƒCƒ„[ƒeƒLƒXƒgƒvƒŒƒnƒu
-    public List<GameObject> UserReadyText;   //ƒvƒŒƒCƒ„[€”õî•ñƒeƒLƒXƒg 
+    public Transform UserReadyObject;//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æƒ…å ±æ•´åˆ—ç”¨ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+    public GameObject playerNamePrefab;  //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒ†ã‚­ã‚¹ãƒˆãƒ—ãƒ¬ãƒãƒ–
+    public List<GameObject> UserReadyText;   //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æº–å‚™æƒ…å ±ãƒ†ã‚­ã‚¹ãƒˆ 
     public Button StartButton;
 
     [Header("Countdown")]
@@ -39,7 +39,9 @@ public class MinigameFlowController : MonoBehaviour
     public bool isGameStarted = false;
 
     public List<string> names;
-    bool willReady = false;
+    public bool willReady = false;
+    public bool AllReady = false;
+    public bool OnStarted = false;
 
     // =====================================================
     // Start
@@ -48,14 +50,14 @@ public class MinigameFlowController : MonoBehaviour
     async void Start()
     {
         SteamVR_Fade.View(new Color(0,0,0,0),1.0f);
-        //RoomModelƒCƒxƒ“ƒgw“Ç
+        //RoomModelã‚¤ãƒ™ãƒ³ãƒˆè³¼èª­
         
-        //InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position = Vector3.zero;//ƒvƒŒƒCƒ„[À•W‰Šú‰»(0,0,0)
-        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)//‘¼ƒvƒŒƒCƒ„[”ñ•\¦
-        {
-            if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
-            player.playerObj.SetActive(false);
-        }
+        //InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position = Vector3.zero;//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åº§æ¨™åˆæœŸåŒ–(0,0,0)
+        //foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)//ä»–ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼éè¡¨ç¤º
+        //{
+        //    if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
+        //    player.playerObj.SetActive(false);
+        //}
            
         waitingText.gameObject.SetActive(false);
         countdownText.gameObject.SetActive(false);
@@ -68,7 +70,7 @@ public class MinigameFlowController : MonoBehaviour
         titleText.text = info.gameName;
         descriptionText.text = info.description;
 
-        readyText.text = "0/"+ InRoomPlayerData.I.PlayerList.Count + "ƒvƒŒƒCƒ„[€”õŠ®—¹";
+        readyText.text = "0/"+ InRoomPlayerData.I.PlayerList.Count + "ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æº–å‚™å®Œäº†";
     }
 
     private void OnEnable()
@@ -98,71 +100,76 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // ReadyØ‚è‘Ö‚¦
+    // Readyåˆ‡ã‚Šæ›¿ãˆ
     // =====================================================
 
     public async void OnReadyButton()
     {
-         willReady = !willReady;//ó‘ÔØ‚è‘Ö‚¦
+         willReady = !willReady;//çŠ¶æ…‹åˆ‡ã‚Šæ›¿ãˆ
 
-        // ƒT[ƒo[‘—M
+        // ã‚µãƒ¼ãƒãƒ¼é€ä¿¡
         await RoomModel.I.SendReadyState(willReady);
 
-        // UIXV
+        // UIæ›´æ–°
         if (willReady)
         {
-            readyButton.GetComponentInChildren<TextMeshProUGUI>().text = "æ‚èÁ‚µ";
+            readyButton.GetComponentInChildren<TextMeshProUGUI>().text = "å–ã‚Šæ¶ˆã—";
             waitingText.gameObject.SetActive(true);
         }
         else
         {
-            readyButton.GetComponentInChildren<TextMeshProUGUI>().text = "€”õOKI";
+            readyButton.GetComponentInChildren<TextMeshProUGUI>().text = "æº–å‚™OKï¼";
             waitingText.gameObject.SetActive(false);
         }
     }
 
     // =====================================================
-    // ƒvƒŒƒCƒ„[ReadyXV
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼Readyæ›´æ–°
     // =====================================================
 
     void OnUpdatePlayerReady(JoinedUser[] users, bool[] isReadyList)
     {
         int readyCount = 0;
-        //ó‘Ô‚ÌƒƒO•\¦
+        //çŠ¶æ…‹ã®ãƒ­ã‚°è¡¨ç¤º
         for (int i = 0; i < users.Length; i++)
         {
-            Debug.Log(isReadyList[i] ? $"{users[i].Name} : €”õOK" : $"{users[i].Name} : ‘Ò‹@’†");
+            Debug.Log(isReadyList[i] ? $"{users[i].Name} : æº–å‚™OK" : $"{users[i].Name} : å¾…æ©Ÿä¸­");
             if (isReadyList[i]) readyCount++;
         }
 
-        readyText.text = readyCount +"/" + users.Length + "ƒvƒŒƒCƒ„[€”õŠ®—¹";
+        readyText.text = readyCount +"/" + users.Length + "ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æº–å‚™å®Œäº†";
     }
 
     // =====================================================
-    // ‘SˆõReady’Ê’m
+    // å…¨å“¡Readyé€šçŸ¥
     // =====================================================
 
     void OnAllReadyState(bool isAllReady)
     {        
-        if(isAllReady)Debug.Log("‘SˆõReady");
-        else Debug.Log("’N‚©‚Ì€”õ‚ª‚Å‚«‚Ä‚¢‚Ü‚¹‚ñ");
+        if(isAllReady)Debug.Log("å…¨å“¡Ready");
+        else Debug.Log("èª°ã‹ã®æº–å‚™ãŒã§ãã¦ã„ã¾ã›ã‚“");
         if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder != 1) return;
-        //Šeƒ{ƒ^ƒ“Ø‚è‘Ö‚¦
+        //å„ãƒœã‚¿ãƒ³åˆ‡ã‚Šæ›¿ãˆ
         readyButton.gameObject.SetActive(!isAllReady);
         StartButton.gameObject.SetActive(isAllReady);
+        AllReady = isAllReady;
     }
 
     // =====================================================
-    // ƒQ[ƒ€ŠJn‘—M
+    // ã‚²ãƒ¼ãƒ é–‹å§‹é€ä¿¡
     // =====================================================
 
     public void GameStrat()
     {
-        RoomModel.I.OnGameStartAsync();
+        if (!OnStarted)
+        {
+            OnStarted = true;
+            RoomModel.I.OnGameStartAsync();
+        }
     }
 
     // =====================================================
-    // ƒQ[ƒ€ŠJnæ“¾
+    // ã‚²ãƒ¼ãƒ é–‹å§‹å–å¾—
     // =====================================================
 
     void StartGameFlow()
@@ -174,7 +181,7 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // ƒJƒEƒ“ƒgƒ_ƒEƒ“óM
+    // ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³å—ä¿¡
     // =====================================================
     public void StartCountdown(int remain)
     {
@@ -193,49 +200,57 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // ƒ~ƒjƒQ[ƒ€ŠJn
+    // ãƒŸãƒ‹ã‚²ãƒ¼ãƒ é–‹å§‹
     // =====================================================
 
     IEnumerator BeginGameAfterStart()
     {
         yield return new WaitForSecondsRealtime(1f);
 
-        countdownText.gameObject.SetActive(false);//ƒJƒEƒ“ƒgƒ_ƒEƒ“íœ
+        countdownText.gameObject.SetActive(false);//ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³å‰Šé™¤
         introUI.SetActive(false);
         gameUI.SetActive(true);
         
-        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)//ƒvƒŒƒCƒ„[•\¦
+        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values)//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼è¡¨ç¤º
         {
             if (player.joinedUser.ConnectionId == NetworkManager.I.myConnectionId) continue;
             player.playerObj.SetActive(true);
         }
         
-        isGameStarted = true;//ƒQ[ƒ€ŠJn”»’è
+        isGameStarted = true;//ã‚²ãƒ¼ãƒ é–‹å§‹åˆ¤å®š
 
     }
 
     // =====================================================
-    // Score‘—M
+    // Scoreé€ä¿¡
     // =====================================================
 
     public void OnSendScore(int score)
     {
-        // ƒT[ƒo[‘—M
+        // ã‚µãƒ¼ãƒãƒ¼é€ä¿¡
         RoomModel.I.SendScore(score);
+    }
+
+    public void OnSendTimeFirstWin() {
+        RoomModel.I.SendTime(true);
+    }
+
+    public void OnSendTimeLastWin() {
+        RoomModel.I.SendTime(false);
     }
 
    
     // =====================================================
-    // ƒ‰ƒ“ƒLƒ“ƒOóM
+    // ãƒ©ãƒ³ã‚­ãƒ³ã‚°å—ä¿¡
     // =====================================================
 
     void OnReceiveRanking(List<JoinedUser> rankOrder)
     {
         AudioManager.PlaySE(AudioManager.SE.MiniGame_Finish);
-        names.Clear();//‘O‰ñ‚Ìƒ†[ƒU[î•ñƒNƒŠƒA
+        names.Clear();//å‰å›ã®ãƒ¦ãƒ¼ã‚¶ãƒ¼æƒ…å ±ã‚¯ãƒªã‚¢
         foreach (var user in rankOrder)names.Add(user.Name);
-        Debug.Log("OnReceiveRankingóM");
-        foreach (var user in names)Debug.Log($"ƒ‰ƒ“ƒLƒ“ƒOóM:{user}");
+        Debug.Log("OnReceiveRankingå—ä¿¡");
+        foreach (var user in names)Debug.Log($"ãƒ©ãƒ³ã‚­ãƒ³ã‚°å—ä¿¡:{user}");
         isGameStarted = false;
         if (countdownText != null)
         {
@@ -246,7 +261,7 @@ public class MinigameFlowController : MonoBehaviour
     }
 
     // =====================================================
-    // I—¹
+    // çµ‚äº†
     // =====================================================
 
     IEnumerator EndGame()
@@ -254,6 +269,6 @@ public class MinigameFlowController : MonoBehaviour
         yield return new WaitForSecondsRealtime(2f);
 
         SteamVR_Fade.View(new Color(1, 1, 1, 1), 2);
-        SceneManager.LoadScene("GameScene");//ƒV[ƒ“ˆÚs
+        SceneManager.LoadScene("GameScene");//ã‚·ãƒ¼ãƒ³ç§»è¡Œ
     }
 }

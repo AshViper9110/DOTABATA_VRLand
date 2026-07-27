@@ -20,12 +20,6 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         private RoomContext? _roomContext;
 
-        /*
-         * ミニゲーム用
-         */
-
-        private ArcanaContext? _arcanaContext;
-
         //public RoomHub(RoomContextRepository roomContextRepository) {
         //    _roomContextRepository = roomContextRepository;
         //}
@@ -433,6 +427,20 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
+        /// ミニゲームの結果を反映
+        /// </summary>
+        public Task RegisterClearTimeAsync(DateTime time, bool firstWin) {
+            var rankOrder = _roomContext.ApplyMiniGameResultTime(ConnectionId, time, firstWin);
+
+            if (rankOrder == null) return Task.CompletedTask;  // まだ全員ゴールしていない
+
+            // 全員ゴール完了、順位確定
+            _roomContext.Group.All.OnRegisterScore(rankOrder);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
         /// 全体の順位更新、送信
         /// </summary>
         public Task GetAllRoundRankingAsync()
@@ -747,6 +755,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             return Task.CompletedTask;
         }
 
+        public Task BallingPinAsync(int pinCount, JoinedUser joinedUser)
+        {
+            this._roomContext.Group.All.OnBallingPinAsync(pinCount, joinedUser);
+            return Task.CompletedTask;
+        }
+
         //爆弾ドッチボールのヒット処理
         public Task HitDodgeBall(Guid connectionId)
         {
@@ -805,6 +819,13 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         {
             // 全員に通知
             this._roomContext.Group.All.OnAudioAsync(id);
+            return Task.CompletedTask;
+        }
+
+        public Task MoveSceneAsync(string name)
+        {
+            // 全員に通知
+            this._roomContext.Group.All.OnMoveSceneAsync(name);
             return Task.CompletedTask;
         }
     }

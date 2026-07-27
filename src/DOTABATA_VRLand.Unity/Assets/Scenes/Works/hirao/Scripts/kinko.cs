@@ -1,3 +1,4 @@
+using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,6 +70,7 @@ public class Kinko : MonoBehaviour
         if (RoomModel.I == null) return;
 
         RoomModel.I.OnCountdownAction += StartCountdown;
+        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
     }
 
     // =====================================================
@@ -80,9 +82,10 @@ public class Kinko : MonoBehaviour
         if (RoomModel.I == null) return;
 
         RoomModel.I.OnCountdownAction -= StartCountdown;
+        RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
     }
 
-    // Update is called once per frame
+        // Update is called once per frame
     void FixedUpdate()
     {
         if (controller.isGameStarted)
@@ -109,19 +112,19 @@ public class Kinko : MonoBehaviour
                 {
                     if (currentLockTime > 0) currentLockTime = 0;
                 }
+            }
 
-                timer -= Time.deltaTime;
-                timerText.text = ((int)timer).ToString();
+            timer -= Time.deltaTime;
+            timerText.text = ((int)timer).ToString();
 
-                if (timer < 0)
-                {
-                    controller.isGameStarted = false;
-                    Debug.Log("GameEnd");
-                    timerText.text = "Finish";
-                    isClear = true;
-                    controller.OnSendScore((int)timer);
-                    return;
-                }
+            if (timer < 0 && !isClear)
+            {
+                controller.isGameStarted = false;
+                Debug.Log("GameEnd");
+                timerText.text = "Finish";
+                isClear = true;
+                controller.OnSendScore((int)timer);
+                return;
             }
             //ƒQ[ƒ€ƒNƒŠƒA”»’è
             if (dialList.Count > 0 && dialList.All(x => x.isOpen) && !isClear)
@@ -143,5 +146,11 @@ public class Kinko : MonoBehaviour
         {
             AudioManager.ChangeBGM(AudioManager.BGM.Bank);
         }
+    }
+
+    void OnReceiveRanking(List<JoinedUser> rankOrder)
+    {
+        if (timerText == null) return;
+        timerText.gameObject.SetActive(false);
     }
 }

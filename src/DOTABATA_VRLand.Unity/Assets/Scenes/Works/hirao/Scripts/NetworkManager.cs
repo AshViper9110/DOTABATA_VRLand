@@ -3,6 +3,7 @@ using DOTABATA_VRLand.Shared.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -34,14 +35,17 @@ public class NetworkManager : Singleton<NetworkManager>
 
     private void Awake()
     {
-        RoomModel.I.OnJoinedUser += OnJoinedUser;
-        RoomModel.I.OnLeavedUser += OnLeavedUser;
-        RoomModel.I.OnUpdatedUserTransfrom += OnSyncPlayer;
-        RoomModel.I.OnGetMiniGameRanking += OnGetMiniGameRanking;
-        RoomModel.I.OnGetRanking += OnGetRanking;
-        RoomModel.I.OnHostProgressed += OnHostProgress;
-        RoomModel.I.onUpdateNit += OnUpdateNit;
-        RoomModel.I.OnAudioAsyncAction += OnAudioAsync;
+        if (RoomModel.I != null)
+        {
+            RoomModel.I.OnJoinedUser += OnJoinedUser;
+            RoomModel.I.OnLeavedUser += OnLeavedUser;
+            RoomModel.I.OnUpdatedUserTransfrom += OnSyncPlayer;
+            RoomModel.I.OnGetMiniGameRanking += OnGetMiniGameRanking;
+            RoomModel.I.OnGetRanking += OnGetRanking;
+            RoomModel.I.OnHostProgressed += OnHostProgress;
+            RoomModel.I.onUpdateNit += OnUpdateNit;
+            RoomModel.I.OnAudioAsyncAction += OnAudioAsync;
+        }
     }
 
     private void OnDisable()
@@ -62,10 +66,12 @@ public class NetworkManager : Singleton<NetworkManager>
 
     private async void Start()
     {
-        await UserModel.I.CreateUserModel();
-        await RoomModel.I.ConnectAsync();
-
-        myConnectionId = RoomModel.I.ConnectionId;
+        if (RoomModel.I != null)
+        {
+            await UserModel.I.CreateUserModel();
+            await RoomModel.I.ConnectAsync();
+            myConnectionId = RoomModel.I.ConnectionId;
+        }
     }
 
     /// <summary>
@@ -122,6 +128,8 @@ public class NetworkManager : Singleton<NetworkManager>
         if (user.ConnectionId != myConnectionId)
         {
             GameObject player = Instantiate(SyncPlayerPrefab);
+            TMP_Text text = player.transform.Find("Canvas/NameTag").GetComponent<TMP_Text>();
+            text.text = user.Name;
             SyncPlayer syncPlayer = player.GetComponent<SyncPlayer>();
             syncPlayer.SetConnectionId(user.ConnectionId);
             PlayerData data = new PlayerData()
@@ -134,10 +142,13 @@ public class NetworkManager : Singleton<NetworkManager>
         }
         else
         {
-            GameObject.Find("Player(Clone)").transform.position = new Vector3((user.JoinOrder * 3) - 6.5f, 0, 0);
+            GameObject player = GameObject.Find("Player(Clone)");
+            player.transform.position = new Vector3((user.JoinOrder * 2f) - 4.85f, 0, 0);
+            TMP_Text text = player.transform.Find("Canvas/NameTag").GetComponent<TMP_Text>();
+            text.text = user.Name;
             PlayerData data = new PlayerData()
             {
-                playerObj = GameObject.Find("Player(Clone)"),
+                playerObj = player,
                 joinedUser = user,
             };
 

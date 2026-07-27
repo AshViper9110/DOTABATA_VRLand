@@ -30,7 +30,7 @@ public class PlayerStatus : MonoBehaviour {
     // シールド量
     [SerializeField] private float shieldAmount = 100;
     // 使用シールド量
-    [SerializeField] private float useShieldAmount = 60;
+    [SerializeField] private float useShieldAmount = 50;
     // シールド回復量
     [SerializeField] private float healShieldAmount = 6;
 
@@ -46,7 +46,7 @@ public class PlayerStatus : MonoBehaviour {
     // シールドの使用フレーム数
     [SerializeField] private int useShieldFlameTimer = 0;
     // ジャストシールド受付フレーム
-    [SerializeField] private int justShieldFlame = 18;
+    [SerializeField] private int justShieldFlame = 9; // 0.15秒
     // フレーム待機中か
     private bool isDisenableShieldWaitFlame = false;
 
@@ -153,6 +153,11 @@ public class PlayerStatus : MonoBehaviour {
             useShieldFlameTimer <= justShieldFlame) {
             Debug.Log("ジャストシールド発動");
             Instantiate(justHit, magicBall.transform.position, Quaternion.identity);
+
+            shieldAmount += useShieldAmount;
+            if (shieldAmount > 100) {
+                shieldAmount = 100;
+            }
 
             MagicController mc = magicBall.GetComponent<MagicController>();
             mc.JustShield(syncPlayer.ConnectionId);

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class TutorialManager : MonoBehaviour
 {
     [SerializeField] List<Sprite> TutorialImages;
-    [SerializeField] Image tutorialImage;
+    [SerializeField] SpriteRenderer tutorialImage;
     int index;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -23,11 +23,13 @@ public class TutorialManager : MonoBehaviour
 
     public void NextTutorial()
     {
-        if (index < TutorialImages.Count)
+        // 次に進めるかチェック
+        if (index + 1 >= TutorialImages.Count)
         {
-            index++;
+            return;
         }
 
+        index++;
         tutorialImage.sprite = (Sprite) TutorialImages[index];
 
     }

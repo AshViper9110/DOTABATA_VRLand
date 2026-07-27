@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEditor.MemoryProfiler;
 using UnityEngine;
 using static SyncObjectDataSO;
 
@@ -164,6 +165,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action<int, JoinedUser, int> OnBallingNexted { get; set; }
 
+    public Action<int, JoinedUser> OnBallingPinAsynced { get; set; }
+
     public Action<Guid> OnHitingDodgeBall { get; set; }
     public Action<Guid> OnHitingBomber { get; set; }
     public Action<Guid> OnOpenedShutter { get; set; }
@@ -176,6 +179,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public Action<Guid, int> OnBlockBreakSendedScore { get; set; }
 
     public Action<int> OnAudioAsyncAction { get; set; }
+
+    public Action<string> OnMovedScene { get; set; }
 
     /*
      * 処理
@@ -280,8 +285,18 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
         isJoinRoom = false;
         NetworkManager.I.isJoin = false;
+        
+        foreach (var item in InRoomPlayerData.I.PlayerList.Keys)
+        {
+            if (item == NetworkManager.I.myConnectionId) continue;
+
+            InRoomPlayerData.I.RemovePlayer(item);
+        }
+        
 
         await roomHub.LeaveRoomAsync();
+
+
     }
 
     /// <summary>
@@ -425,6 +440,10 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public async void SendScore(int result)
     {
         await roomHub.RegisterScoreAsync(result);
+    }
+
+    public async void SendTime(bool firstWin) {
+        await roomHub.RegisterClearTimeAsync(DateTime.Now, firstWin);
     }
 
     /// <summary>
@@ -851,6 +870,23 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         }
     }
 
+    public async UniTask BallingPinAsync(int pinCount, JoinedUser joinedUser)
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.BallingPinAsync(pinCount, joinedUser);
+    }
+
+    public void OnBallingPinAsync(int pinCount, JoinedUser joinedUser)
+    {
+        if (OnBallingPinAsynced != null)
+        {
+            OnBallingPinAsynced(pinCount, joinedUser);
+        }
+    }
+
     public async UniTask HitDodgeBall()
     {
         if (roomHub == null)
@@ -957,6 +993,23 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         if(OnAudioAsyncAction != null)
         {
             OnAudioAsyncAction(id);
+        }
+    }
+
+    public async UniTask MoveSceneAsync(string name)
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.MoveSceneAsync(name);
+    }
+
+    public void OnMoveSceneAsync(string name)
+    {
+        if (OnMovedScene != null)
+        {
+            OnMovedScene(name);
         }
     }
 }

@@ -903,7 +903,7 @@ MonoBehaviour:
   m_text: "\u30B2\u30FC\u30E0\u30B9\u30BF\u30FC\u30C8"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 55ff2f08d08046e4a9d6bcc34fbe298f, type: 2}
-  m_sharedMaterial: {fileID: -4795938968160391167, guid: 55ff2f08d08046e4a9d6bcc34fbe298f, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 0ee4597c8bfb8c141b37d572f442b9e9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1372,7 +1372,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2260,10 +2260,12 @@ MonoBehaviour:
   followMoveSpeed: 0.1
   followRotateSpeed: 0.5
   rotateSpeedThreshold: 0.9
+  distance: 0.9
   isImmediateMove: 0
   isLockX: 1
   isLockY: 0
   isLockZ: 0
+  StartSync: 0
 --- !u!114 &463589211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2593,6 +2595,9 @@ MonoBehaviour:
   info: {fileID: 11400000, guid: 8a311d35ed99440438e28ee0edfbe575, type: 2}
   isGameStarted: 0
   names: []
+  willReady: 0
+  AllReady: 0
+  OnStarted: 0
 --- !u!4 &675000072
 Transform:
   m_ObjectHideFlags: 0
@@ -2938,7 +2943,7 @@ Transform:
   m_GameObject: {fileID: 918304711}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.548, y: 0, z: -5.795}
+  m_LocalPosition: {x: -0.432, y: 0, z: -5.795}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3221,8 +3226,8 @@ Transform:
   m_GameObject: {fileID: 1000729049}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.14, y: -0.014, z: 18.82}
-  m_LocalScale: {x: 11.535675, y: 0.01, z: 11.535675}
+  m_LocalPosition: {x: 1.1, y: -0.014, z: 0}
+  m_LocalScale: {x: 21.833572, y: 0.01, z: 21.10567}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -3881,7 +3886,7 @@ Transform:
   m_GameObject: {fileID: 1521414022}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -1.43, y: 0, z: -1.534}
+  m_LocalPosition: {x: -1.521, y: 0, z: -1.534}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4015,7 +4020,7 @@ Transform:
   m_GameObject: {fileID: 1652338129}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.198, y: 0, z: -3.165}
+  m_LocalPosition: {x: 1.198, y: 0, z: -3.063}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4394,7 +4399,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4485,6 +4490,7 @@ GameObject:
   - component: {fileID: 1903847316}
   - component: {fileID: 1903847318}
   - component: {fileID: 1903847317}
+  - component: {fileID: 1903847319}
   m_Layer: 5
   m_Name: CountdownText
   m_TagString: Untagged
@@ -4611,6 +4617,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1903847315}
   m_CullTransparentMesh: 1
+--- !u!114 &1903847319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903847315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1076f59856b42064496791dad52023f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  followMoveSpeed: 0.1
+  followRotateSpeed: 0.02
+  rotateSpeedThreshold: 0.9
+  distance: 0.9
+  isImmediateMove: 0
+  isLockX: 0
+  isLockY: 0
+  isLockZ: 0
+  StartSync: 0
 --- !u!1 &1991317769
 GameObject:
   m_ObjectHideFlags: 0
@@ -5098,7 +5126,7 @@ Transform:
   m_GameObject: {fileID: 7734710156970791079}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.126, y: 0, z: -4.166}
+  m_LocalPosition: {x: -3.126, y: 0, z: -4.232}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5177,24 +5205,24 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: TutorialImages.Array.size
-      value: 6
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[0]'
       value: 
-      objectReference: {fileID: 21300000, guid: 424bc4de958d83e40a635d8903e25c90, type: 3}
+      objectReference: {fileID: 21300000, guid: 72ddcd852dd90a4428a1a9608f5b01c1, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[1]'
       value: 
-      objectReference: {fileID: 21300000, guid: c1118d367f0ca104094c7a8989e520bb, type: 3}
+      objectReference: {fileID: 21300000, guid: 72a1b9dea462aac449ee2787c73f6c11, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[2]'
       value: 
-      objectReference: {fileID: 21300000, guid: 755a493eb2819b947a907004ca3acdb8, type: 3}
+      objectReference: {fileID: 21300000, guid: 6213f46b75125cb4fb95459cb3461aee, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[3]'
       value: 
-      objectReference: {fileID: 21300000, guid: 5d47e5032b12c914293920ba1c136c3a, type: 3}
+      objectReference: {fileID: 21300000, guid: d60a91d6307322c4495cd12346ca7d53, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[4]'
       value: 
