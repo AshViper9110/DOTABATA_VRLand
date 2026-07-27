@@ -379,6 +379,11 @@ public class GameManager : MonoBehaviour
         SteamVR_Fade.View(new Color(1,1,1,1), 2);
         Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
         AudioManager.PlaySE(AudioManager.SE.MoveScene);
+
+        if (name == "TitleScene")
+        {
+            RoomModel.I.LeaveRoomAsync();
+        }
     }
 
     public void SetMiniGame()
@@ -637,8 +642,11 @@ public class GameManager : MonoBehaviour
             if (textIndex >= FinishText.Count)
             {
                 //ƒ^ƒCƒgƒ‹‚É–ß‚é
-                RoomModel.I.MoveSceneAsync("TitleScene");
-                RoomModel.I.LeaveRoomAsync();
+                if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+                {
+                    RoomModel.I.MoveSceneAsync("TitleScene");
+                    RoomModel.I.LeaveRoomAsync();
+                }
                 EndProgress = true;
                 return;
             }

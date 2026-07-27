@@ -427,6 +427,20 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         /// <summary>
+        /// ミニゲームの結果を反映
+        /// </summary>
+        public Task RegisterClearTimeAsync(DateTime time, bool firstWin) {
+            var rankOrder = _roomContext.ApplyMiniGameResultTime(ConnectionId, time, firstWin);
+
+            if (rankOrder == null) return Task.CompletedTask;  // まだ全員ゴールしていない
+
+            // 全員ゴール完了、順位確定
+            _roomContext.Group.All.OnRegisterScore(rankOrder);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
         /// 全体の順位更新、送信
         /// </summary>
         public Task GetAllRoundRankingAsync()
