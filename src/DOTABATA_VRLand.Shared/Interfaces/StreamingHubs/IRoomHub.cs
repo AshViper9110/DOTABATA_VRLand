@@ -95,6 +95,11 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         Task RegisterScoreAsync(int result);
 
         /// <summary>
+        /// ミニゲームの結果を反映
+        /// </summary>
+        Task RegisterClearTimeAsync(DateTime time, bool firstWin);
+
+        /// <summary>
         /// ミニゲーム大会順位取得
         /// </summary>
         Task GetAllRoundRankingAsync();
