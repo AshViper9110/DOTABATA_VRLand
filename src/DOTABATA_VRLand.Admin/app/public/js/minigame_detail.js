@@ -14,7 +14,7 @@ async function loadDetail() {
         document.getElementById("name").textContent = game.name;
         document.getElementById("rule").textContent = game.rule;
         document.getElementById("type").textContent = game.type;
-        document.getElementById("scene_number").textContent = game.scene_number;
+        document.getElementById("scene_name").textContent = game.scene_name;
         document.getElementById("playable").textContent =
             game.playable ? "〇" : "✕";
         document.getElementById("created_at").textContent = game.created_at;

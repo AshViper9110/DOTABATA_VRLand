@@ -44,6 +44,7 @@ app.use((req, res, next) => {
 
   next();
 });
+
 // この後にstaticを置く
 app.use(express.static("public"));
 
@@ -57,7 +58,7 @@ function requireLogin(req, res, next) {
   next();
 }
 
-// 他の管理ユーザーの情報(名前・パスワード)を編集できるか
+// 他の管理ユーザーの情報(名前・パスワード)を編集できるか（レベル1以上）
 function requireManagePermission(req, res, next) {
   if ((req.session.canManageAdminUsers ?? 0) < 1) {
     return res.status(403).json({ message: "編集権限がありません。" });
@@ -65,7 +66,7 @@ function requireManagePermission(req, res, next) {
   next();
 }
 
-// 他の管理ユーザーの権限レベル自体を変更できるか
+// 他の管理ユーザーの権限レベル自体を変更できるか（レベル2以上）
 function requireGrantPermission(req, res, next) {
   if ((req.session.canManageAdminUsers ?? 0) < 2) {
     return res.status(403).json({ message: "権限変更の権限がありません。" });
@@ -108,8 +109,13 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// セッションチェック（ログイン状態 + 自分のID・権限レベルを返す）
 app.get("/check", (req, res) => {
-  res.json({ loggedIn: !!req.session.user });
+  res.json({
+    loggedIn: !!req.session.user,
+    userId: req.session.userId ?? null,
+    canManageAdminUsers: req.session.canManageAdminUsers ?? 0,
+  });
 });
 
 app.post("/logout", (req, res) => {
@@ -175,11 +181,36 @@ app.post("/api/user/add", requireLogin, async (req, res) => {
 });
 
 /**
- * 管理ユーザー削除（要:管理権限）
+ * 管理ユーザー削除
+ * - 自分自身は削除不可
+ * - 自分より権限レベルが高い/同じ相手は削除不可
  */
 app.delete("/api/admin-user/delete/:id", requireLogin, requireManagePermission, async (req, res) => {
   try {
     const id = req.params.id;
+    const myLevel = req.session.canManageAdminUsers ?? 0;
+    const isSelf = String(req.session.userId) === String(id);
+
+    // 自分自身の削除は、ランク2の場合のみ許可
+    if (isSelf && myLevel < 2) {
+      return res.status(403).json({ message: "自分自身は削除できません。" });
+    }
+
+    const [rows] = await db.query(
+        "SELECT can_manage_admin_users FROM admin_users WHERE id = ?",
+        [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "管理ユーザーが見つかりません。" });
+    }
+
+    const targetLevel = rows[0].can_manage_admin_users;
+
+    // 自分自身でない場合のみ、相手のランクをチェック
+    if (!isSelf && myLevel <= targetLevel) {
+      return res.status(403).json({ message: "削除権限がありません。" });
+    }
 
     const [result] = await db.query(
         "DELETE FROM admin_users WHERE id = ?",
@@ -200,13 +231,17 @@ app.delete("/api/admin-user/delete/:id", requireLogin, requireManagePermission, 
 
 // --- ミニゲーム系（変更なし） ---
 
+/**
+ * ミニゲーム一覧取得
+ */
 app.get("/api/minigames/get", requireLogin, async (req, res) => {
   try {
     const [rows] = await db.query(`
-      SELECT id, name, type, playable, updated_at
+      SELECT id, name, type, scene_name, playable, updated_at
       FROM miniGames
       ORDER BY id
     `);
+
     res.json(rows);
   } catch (err) {
     console.error(err);
@@ -214,27 +249,119 @@ app.get("/api/minigames/get", requireLogin, async (req, res) => {
   }
 });
 
+/**
+ * ミニゲーム詳細取得
+ */
 app.get("/api/Minigames/get/:id", requireLogin, async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await db.query(
-        `SELECT id, name, rule, type, scene_number, playable, created_at, updated_at
+        `SELECT
+                id,
+                name,
+                rule,
+                type,
+                scene_name,
+                playable,
+                created_at,
+                updated_at
              FROM miniGames
              WHERE id = ?`,
         [id]
     );
+
     if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: "ミニゲームが見つかりません" });
+      return res.status(404).json({
+        success: false,
+        message: "ミニゲームが見つかりません"
+      });
     }
+
     res.json(rows[0]);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "サーバーエラー"
+    });
+  }
+});
+
+/**
+ * ミニゲーム追加
+ */
+app.post("/api/minigames/add", requireLogin, async (req, res) => {
+  try {
+    const { name, rule, type, scene_name, playable } = req.body;
+
+    if (!name || !type || !scene_name) {
+      return res.status(400).json({ message: "名前・タイプ・シーン名は必須です。" });
+    }
+
+    if (![1, 2].includes(Number(type))) {
+      return res.status(400).json({ message: "タイプの値が不正です。" });
+    }
+
+    // 同じシーン名が既に存在しないか確認
+    const [exists] = await db.query(
+        "SELECT id FROM miniGames WHERE scene_name = ?",
+        [scene_name]
+    );
+
+    if (exists.length > 0) {
+      return res.status(409).json({ message: "そのシーン名は既に使用されています。" });
+    }
+
+    await db.query(
+        `INSERT INTO miniGames (name, rule, type, scene_name, playable)
+         VALUES (?, ?, ?, ?, ?)`,
+        [
+          name,
+          rule || null,
+          Number(type),
+          scene_name,
+          playable === false ? 0 : 1
+        ]
+    );
+
+    res.json({ success: true, message: "ミニゲームを作成しました。" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "サーバーエラー" });
+  }
+});
+
+/**
+ * ミニゲーム削除
+ */
+app.delete("/api/Minigames/delete/:id", requireLogin, async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const [result] = await db.query(
+        "DELETE FROM miniGames WHERE id = ?",
+        [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: "ミニゲームが見つかりません。" });
+    }
+
+    res.json({ success: true, message: "ミニゲームを削除しました。" });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "サーバーエラー" });
   }
 });
 
+
 /**
- * 管理ユーザー詳細（要:管理権限。自分自身の場合は許可）
+ * 管理ユーザー詳細
+ * - 自分自身は常に閲覧可
+ * - 他人は requireManagePermission（レベル1以上）が必要
  */
 app.get("/api/admin-user/detail", requireLogin, async (req, res) => {
   try {
@@ -247,8 +374,8 @@ app.get("/api/admin-user/detail", requireLogin, async (req, res) => {
 
     const [rows] = await db.query(
         `SELECT id, name, can_manage_admin_users, created_at, updated_at
-       FROM admin_users
-       WHERE id = ?`,
+         FROM admin_users
+         WHERE id = ?`,
         [id]
     );
 
@@ -264,7 +391,7 @@ app.get("/api/admin-user/detail", requireLogin, async (req, res) => {
 });
 
 /**
- * 管理ユーザー登録（要:管理権限）
+ * 管理ユーザー登録（要:管理権限。新規作成時のレベルは常に0固定）
  */
 app.post("/api/admin-users/add", requireLogin, requireManagePermission, async (req, res) => {
   try {
@@ -302,7 +429,7 @@ app.post("/api/admin-users/add", requireLogin, requireManagePermission, async (r
 /**
  * 管理ユーザーパスワード変更
  * 自分自身 → 現在のパスワード確認が必要
- * 他人     → requireManagePermission が必要（対象者の現在パスワードは不要）
+ * 他人     → 自分のレベルが相手より高い場合のみ許可（対象者の現在パスワードは不要）
  */
 app.put("/api/admin-user/password/:id", requireLogin, async (req, res) => {
   try {
@@ -315,7 +442,7 @@ app.put("/api/admin-user/password/:id", requireLogin, async (req, res) => {
     }
 
     const [rows] = await db.query(
-        "SELECT password FROM admin_users WHERE id = ?",
+        "SELECT password, can_manage_admin_users FROM admin_users WHERE id = ?",
         [id]
     );
 
@@ -324,7 +451,6 @@ app.put("/api/admin-user/password/:id", requireLogin, async (req, res) => {
     }
 
     if (isSelf) {
-      // 自分自身の変更 → 現在のパスワード確認が必須
       if (!currentPassword) {
         return res.status(400).json({ message: "現在のパスワードを入力してください。" });
       }
@@ -333,8 +459,10 @@ app.put("/api/admin-user/password/:id", requireLogin, async (req, res) => {
         return res.status(400).json({ message: "現在のパスワードが正しくありません。" });
       }
     } else {
-      // 他人の変更 → 管理権限が必須
-      if ((req.session.canManageAdminUsers ?? 0) < 1) {
+      const myLevel = req.session.canManageAdminUsers ?? 0;
+      const targetLevel = rows[0].can_manage_admin_users;
+
+      if (myLevel <= targetLevel) {
         return res.status(403).json({ message: "編集権限がありません。" });
       }
     }
@@ -357,7 +485,7 @@ app.put("/api/admin-user/password/:id", requireLogin, async (req, res) => {
 /**
  * 管理ユーザー名前変更
  * 自分自身 → 現在のパスワード確認が必要
- * 他人     → requireManagePermission が必要（対象者のパスワードは不要）
+ * 他人     → 自分のレベルが相手より高い場合のみ許可（対象者のパスワードは不要）
  */
 app.put("/api/admin-user/name/:id", requireLogin, async (req, res) => {
   try {
@@ -370,7 +498,7 @@ app.put("/api/admin-user/name/:id", requireLogin, async (req, res) => {
     }
 
     const [rows] = await db.query(
-        "SELECT name, password FROM admin_users WHERE id = ?",
+        "SELECT name, password, can_manage_admin_users FROM admin_users WHERE id = ?",
         [id]
     );
 
@@ -387,7 +515,10 @@ app.put("/api/admin-user/name/:id", requireLogin, async (req, res) => {
         return res.status(400).json({ message: "パスワードが正しくありません。" });
       }
     } else {
-      if ((req.session.canManageAdminUsers ?? 0) < 1) {
+      const myLevel = req.session.canManageAdminUsers ?? 0;
+      const targetLevel = rows[0].can_manage_admin_users;
+
+      if (myLevel <= targetLevel) {
         return res.status(403).json({ message: "編集権限がありません。" });
       }
     }
@@ -415,7 +546,7 @@ app.put("/api/admin-user/name/:id", requireLogin, async (req, res) => {
 });
 
 /**
- * 管理ユーザー権限レベル変更（新規・要:権限付与権限）
+ * 管理ユーザー権限レベル変更（要:権限付与権限。自分より低いレベルの相手にのみ可能）
  */
 app.put("/api/admin-user/permission/:id", requireLogin, requireGrantPermission, async (req, res) => {
   try {
@@ -426,14 +557,27 @@ app.put("/api/admin-user/permission/:id", requireLogin, requireGrantPermission, 
       return res.status(400).json({ message: "権限レベルの値が不正です。" });
     }
 
-    const [result] = await db.query(
+    const [rows] = await db.query(
+        "SELECT can_manage_admin_users FROM admin_users WHERE id = ?",
+        [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "管理ユーザーが見つかりません。" });
+    }
+
+    const myLevel = req.session.canManageAdminUsers ?? 0;
+    const targetLevel = rows[0].can_manage_admin_users;
+
+    // 自分より高い/同じレベルの相手は操作不可（自分自身への変更も禁止）
+    if (myLevel <= targetLevel) {
+      return res.status(403).json({ message: "編集権限がありません。" });
+    }
+
+    await db.query(
         "UPDATE admin_users SET can_manage_admin_users = ?, updated_at = NOW() WHERE id = ?",
         [can_manage_admin_users, id]
     );
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "管理ユーザーが見つかりません。" });
-    }
 
     res.json({ message: "権限を変更しました。" });
 

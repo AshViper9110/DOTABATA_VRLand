@@ -26,7 +26,7 @@ CREATE TABLE `miniGames` (
  `name`         VARCHAR(255) NOT NULL,
  `rule`         TEXT,
  `type`         INT NOT NULL,
- `scene_number` INT NOT NULL,
+ `scene_name`   VARCHAR(255) NOT NULL,
  `playable`     TINYINT(1) NOT NULL DEFAULT 1,
  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
  `updated_at`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -94,4 +94,4 @@ VALUES (
 );
 
 -- miniGamesテスト用(本番削除)
-INSERT  INTO miniGames (name, rule, type, scene_number,playable) VALUES ('testGame','test',99,99,1);
+INSERT  INTO miniGames (name, rule, type, scene_name,playable) VALUES ('testGame','test',99,'testGame',1);
