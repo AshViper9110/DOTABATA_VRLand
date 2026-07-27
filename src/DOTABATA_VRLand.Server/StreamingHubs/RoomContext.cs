@@ -22,7 +22,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
 
         public List<JoinedUser> GoalOrder = new List<JoinedUser>();
-        private List<(JoinedUser user, int result)> rankOrder = new();
+        private List<(JoinedUser user, int result)> rankOrderScore = new();
+        private List<(JoinedUser user, DateTime time)> rankOrderTime = new();
 
         private int _currentCount = 3;//カウントダウン用
 
@@ -123,7 +124,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// </summary>
         public void InitializeScoreOrder()
         {
-            rankOrder.Clear();//ミニゲーム開始時に毎回呼ぶ
+            rankOrderScore.Clear();//ミニゲーム開始時に毎回呼ぶ
+            rankOrderTime.Clear();
         }
 
         /// <summary>
@@ -132,7 +134,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public List<JoinedUser> ApplyMiniGameResultScore(Guid connectionId ,int result) {
 
             // 既にクリア済みの場合は無視
-            if (rankOrder.Any(u => u.user.ConnectionId == connectionId))
+            if (rankOrderScore.Any(u => u.user.ConnectionId == connectionId))
             {
                 Console.WriteLine($"[RoomContext] クリアしているプレイヤーのクリア判定が行われました");
                 return null;
@@ -148,15 +150,15 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             Console.WriteLine($"[RoomContext]GetScore{userData.joinedUser.Name}:{result}");
 
             //クリアした順番に追加
-            rankOrder.Add((userData.joinedUser, result));
+            rankOrderScore.Add((userData.joinedUser, result));
 
             //全員のデータがそろったタイミング
-            if (rankOrder.Count == RoomUserDataList.Count)
+            if (rankOrderScore.Count == RoomUserDataList.Count)
             {
                 // 順にソートして順位確定
-                var ranked = rankOrder
+                var ranked = rankOrderScore
                 .OrderByDescending(u => u.result)
-                .ThenBy(u => rankOrder.IndexOf(u)) // ゴールした順番を優先
+                .ThenBy(u => rankOrderScore.IndexOf(u)) // ゴールした順番を優先
                 .Select(u => u.user)
                 .ToList();
 
@@ -169,6 +171,61 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                     roomUserData.miniGameResultData.rankings.Add(rank); // 1位なら1, 2位なら2
                     //if (rank == 1) roomUserData.miniGameResultData.winCount++;//一位のプレイヤーは勝利カウントを+
              
+                }
+
+
+
+                return ranked;//joinedUser型の順位リストを返す
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// ミニゲームの結果を反映
+        /// </summary>
+        public List<JoinedUser> ApplyMiniGameResultTime(Guid connectionId, DateTime time, bool firstWin) {
+            // 既にクリア済みの場合は無視
+            if (rankOrderTime.Any(u => u.user.ConnectionId == connectionId)) {
+                Console.WriteLine($"[RoomContext] クリアしているプレイヤーのクリア判定が行われました");
+                return null;
+            }
+
+            // connectionIDを基にクリアユーザーの情報を取得
+            if (!RoomUserDataList.TryGetValue(connectionId, out var userData)) {
+                Console.WriteLine($"[RoomContext] クリアユーザーの情報の取得に失敗しました ID:{connectionId}");
+                return null;
+            }
+
+            Console.WriteLine($"[RoomContext]GetTime{userData.joinedUser.Name}:{time}");
+            //クリアした順番に追加
+            rankOrderTime.Add((userData.joinedUser, time));
+
+            //全員のデータがそろったタイミング
+            if (rankOrderTime.Count == RoomUserDataList.Count) {
+                List<JoinedUser> ranked;
+                if (firstWin) {
+                    // 順にソートして順位確定
+                    ranked = rankOrderTime
+                    .OrderBy(u => u.time)
+                    .Select(u => u.user)
+                    .ToList();
+                }
+                else {
+                    // 順にソートして順位確定
+                    ranked = rankOrderTime
+                    .OrderByDescending(u => u.time)
+                    .Select(u => u.user)
+                    .ToList();
+                }
+
+                //各プレイヤーの順位を保存
+                for (int i = 0; i < ranked.Count; i++) {
+                    if (!RoomUserDataList.TryGetValue(ranked[i].ConnectionId, out var roomUserData)) continue;
+
+                    int rank = i + 1; // 0始まりなので+1
+                    roomUserData.miniGameResultData.rankings.Add(rank); // 1位なら1, 2位なら2
+                                                                        //if (rank == 1) roomUserData.miniGameResultData.winCount++;//一位のプレイヤーは勝利カウントを+
+
                 }
 
 

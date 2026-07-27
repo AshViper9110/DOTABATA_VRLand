@@ -220,7 +220,8 @@ public class ArcanaGameManager : MonoBehaviour {
     public async void DeathAsync() {
         // VFX
         Instantiate(deathEffect, mySelf.playerObj.transform.position, Quaternion.identity);
-        minigameFlowController.OnSendScore(gameTimer);
+        // minigameFlowController.OnSendScore(gameTimer);
+        minigameFlowController.OnSendTimeLastWin();
         myController.Dead();
         await RoomModel.I.DeathAsync();
     }
@@ -256,7 +257,8 @@ public class ArcanaGameManager : MonoBehaviour {
         }
 
         if (mySelf.joinedUser.ConnectionId == winnerConId) {
-            minigameFlowController.OnSendScore(gameTimer + 100);
+            // minigameFlowController.OnSendScore(gameTimer + 100);
+            minigameFlowController.OnSendTimeLastWin();
         }
     }
 }
