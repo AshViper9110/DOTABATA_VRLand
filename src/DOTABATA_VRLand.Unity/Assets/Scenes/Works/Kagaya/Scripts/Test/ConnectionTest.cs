@@ -26,9 +26,6 @@ public class ConnectionTest : MonoBehaviour {
         await RoomModel.I.ConnectAsync();
         ulong steamId = SteamUser.GetSteamID().m_SteamID;//steam��ID��擾
         await RoomModel.I.JoinRoomAsync(steamId, new RoomConfig() { GameModeId = 0, Name = "TestRoom"});
-        //await UserModel.I.RegistUserAsync("YamagamiSecond");
-       
-
     }
 
     /// <summary>
