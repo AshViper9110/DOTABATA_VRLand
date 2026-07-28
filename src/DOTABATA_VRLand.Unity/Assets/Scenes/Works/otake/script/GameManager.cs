@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviour
     public float crownDistance;
 
 
-
+    static public List<string> PlayedMiniGame = new List<string>();
 
     //
 
@@ -376,12 +376,15 @@ public class GameManager : MonoBehaviour
         {
             DeleteCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
         }
+        PlayedMiniGame.Add(scene);
+
         SteamVR_Fade.View(new Color(1,1,1,1), 2);
         Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
         AudioManager.PlaySE(AudioManager.SE.MoveScene);
 
         if (name == "TitleScene")
         {
+            PlayedMiniGame = new List<string>();
             RoomModel.I.LeaveRoomAsync();
         }
     }
@@ -398,9 +401,42 @@ public class GameManager : MonoBehaviour
                                                       SelPointHeght,
                                                       selectPoint.transform.position.z);
 
+
+
         int count = miniGames.Count;
+        List<string> minis = new List<string>();
+        List<GameObject> miniObjs = new List<GameObject>();
+
         for (int i = 0; i < count; i++)
         {
+            if (PlayedMiniGame.Contains(miniGames[i])) continue;
+            miniObjs.Add( Instantiate(MinigamePrefab,
+                CenterObj.transform.position + pos,
+                Quaternion.identity,
+                CenterObj.transform));
+        }
+
+        if (miniObjs.Count <= 0)
+        {
+            PlayedMiniGame = new List<string>();
+
+
+            for (int i = 0; i < count; i++)
+            {
+                miniObjs.Add(Instantiate(MinigamePrefab,
+                    CenterObj.transform.position + pos,
+                    Quaternion.identity,
+                    CenterObj.transform));
+            }
+        }
+
+        count = miniObjs.Count;
+
+            for (int i = 0; i < miniObjs.Count; i++)
+        {
+
+          
+
             // Šp“x‚ðŒvŽZ
             angle = i * Mathf.PI * 2 / count;
 
@@ -408,12 +444,10 @@ public class GameManager : MonoBehaviour
             pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
 
             // ¶¬‚µ‚Ä‰ñ“]‚ð“K—p
-            GameObject obj = Instantiate(MinigamePrefab,
-                CenterObj.transform.position + pos,
-                Quaternion.identity,
-                CenterObj.transform);
 
-            MiniGameObjManager manager = obj.GetComponent<MiniGameObjManager>();
+
+            MiniGameObjManager manager = miniObjs[i].GetComponent<MiniGameObjManager>();
+            miniObjs[i].transform.position = CenterObj.transform.position + pos;
             RawImage Image = manager.GetComponentInChildren<RawImage>();
             manager.ID = i;
             Image.texture = miniGameTitleImages[i].texture;
