@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEditor.MemoryProfiler;
 using UnityEngine;
 using static SyncObjectDataSO;
 
@@ -284,8 +285,18 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
         isJoinRoom = false;
         NetworkManager.I.isJoin = false;
+        
+        foreach (var item in InRoomPlayerData.I.PlayerList.Keys)
+        {
+            if (item == NetworkManager.I.myConnectionId) continue;
+
+            InRoomPlayerData.I.RemovePlayer(item);
+        }
+        
 
         await roomHub.LeaveRoomAsync();
+
+
     }
 
     /// <summary>

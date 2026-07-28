@@ -82,7 +82,7 @@ public class Kinko : MonoBehaviour
         if (RoomModel.I == null) return;
 
         RoomModel.I.OnCountdownAction -= StartCountdown;
-        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
+        RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
     }
 
         // Update is called once per frame
@@ -117,7 +117,7 @@ public class Kinko : MonoBehaviour
             timer -= Time.deltaTime;
             timerText.text = ((int)timer).ToString();
 
-            if (timer < 0)
+            if (timer < 0 && !isClear)
             {
                 controller.isGameStarted = false;
                 Debug.Log("GameEnd");

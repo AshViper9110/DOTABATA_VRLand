@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 1276610886676654262}
   - component: {fileID: 6608867135282191341}
   - component: {fileID: 4959757463721254550}
+  - component: {fileID: 1050547337421230410}
+  - component: {fileID: 1679906694794935576}
   m_Layer: 5
   m_Name: RawImage
   m_TagString: Untagged
@@ -72,6 +74,41 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &1050547337421230410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2096083796097637627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71a962ef61c26864486fed7b06ca2919, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_rawImage: {fileID: 4959757463721254550}
+  m_imgAspectCtrl: {fileID: 1679906694794935576}
+  m_filterMode: 0
+  m_wrapMode: 1
+  m_loadOnStart: 1
+  m_loadOnStartUrl: Assets/Scenes/Works/otake/img/Game/Sppato/left-arrow.gif
+  m_rotateOnLoading: 0
+  m_outputDebugLog: 0
+--- !u!114 &1679906694794935576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2096083796097637627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10b5e2a9913274d43a1e678b6ac98f7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_originalWidth: 0
+  m_originalHeight: 0
+  m_fixOnUpdate: 0
 --- !u!1 &2506797765385362744
 GameObject:
   m_ObjectHideFlags: 0

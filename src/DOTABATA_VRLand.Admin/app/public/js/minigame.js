@@ -1,6 +1,6 @@
 async function loadMinigames() {
     try {
-        const res = await fetch("/api/Minigames/get");
+        const res = await fetch("/api/minigames/get");
         const games = await res.json();
 
         const tbody = document.getElementById("minigame-list");
@@ -13,11 +13,13 @@ async function loadMinigames() {
                 .toLocaleString("ja-JP");
 
             const playable = game.playable ? "〇" : "✕";
+            const typeLabel = game.type === 1 ? "スコア型" : "タイム型";
 
             tr.innerHTML = `
         <td>${game.id}</td>
         <td>${game.name}</td>
-        <td>${game.type}</td>
+        <td>${typeLabel}</td>
+        <td>${game.scene_name}</td>
         <td>${playable}</td>
         <td>${updatedAt}</td>
         <td>

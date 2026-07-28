@@ -47,8 +47,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// ルームを全取得
         /// </summary>
         public Task<List<RoomInfo>> GetAllRoomAsync() {
+            //
             List<RoomInfo> roomInfoList = new List<RoomInfo>();
+            //
             foreach (var context in _roomContextRepository.GetAllContext()) {
+                if (context.Value.isStarted) continue;
+
                 RoomInfo roomInfo = new RoomInfo() {
                     Name = context.Value.Name,
                     UsePassword = context.Value.Password != "",
@@ -397,6 +401,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         {
             //ボーリングの順番リセット
             _roomContext.ballingOrder = 1;
+
+            _roomContext.isStarted = true;
             //ミニゲーム順位リストの初期化
             _roomContext.InitializeScoreOrder();
             // 全員に通知
