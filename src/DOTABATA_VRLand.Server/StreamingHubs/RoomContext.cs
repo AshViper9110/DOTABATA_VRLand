@@ -29,6 +29,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         public string Password { get; set; } // ルームパスワード
 
+        public bool isStarted { get; set; } = false;
+
         // その他、ルームのデータとして保存したいものをフィールドに追加していく
         //ボーリングの順番
         public int ballingOrder;
@@ -172,8 +174,6 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                     //if (rank == 1) roomUserData.miniGameResultData.winCount++;//一位のプレイヤーは勝利カウントを+
              
                 }
-
-
 
                 return ranked;//joinedUser型の順位リストを返す
             }
