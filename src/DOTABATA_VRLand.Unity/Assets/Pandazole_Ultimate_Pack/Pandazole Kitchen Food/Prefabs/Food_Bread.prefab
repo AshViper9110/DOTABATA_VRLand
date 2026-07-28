@@ -224,6 +224,8 @@ GameObject:
   - component: {fileID: 9196967010630553900}
   - component: {fileID: 3014908136322086896}
   - component: {fileID: 4962959528332808378}
+  - component: {fileID: 9000267744861645869}
+  - component: {fileID: 4078448150970360085}
   m_Layer: 0
   m_Name: Food_Bread
   m_TagString: Cuttable
@@ -366,6 +368,41 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &9000267744861645869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1562450511784550434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71a962ef61c26864486fed7b06ca2919, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_rawImage: {fileID: 6051622581097498970}
+  m_imgAspectCtrl: {fileID: 4078448150970360085}
+  m_filterMode: 0
+  m_wrapMode: 1
+  m_loadOnStart: 0
+  m_loadOnStartUrl: Assets/Scenes/Works/otake/img/Game/Sppato/left-arrow.gif
+  m_rotateOnLoading: 0
+  m_outputDebugLog: 0
+--- !u!114 &4078448150970360085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1562450511784550434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10b5e2a9913274d43a1e678b6ac98f7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_originalWidth: 0
+  m_originalHeight: 0
+  m_fixOnUpdate: 0
 --- !u!1 &2626801115989400336
 GameObject:
   m_ObjectHideFlags: 0

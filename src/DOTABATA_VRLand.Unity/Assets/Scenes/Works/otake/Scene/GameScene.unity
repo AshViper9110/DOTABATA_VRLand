@@ -1723,8 +1723,8 @@ GameObject:
   m_Component:
   - component: {fileID: 254124047}
   - component: {fileID: 254124046}
-  - component: {fileID: 254124048}
   - component: {fileID: 254124049}
+  - component: {fileID: 254124048}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1751,13 +1751,13 @@ MonoBehaviour:
     needsReinit: 0
   handType: 2
   miniGames:
-  - ArcanaSketch
+  - nitnit
   - Kinko
-  - ArcanaSketch
+  - nitnit
   - Kinko
-  - ArcanaSketch
+  - nitnit
   - Kinko
-  - ArcanaSketch
+  - nitnit
   miniGameNames:
   - "\u30CB\u30C3\u30C8\u30CB\u30C3\u30C8"
   - "\u91D1\u5EAB\u7834\u308A"
@@ -1780,7 +1780,7 @@ MonoBehaviour:
   onSelect: 0
   onResult: 0
   onEnd: 1
-  radius: 30
+  radius: 15
   MinigamePrefab: {fileID: 8531964900129808126, guid: b8822b7a5372ea14bab556bf08b99f29, type: 3}
   CenterObj: {fileID: 1277725972}
   selectPoint: {fileID: 2553432454474539405}
