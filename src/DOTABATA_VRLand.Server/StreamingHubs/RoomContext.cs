@@ -29,6 +29,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         public string Password { get; set; } // ルームパスワード
 
+        public bool isStarted { get; set; } = false;
+
         // その他、ルームのデータとして保存したいものをフィールドに追加していく
         //ボーリングの順番
         public int ballingOrder;

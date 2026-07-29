@@ -86,9 +86,7 @@ public class ArcanaGameManager : MonoBehaviour {
             // サーバーのArcanaContextを初期化
             await RoomModel.I.ArcanaInitGameAsync();
         }
-        mySelf.playerObj.transform.position = firstSpawnPoint.position;
-
-        await UniTask.WaitUntil(() => minigameFlowController.isGameStarted == true);
+        //mySelf.playerObj.transform.position = firstSpawnPoint.position;
 
         RoomModel.I.OnDead += OnDead;
         RoomModel.I.OnArcanaGameSeted += OnArcanaGameSeted;
@@ -101,6 +99,8 @@ public class ArcanaGameManager : MonoBehaviour {
         Player player = Player.instance;
         player.transform.LookAt(centerTransform);
         player.transform.eulerAngles = new Vector3(0, player.transform.eulerAngles.y, 0);
+
+        await UniTask.WaitUntil(() => minigameFlowController.isGameStarted == true);
 
         await UniTask.DelayFrame(5);
 

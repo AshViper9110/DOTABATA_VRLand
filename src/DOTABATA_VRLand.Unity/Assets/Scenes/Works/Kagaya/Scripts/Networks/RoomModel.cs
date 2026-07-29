@@ -4,10 +4,10 @@ using DOTABATA_VRLand.Shared.Models.Entities;
 using MagicOnion;
 using MagicOnion.Client;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEditor.MemoryProfiler;
 using UnityEngine;
 using static SyncObjectDataSO;
 
@@ -285,8 +285,10 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
         isJoinRoom = false;
         NetworkManager.I.isJoin = false;
-        
-        foreach (var item in InRoomPlayerData.I.PlayerList.Keys)
+
+        var keys = InRoomPlayerData.I.PlayerList.Keys.ToList();
+
+        foreach (var item in keys)
         {
             if (item == NetworkManager.I.myConnectionId) continue;
 
