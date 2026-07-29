@@ -212,6 +212,26 @@ app.delete("/api/admin-user/delete/:id", requireLogin, requireManagePermission, 
       return res.status(403).json({ message: "削除権限がありません。" });
     }
 
+    // 管理ユーザーが1人しかいない場合は削除不可
+    const [[{ count }]] = await db.query(
+        "SELECT COUNT(*) AS count FROM admin_users"
+    );
+
+    if (count <= 1) {
+      return res.status(403).json({ message: "最後の管理ユーザーは削除できません。" });
+    }
+
+    // 削除対象がレベル2の場合、他にレベル2がいなければ削除不可
+    if (targetLevel === 2) {
+      const [[{ level2Count }]] = await db.query(
+          "SELECT COUNT(*) AS level2Count FROM admin_users WHERE can_manage_admin_users = 2"
+      );
+
+      if (level2Count <= 1) {
+        return res.status(403).json({ message: "最後の最上位権限（レベル2）の管理ユーザーは削除できません。" });
+      }
+    }
+
     const [result] = await db.query(
         "DELETE FROM admin_users WHERE id = ?",
         [id]
@@ -228,7 +248,6 @@ app.delete("/api/admin-user/delete/:id", requireLogin, requireManagePermission, 
     res.status(500).json({ message: "サーバーエラー" });
   }
 });
-
 // --- ミニゲーム系（変更なし） ---
 
 /**
@@ -303,7 +322,6 @@ app.post("/api/minigames/add", requireLogin, async (req, res) => {
       return res.status(400).json({ message: "タイプの値が不正です。" });
     }
 
-    // 同じシーン名が既に存在しないか確認
     const [exists] = await db.query(
         "SELECT id FROM miniGames WHERE scene_name = ?",
         [scene_name]
@@ -313,23 +331,77 @@ app.post("/api/minigames/add", requireLogin, async (req, res) => {
       return res.status(409).json({ message: "そのシーン名は既に使用されています。" });
     }
 
-    await db.query(
+    const [result] = await db.query(
         `INSERT INTO miniGames (name, rule, type, scene_name, playable)
          VALUES (?, ?, ?, ?, ?)`,
-        [
-          name,
-          rule || null,
-          Number(type),
-          scene_name,
-          playable === false ? 0 : 1
-        ]
+        [name, rule || null, Number(type), scene_name, playable === false ? 0 : 1]
     );
 
-    res.json({ success: true, message: "ミニゲームを作成しました。" });
+    // 作成したレコードのIDを返す（このあと画像アップロードに使う）
+    res.json({ success: true, message: "ミニゲームを作成しました。", id: result.insertId });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "サーバーエラー" });
+  }
+});
+
+/**
+ * ミニゲームアイコン画像アップロード（生バイナリを直接受け取る）
+ */
+app.put(
+    "/api/minigames/icon/:id",
+    requireLogin,
+    express.raw({ type: "image/*", limit: "5mb" }),
+    async (req, res) => {
+      try {
+        const id = req.params.id;
+        const iconBuffer = req.body;
+
+        if (!iconBuffer || iconBuffer.length === 0) {
+          return res.status(400).json({ message: "画像データがありません。" });
+        }
+
+        const [result] = await db.query(
+            "UPDATE miniGames SET icon = ? WHERE id = ?",
+            [iconBuffer, id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ message: "ミニゲームが見つかりません。" });
+        }
+
+        res.json({ success: true, message: "画像を保存しました。" });
+
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "サーバーエラー" });
+      }
+    }
+);
+
+/**
+ * ミニゲームアイコン画像取得
+ */
+app.get("/api/minigames/icon/:id", requireLogin, async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const [rows] = await db.query(
+        "SELECT icon FROM miniGames WHERE id = ?",
+        [id]
+    );
+
+    if (rows.length === 0 || !rows[0].icon) {
+      return res.status(404).send();
+    }
+
+    res.set("Content-Type", "image/jpeg");
+    res.send(rows[0].icon);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send();
   }
 });
 
@@ -357,6 +429,62 @@ app.delete("/api/Minigames/delete/:id", requireLogin, async (req, res) => {
   }
 });
 
+/**
+ * ミニゲーム更新
+ */
+app.put("/api/minigames/update/:id", requireLogin, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { name, rule, type, scene_name, playable } = req.body;
+
+    if (!name || !type || !scene_name) {
+      return res.status(400).json({ message: "名前・タイプ・シーン名は必須です。" });
+    }
+
+    if (![1, 2].includes(Number(type))) {
+      return res.status(400).json({ message: "タイプの値が不正です。" });
+    }
+
+    const [rows] = await db.query(
+        "SELECT id FROM miniGames WHERE id = ?",
+        [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "ミニゲームが見つかりません。" });
+    }
+
+    // 同じシーン名が他のレコードで使われていないか確認（自分自身は除外）
+    const [exists] = await db.query(
+        "SELECT id FROM miniGames WHERE scene_name = ? AND id <> ?",
+        [scene_name, id]
+    );
+
+    if (exists.length > 0) {
+      return res.status(409).json({ message: "そのシーン名は既に使用されています。" });
+    }
+
+    await db.query(
+        `UPDATE miniGames
+         SET name = ?, rule = ?, type = ?, scene_name = ?, playable = ?, updated_at = NOW()
+         WHERE id = ?`,
+        [
+          name,
+          rule || null,
+          Number(type),
+          scene_name,
+          playable === false ? 0 : 1,
+          id
+        ]
+    );
+
+    res.json({ success: true, message: "ミニゲームを更新しました。" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "サーバーエラー" });
+  }
+});
 
 /**
  * 管理ユーザー詳細
@@ -546,7 +674,9 @@ app.put("/api/admin-user/name/:id", requireLogin, async (req, res) => {
 });
 
 /**
- * 管理ユーザー権限レベル変更（要:権限付与権限。自分より低いレベルの相手にのみ可能）
+ * 管理ユーザー権限レベル変更
+ * - レベル2の管理者のみ実行可能
+ * - 対象がレベル2の場合は変更不可（自分自身も含め、レベル2同士は対象外）
  */
 app.put("/api/admin-user/permission/:id", requireLogin, requireGrantPermission, async (req, res) => {
   try {
@@ -566,12 +696,11 @@ app.put("/api/admin-user/permission/:id", requireLogin, requireGrantPermission, 
       return res.status(404).json({ message: "管理ユーザーが見つかりません。" });
     }
 
-    const myLevel = req.session.canManageAdminUsers ?? 0;
     const targetLevel = rows[0].can_manage_admin_users;
 
-    // 自分より高い/同じレベルの相手は操作不可（自分自身への変更も禁止）
-    if (myLevel <= targetLevel) {
-      return res.status(403).json({ message: "編集権限がありません。" });
+    // 対象がレベル2の場合は変更不可（自分自身も含む）
+    if (targetLevel === 2) {
+      return res.status(403).json({ message: "レベル2の管理者の権限は変更できません。" });
     }
 
     await db.query(

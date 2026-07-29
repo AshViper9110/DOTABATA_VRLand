@@ -69,7 +69,7 @@ async function init() {
 
         if (response.ok) {
             alert(data.message);
-            location.href = `/adminUser_detail.html?id=${id}`;
+            location.replace(`/adminUser_detail.html?id=${id}`);
         } else {
             alert(data.message);
         }

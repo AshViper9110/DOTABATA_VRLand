@@ -11,6 +11,8 @@ using UnityEditor;
 using TMPro;
 using Cysharp.Threading.Tasks.Triggers;
 using Unity.VisualScripting;
+using DOTABATA_VRLand.Shared.Models.Entities;
+using System.Threading.Tasks;
 
 
 public class GameManager : MonoBehaviour
@@ -217,8 +219,8 @@ public class GameManager : MonoBehaviour
                 if (CenterObjRb.angularVelocity.y < 0.01f)
                 {
                     DummyText.text = "";
-                    Debug.Log(miniGameNames[selPointManager.SelectId] + "Ç…ÉQÅ[ÉÄÇ™åàÇ‹ÇËÇ‹ÇµÇΩ");
-                    DummyText.DOText(miniGameNames[selPointManager.SelectId] + "Ç…ÉQÅ[ÉÄÇ™åàÇ‹ÇËÇ‹ÇµÇΩ", 1.0f);
+                    Debug.Log(selPointManager.titleName + "Ç…ÉQÅ[ÉÄÇ™åàÇ‹ÇËÇ‹ÇµÇΩ");
+                    DummyText.DOText(selPointManager.titleName + "Ç…ÉQÅ[ÉÄÇ™åàÇ‹ÇËÇ‹ÇµÇΩ", 1.0f);
 
                     audio.Stop();
                     audio.PlayOneShot(RollEnd);
@@ -255,7 +257,7 @@ public class GameManager : MonoBehaviour
 
     public void InitRally()
     {
-        SetMiniGame();
+        SetMiniGameAsync();
         CenterObjRb = CenterObj.GetComponent<Rigidbody>();
         selPointManager = selectPoint.GetComponent<SelPointManager>();
         isSpin = false;
@@ -389,69 +391,53 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SetMiniGame()
+    public async Task SetMiniGameAsync()
     {
-        // äpìxÇåvéZ
-        float angle = 3 * Mathf.PI * 2 / 4;
-
-        // à íuÇåvéZ (X, ZïΩñ )
-        Vector3 pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
-        selectPoint.transform.position = CenterObj.transform.position + pos;
-        selectPoint.transform.position = new Vector3(selectPoint.transform.position.x,
-                                                      SelPointHeght,
-                                                      selectPoint.transform.position.z);
-
-
+        List<MiniGameInfo> miniGames = await RoomModel.I.GetAllMiniGameAsync();
 
         int count = miniGames.Count;
-        List<string> minis = new List<string>();
-        List<GameObject> miniObjs = new List<GameObject>();
 
         for (int i = 0; i < count; i++)
         {
-            if (PlayedMiniGame.Contains(miniGames[i])) continue;
-            miniObjs.Add( Instantiate(MinigamePrefab,
-                CenterObj.transform.position + pos,
-                Quaternion.identity,
-                CenterObj.transform));
-        }
-
-        if (miniObjs.Count <= 0)
-        {
-            PlayedMiniGame = new List<string>();
-
-
-            for (int i = 0; i < count; i++)
-            {
-                miniObjs.Add(Instantiate(MinigamePrefab,
-                    CenterObj.transform.position + pos,
-                    Quaternion.identity,
-                    CenterObj.transform));
-            }
-        }
-
-        count = miniObjs.Count;
-
-            for (int i = 0; i < miniObjs.Count; i++)
-        {
-
-          
-
-            // äpìxÇåvéZ
-            angle = i * Mathf.PI * 2 / count;
+            // â~é¸è„Ç…ìôä‘äuîzíu
+            float angle = i * Mathf.PI * 2f / count;
 
             // à íuÇåvéZ (X, ZïΩñ )
-            pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
+            Vector3 pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
 
-            // ê∂ê¨ÇµÇƒâÒì]ÇìKóp
+            GameObject minigame = Instantiate(
+                MinigamePrefab,
+                CenterObj.transform.position + pos,
+                Quaternion.identity,
+                CenterObj.transform);
 
+            // íÜêSÇå¸Ç©ÇπÇÈ
+            minigame.transform.LookAt(CenterObj.transform.position);
 
-            MiniGameObjManager manager = miniObjs[i].GetComponent<MiniGameObjManager>();
-            miniObjs[i].transform.position = CenterObj.transform.position + pos;
-            RawImage Image = manager.GetComponentInChildren<RawImage>();
-            manager.ID = i;
-            Image.texture = miniGameTitleImages[i].texture;
+            MiniGameObjManager free = minigame.GetComponent<MiniGameObjManager>();
+            free.sceneName = miniGames[i].SceneName;
+            free.titleName = miniGames[i].TitleName;
+
+            RawImage image = free.GetComponentInChildren<RawImage>();
+            image.texture = CreateTextureFromBytes(miniGames[i].BinaryImg);
         }
+    }
+
+    private Texture2D CreateTextureFromBytes(byte[] imageBytes)
+    {
+        if (imageBytes == null || imageBytes.Length == 0)
+            return null;
+
+        Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+
+        if (!texture.LoadImage(imageBytes))
+        {
+            Debug.LogError("âÊëúÇÃì«Ç›çûÇ›Ç…é∏îsÇµÇ‹ÇµÇΩÅB");
+            Destroy(texture);
+            return null;
+        }
+
+        return texture;
     }
 
     public void SetCrown(Guid guid,int ID)
@@ -622,8 +608,8 @@ public class GameManager : MonoBehaviour
                 audio.Stop();
                 audio.PlayOneShot(RollEnd);
                 DummyText.text = "";
-                Debug.Log(miniGameNames[selPointManager.SelectId] + "Ç…ÉQÅ[ÉÄÇ™åàÇ‹ÇËÇ‹ÇµÇΩ");
-                DummyText.DOText(miniGameNames[selPointManager.SelectId] + "Ç…ÉQÅ[ÉÄÇ™åàÇ‹ÇËÇ‹ÇµÇΩ", 1.0f);
+                Debug.Log(selPointManager.titleName + "Ç…ÉQÅ[ÉÄÇ™åàÇ‹ÇËÇ‹ÇµÇΩ");
+                DummyText.DOText(selPointManager.titleName + "Ç…ÉQÅ[ÉÄÇ™åàÇ‹ÇËÇ‹ÇµÇΩ", 1.0f);
 
                 onSelect = true;
                 onResult = false;
@@ -700,7 +686,7 @@ public class GameManager : MonoBehaviour
         }
         else if (onSelect)
         {
-            RoomModel.I.MoveSceneAsync(miniGames[selPointManager.SelectId]);
+            RoomModel.I.MoveSceneAsync(selPointManager.sceneName);
             EndProgress = true;
         }
         else

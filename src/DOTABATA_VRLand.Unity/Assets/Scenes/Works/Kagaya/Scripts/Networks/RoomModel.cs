@@ -239,6 +239,11 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         return await roomHub.GetAllRoomAsync();
     }
 
+    public async UniTask<List<MiniGameInfo>> GetAllMiniGameAsync()
+    {
+        return await roomHub.GetAllMiniGameAsync();
+    }
+
 
     /// <summary>
     /// ルームに入室

@@ -107,6 +107,17 @@ public class NetworkManager : Singleton<NetworkManager>
         gameModeId = roomConfig.GameModeId;
         SyncPlayer syncPlayer = GameObject.Find("Player(Clone)").GetComponent<SyncPlayer>();
         syncPlayer.isLocalPlayer = true;
+
+        //List<MiniGameInfo> miniGames = await RoomModel.I.GetAllMiniGameAsync();
+
+        //foreach (var game in miniGames)
+        //{
+        //    Debug.Log(
+        //        $"Title: {game.TitleName}, " +
+        //        $"Scene: {game.SceneName}, " +
+        //        $"Played: {game.IsPlayed}, " +
+        //        $"ImageSize: {game.BinaryImg?.Length ?? 0} bytes");
+        //}
     }
 
     /// <summary>
