@@ -95,6 +95,8 @@ VALUES (
 );
 
 -- miniGamesテスト用(本番削除)
+SET NAMES utf8mb4;
+
 INSERT INTO miniGames
 (name, icon, rule, type, scene_name, playable)
 VALUES
