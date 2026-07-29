@@ -13,14 +13,17 @@ namespace DOTABATA_VRLand.Server.Models.Entities
         [Column("name")]
         public string Name { get; set; }
 
+        [Column("icon")]
+        public byte[] Icon { get; set; }
+
         [Column("rule")]
         public string Rule { get; set; }
 
         [Column("type")]
         public int Type { get; set; }//タイムアタック:1 スコアアタック:2
 
-        [Column("scene_number")]
-        public int SceneNumber { get; set; }
+        [Column("scene_name")]
+        public string SceneName { get; set; }
 
         [Column("playable")]
         public int Playable { get; set; }
