@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class SelPointManager : MonoBehaviour
 {
-    public int SelectId;
+    public string sceneName;
+    public string titleName;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -17,7 +18,8 @@ public class SelPointManager : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        SelectId = other.GetComponent<MiniGameObjManager>().ID;
+        sceneName = other.GetComponent<MiniGameObjManager>().sceneName;
+        titleName = other.GetComponent<MiniGameObjManager>().titleName;
         Debug.Log("‚ ‚Á‚½ƒ^ƒˆ");
     }
 }

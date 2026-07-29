@@ -1723,8 +1723,8 @@ GameObject:
   m_Component:
   - component: {fileID: 254124047}
   - component: {fileID: 254124046}
-  - component: {fileID: 254124048}
   - component: {fileID: 254124049}
+  - component: {fileID: 254124048}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1751,13 +1751,13 @@ MonoBehaviour:
     needsReinit: 0
   handType: 2
   miniGames:
-  - ArcanaSketch
+  - nitnit
   - Kinko
-  - ArcanaSketch
+  - nitnit
   - Kinko
-  - ArcanaSketch
+  - nitnit
   - Kinko
-  - ArcanaSketch
+  - nitnit
   miniGameNames:
   - "\u30CB\u30C3\u30C8\u30CB\u30C3\u30C8"
   - "\u91D1\u5EAB\u7834\u308A"
@@ -17216,7 +17216,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f21813b9874a4c74d921f27bd3f5c318, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SelectId: 0
+  sceneName: 
+  titleName: 
 --- !u!1 &4739754563660414513
 GameObject:
   m_ObjectHideFlags: 0

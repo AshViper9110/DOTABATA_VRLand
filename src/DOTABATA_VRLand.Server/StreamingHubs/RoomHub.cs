@@ -43,6 +43,28 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             return CompletedTask;
         }
 
+        /// <summary>
+        /// みにげーむを全取得
+        /// </summary>
+        public Task<List<MiniGameInfo>> GetAllMiniGameAsync()
+        {
+            List<MiniGameInfo> minigameList = new List<MiniGameInfo>();
+            foreach(var context in _roomContext.miniGameInfoList)
+            {
+                if (!context.IsPlayed) continue;
+
+                MiniGameInfo miniGameInfo = new MiniGameInfo()
+                {
+                    BinaryImg = context.BinaryImg,
+                    TitleName = context.TitleName,
+                    SceneName = context.SceneName,
+                    IsPlayed = context.IsPlayed,
+                };
+                minigameList.Add(miniGameInfo);
+            }
+            return Task.FromResult<List<MiniGameInfo>>(minigameList);
+        }
+
 
         /// <summary>
         /// ルームを全取得
@@ -99,6 +121,18 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
                 _dbContext.Rooms.Add(room);
                 await _dbContext.SaveChangesAsync();//保存
+
+                foreach (var context in await _dbContext.Minigames.ToListAsync())
+                {
+                    MiniGameInfo miniGameInfo = new MiniGameInfo()
+                    {
+                        BinaryImg = context.Icon,
+                        TitleName = context.Name,
+                        SceneName = context.SceneName,
+                        IsPlayed = true,
+                    };
+                    _roomContext.miniGameInfoList.Add(miniGameInfo);
+                }
 
                 Console.WriteLine($"[DB] Room Created Id:{room.Id} Name:{room.Name}");
             }           
@@ -224,7 +258,6 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 this._roomContext.RoomUserDataList[this.ConnectionId] = roomUserData;
 
             }
-
             // コンソールにログを表示
             _roomContext.WriteConsoleJoinInfo(joinedUser);
 
@@ -403,7 +436,6 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             //ボーリングの順番リセット
             _roomContext.ballingOrder = 1;
 
-            _roomContext.isStarted = true;
             //ミニゲーム順位リストの初期化
             _roomContext.InitializeScoreOrder();
             // 全員に通知
@@ -750,6 +782,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         //ルームの開始
         public Task RoomStart()
         {
+            _roomContext.isStarted = true;
             this._roomContext.Group.All.OnRoomStart();
             return Task.CompletedTask;
         }
@@ -832,8 +865,20 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public Task MoveSceneAsync(string name)
         {
             // 全員に通知
+            ResetPlayed(_roomContext.miniGameInfoList, name);
             this._roomContext.Group.All.OnMoveSceneAsync(name);
             return Task.CompletedTask;
+        }
+
+        public void ResetPlayed(List<MiniGameInfo> miniGames, string sceneName)
+        {
+            foreach (var game in miniGames)
+            {
+                if (game.SceneName == sceneName)
+                {
+                    game.IsPlayed = false;
+                }
+            }
         }
 
         /// <summary>
