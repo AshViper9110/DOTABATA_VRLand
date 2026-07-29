@@ -31,6 +31,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
         public bool isStarted { get; set; } = false;
 
+        public List<MiniGameInfo> miniGameInfoList  = new List<MiniGameInfo>();
+
         // その他、ルームのデータとして保存したいものをフィールドに追加していく
         //ボーリングの順番
         public int ballingOrder;
