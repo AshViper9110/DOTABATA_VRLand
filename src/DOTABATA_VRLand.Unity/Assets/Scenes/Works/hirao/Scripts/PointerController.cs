@@ -1,10 +1,12 @@
+Ôªøusing System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using TMPro;
 using Valve.VR;
-using System.Collections;
+using Valve.VR.InteractionSystem;
+using static PositionChecker;
 
 public class PointerController : MonoBehaviour
 {
@@ -28,6 +30,14 @@ public class PointerController : MonoBehaviour
     private EventSystem eventSystem;
 
     private GameObject currentHover;
+
+    [SerializeField] private float scrollSpeed = 2;
+
+    // Âè≥„Çπ„ÉÜ„Ç£„ÉÉ„ÇØ
+    [SerializeField] private SteamVR_Action_Vector2 rightStickAction;
+
+
+    [SerializeField] private SnapTurn snapTurn;
 
     void Start()
     {
@@ -116,7 +126,18 @@ public class PointerController : MonoBehaviour
 
             Toggle toggle = obj.GetComponentInParent<Toggle>();
 
-            // Button / InputField ÇÃÇ›ëŒè€
+            ScrollRect scrollRect = obj.GetComponent<ScrollRect>();
+            if (rightStickAction != null) {
+                if (!scrollRect) {
+                    scrollRect = button?.GetComponentInParent<ScrollRect>();
+                }
+                snapTurn.enabled = true;
+                if (scrollRect) {
+                    snapTurn.enabled = false;
+                }
+            }
+
+            // Button / InputField „ÅÆ„ÅøÂØæË±°
             if (button == null &&
                 inputField == null &&
                 tmpInputField == null &&
@@ -133,7 +154,7 @@ public class PointerController : MonoBehaviour
 
             end = result.worldPosition;
 
-            // HoveräJén
+            // HoverÈñãÂßã
             if (target != currentHover)
             {
                 if (currentHover != null)
@@ -164,7 +185,7 @@ public class PointerController : MonoBehaviour
                 // Button
                 if (button != null)
                 {
-                    button.onClick.Invoke();
+                    button.onClick?.Invoke();
 
                     Debug.Log(
                         "Clicked Button : " +
@@ -205,11 +226,24 @@ public class PointerController : MonoBehaviour
                         toggle.name);
                 }
             }
+            // Turn
+            if (rightStickAction != null &&
+                rightStickAction.axis != Vector2.zero) {
+                // ScrollRect
+                if (scrollRect != null) {
+                    float y = rightStickAction.axis.y;
+                    scrollRect.verticalNormalizedPosition += y * scrollSpeed * Time.deltaTime;
+
+                    Debug.Log(
+                        "Scroll View : " +
+                         scrollRect.name);
+                }
+            }
 
             break;
         }
 
-        // Hoverâèú
+        // HoverËß£Èô§
         if (!hitUI)
         {
             if (currentHover != null)
@@ -223,18 +257,18 @@ public class PointerController : MonoBehaviour
                 currentHover = null;
             }
 
-            // âΩÇ‡Ç»Ç¢èÍèäÇ≈Trigger
+            // ‰Ωï„ÇÇ„Å™„ÅÑÂ†¥ÊâÄ„ÅßTrigger
             if (triggerAction != null &&
                 triggerAction.stateDown)
             {
-                // UIëIëâèú
+                // UIÈÅ∏ÊäûËß£Èô§
                 eventSystem.SetSelectedGameObject(null);
 
                 Debug.Log("UI Selection Cleared");
             }
         }
 
-        // ÉåÅ[ÉUÅ[
+        // „É¨„Éº„Ç∂„Éº
         if (lineRenderer != null)
         {
             lineRenderer.enabled = hitUI;

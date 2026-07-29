@@ -2571,6 +2571,11 @@ MonoBehaviour:
   rayDistance: 20
   rotationOffset: {x: 30, y: 0, z: 0}
   posOffset: {x: -0.04, y: -0.05, z: 0}
+  scrollSpeed: 2
+  rightStickAction:
+    actionPath: 
+    needsReinit: 1
+  snapTurn: {fileID: 2133630837047723976}
 --- !u!1 &6568915954568625978
 GameObject:
   m_ObjectHideFlags: 0
@@ -3190,6 +3195,11 @@ MonoBehaviour:
   rayDistance: 20
   rotationOffset: {x: 30, y: 0, z: 0}
   posOffset: {x: 0.04, y: -0.05, z: 0}
+  scrollSpeed: 2
+  rightStickAction:
+    actionPath: /actions/default/in/Turn
+    needsReinit: 0
+  snapTurn: {fileID: 2133630837047723976}
 --- !u!1 &7072114806391354250
 GameObject:
   m_ObjectHideFlags: 0
