@@ -41,6 +41,11 @@ public class SppatoManager : MonoBehaviour
         SppatoManager.Register(food);
 
     }
+
+    public void  SetObject(int index)
+    {
+
+    }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

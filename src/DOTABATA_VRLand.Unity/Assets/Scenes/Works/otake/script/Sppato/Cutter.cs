@@ -20,6 +20,8 @@ public class Cutter : MonoBehaviour
         previousPosition = transform.position;
     }
 
+
+
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "CutOk")
@@ -62,19 +64,21 @@ public class Cutter : MonoBehaviour
         // Ø’f–Ê‚Ì–@ü
         Vector3 planeNormal = Vector3.Cross(moveDir.normalized, bladeDirection).normalized;
 
+        //TODO:‚±‚±‚Åa‚Á‚½’Ê’m‘—‚Á‚Ä‚İ‚½‚¢
 
         var (fragment, original) = MeshCut.CutMesh(
             other.gameObject,
             planePoint,
             planeNormal,
             true,
-            null);
+            cut.cutMaterial);
 
         if (fragment == null || original == null)
             return;
 
         cut.cutCount++;
         cutCount++; 
+
 
 
         // Ÿ‚ÉØ’f‚Å‚«‚é‚ğİ’è 
@@ -85,6 +89,12 @@ public class Cutter : MonoBehaviour
         {
             originalCut.nextCutTime = nextTime;
             originalCut.cutCount = cut.cutCount;
+            originalCut.cutMaterial = cut.cutMaterial;
+            
+            if (originalCut.arrow != null)
+            {
+                Destroy(originalCut.arrow);
+            }
         }
 
         Cuttable fragmentCut = fragment.GetComponent<Cuttable>();
@@ -92,6 +102,11 @@ public class Cutter : MonoBehaviour
         {
             fragmentCut.nextCutTime = nextTime;
             fragmentCut.cutCount = cut.cutCount;
+            fragmentCut.cutMaterial = cut.cutMaterial;
+            if (fragmentCut.arrow != null)
+            {
+                Destroy(fragmentCut.arrow);
+            }
         }
 
         SppatoManager.Register(original);

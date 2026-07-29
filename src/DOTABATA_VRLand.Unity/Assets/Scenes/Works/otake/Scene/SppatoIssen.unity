@@ -2131,10 +2131,12 @@ MonoBehaviour:
   followMoveSpeed: 0.1
   followRotateSpeed: 0.5
   rotateSpeedThreshold: 0.9
+  distance: 0.9
   isImmediateMove: 0
   isLockX: 1
   isLockY: 0
   isLockZ: 0
+  StartSync: 0
 --- !u!114 &463589211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2466,6 +2468,9 @@ MonoBehaviour:
   info: {fileID: 11400000, guid: 8a311d35ed99440438e28ee0edfbe575, type: 2}
   isGameStarted: 0
   names: []
+  willReady: 0
+  AllReady: 0
+  OnStarted: 0
 --- !u!4 &675000072
 Transform:
   m_ObjectHideFlags: 0
@@ -2488,7 +2493,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 675000070}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c57dce88f088c5e448ad8bcca6525b36, type: 3}
   m_Name: 
@@ -2528,7 +2533,6 @@ MonoBehaviour:
   - {fileID: 2035933908921555893, guid: 4f166b533e80e054e839d72949c4a57c, type: 3}
   - {fileID: 6077825517818676015, guid: 4b12b415f689c64439a7d22f043b91db, type: 3}
   - {fileID: 1562450511784550434, guid: 90dd31c36f3997d46bb4fbbc7884b624, type: 3}
-  - {fileID: 2738341772031687196, guid: 23244ec81d1b60d4eb89d43c5a1606eb, type: 3}
   - {fileID: 4492821927860754639, guid: e65e0f5a23047e147be6dc32db77c4f1, type: 3}
   - {fileID: 4797751799249303859, guid: 1473e8761428dcd44a8962866ef4fc6a, type: 3}
   - {fileID: 8041849481946025025, guid: c68bd0879681d2241845579839f5c99d, type: 3}

@@ -182,6 +182,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action<string> OnMovedScene { get; set; }
 
+    public Action<Vector3,Vector3> OnCutingFood { get; set; }
+
     /*
      * 処理
      */
@@ -1008,6 +1010,20 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     }
 
     public void OnMoveSceneAsync(string name)
+    {
+        if (OnMovedScene != null)
+        {
+            OnMovedScene(name);
+        }
+    }
+
+    public async UniTask CutFood(Vector3 planePoint, Vector3 planeNormal)
+    {
+        
+
+    }
+
+    public void OnCutFood(Vector3 planePoint, Vector3 planeNormal)
     {
         if (OnMovedScene != null)
         {

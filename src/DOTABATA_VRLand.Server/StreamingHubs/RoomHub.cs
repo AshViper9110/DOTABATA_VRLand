@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Xml.Linq;
+using UnityEngine;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
@@ -832,6 +833,13 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         {
             // 全員に通知
             this._roomContext.Group.All.OnMoveSceneAsync(name);
+            return Task.CompletedTask;
+        }
+
+        public Task CutFood(Vector3 planePoint,Vector3 planeNormal)
+        {
+            // 全員に通知
+            this._roomContext.Group.All.OnCutFood(planePoint,planeNormal);
             return Task.CompletedTask;
         }
     }
