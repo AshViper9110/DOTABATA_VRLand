@@ -35,6 +35,7 @@ async function loadAdminUser() {
         const editNameBtn = document.getElementById("editNameButton");
         const editPasswordBtn = document.getElementById("editPasswordButton");
         const deleteBtn = document.getElementById("deleteButton");
+        const editPermissionBtn = document.getElementById("editPermissionButton");
 
         if (canEdit) {
             editNameBtn.onclick = () => {
@@ -49,14 +50,8 @@ async function loadAdminUser() {
             editPasswordBtn.style.display = "none";
         }
 
-        // 削除ボタンの表示条件:
-// - 自分自身でない場合: myLevel > targetLevel
-// - 自分自身の場合: myLevel === 2 のときのみ
-        const canDelete = isSelf
-            ? myLevel === 2
-            : myLevel > user.can_manage_admin_users;
-
-        if (canDelete) {
+        // 削除ボタンは「自分自身でない」かつ「編集権限がある」場合のみ表示
+        if (!isSelf && myLevel > user.can_manage_admin_users) {
             deleteBtn.onclick = async () => {
                 if (!confirm("この管理ユーザーを削除しますか？")) {
                     return;
@@ -66,16 +61,26 @@ async function loadAdminUser() {
                     method: "DELETE"
                 });
 
+                const data = await response.json().catch(() => ({}));
+
                 if (response.ok) {
-                    alert("管理ユーザーを削除しました。");
-                    location.href = "/adminUsers.html";
+                    alert(data.message);
+                    location.replace("/adminUsers.html");
                 } else {
-                    const data = await response.json().catch(() => ({}));
                     alert(data.message || "削除に失敗しました。");
                 }
             };
         } else {
             deleteBtn.style.display = "none";
+        }
+
+        // 権限変更ボタンは「自分がレベル2」かつ「対象がレベル2でない」場合のみ表示
+        if (myLevel === 2 && user.can_manage_admin_users !== 2) {
+            editPermissionBtn.onclick = () => {
+                location.href = `/adminUser_permissionEdit.html?id=${user.id}`;
+            };
+        } else {
+            editPermissionBtn.style.display = "none";
         }
 
     } catch (err) {
