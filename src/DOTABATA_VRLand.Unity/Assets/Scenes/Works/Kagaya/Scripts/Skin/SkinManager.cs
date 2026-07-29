@@ -71,7 +71,7 @@ public class SkinManager : MonoBehaviour {
         foreach (Skin skin in skinList) {
             GameObject createdBtn = Instantiate(skinSelectBtn, contentTransform);
             // 名前設定
-            createdBtn.GetComponentInChildren<TextMeshProUGUI>().text = skin.name;
+            createdBtn.GetComponentInChildren<TextMeshProUGUI>().text = skin.skinObject.name ?? "None";
             
             if (category == SkinCategory.HeadColor) {
                 // 画像設定
@@ -94,7 +94,7 @@ public class SkinManager : MonoBehaviour {
                 // イベント設定
                 createdBtn.GetComponent<Button>().onClick.AddListener(async () => {
                     // フィールド保持
-                    this.hatName = skin.name;
+                    this.hatName = skin.skinObject.name ?? "None";
 
                     // スキン変更
                     Transform hat = player.head.GetComponentsInChildren<Transform>().First(_ => _.gameObject.name == "Hat");
@@ -115,7 +115,7 @@ public class SkinManager : MonoBehaviour {
                 // イベント設定
                 createdBtn.GetComponent<Button>().onClick.AddListener(async () => {
                     // フィールド保持
-                    accessoriesName = skin.name;
+                    accessoriesName = skin.skinObject.name ?? "None";
 
                     // スキン変更
                     Transform accessories = player.head.GetComponentsInChildren<Transform>().First(_ => _.gameObject.name == "Accessories");
@@ -186,7 +186,7 @@ public class SkinManager : MonoBehaviour {
 
         // 帽子生成
         if (hatName != "None") {
-            Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Hat).skinList.First(_ => _.name == hatName).skinObject,
+            Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Hat).skinList.First(_ => _.skinObject.name == hatName).skinObject,
                 hat);
         }
 
@@ -198,7 +198,7 @@ public class SkinManager : MonoBehaviour {
 
         // アクセサリー生成
         if (accessoriesName != "None") {
-            Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Accessories).skinList.First(_ => _.name == accessoriesName).skinObject,
+            Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Accessories).skinList.First(_ => _.skinObject.name == accessoriesName).skinObject,
                 accessories);
         }
 

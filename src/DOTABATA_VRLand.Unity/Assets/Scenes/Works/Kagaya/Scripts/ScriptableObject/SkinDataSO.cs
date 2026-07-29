@@ -10,7 +10,6 @@ public class SkinDataSO : ScriptableObject {
 
 [System.Serializable]
 public class Skin {
-    public string name;
     public Sprite spriteImage;
     public GameObject skinObject;
     public Color color;
