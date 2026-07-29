@@ -115,7 +115,7 @@ public class SkinManager : MonoBehaviour {
                 // イベント設定
                 createdBtn.GetComponent<Button>().onClick.AddListener(async () => {
                     // フィールド保持
-                    accessoriesName = skin.skinObject.name;
+                    accessoriesName = skin.skinObject.name ?? "None";
 
                     // スキン変更
                     Transform accessories = player.head.GetComponentsInChildren<Transform>().First(_ => _.gameObject.name == "Accessories");
