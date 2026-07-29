@@ -67,6 +67,7 @@ public class SkinManager : MonoBehaviour {
             return;
         }
 
+        // コンテンツを生成
         foreach (Skin skin in skinList) {
             GameObject createdBtn = Instantiate(skinSelectBtn, contentTransform);
             // 名前設定
@@ -179,15 +180,27 @@ public class SkinManager : MonoBehaviour {
 
         // 帽子変更
         Transform hat = playerData.playerObj.GetComponentsInChildren<Transform>().First(_ => _.gameObject.name == "Hat");
+
+        // 元々装備していたオブジェクト削除
         DestroySkinObj(hat);
-        Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Hat).skinList.First(_=>_.name == hatName).skinObject,
-            hat);
+
+        // 帽子生成
+        if (hatName != "None") {
+            Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Hat).skinList.First(_ => _.name == hatName).skinObject,
+                hat);
+        }
 
         // アクセサリー変更
         Transform accessories = playerData.playerObj.GetComponentsInChildren<Transform>().First(_ => _.gameObject.name == "Accessories");
+        
+        // 元々装備していたオブジェクト削除
         DestroySkinObj(accessories);
-        Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Accessories).skinList.First(_ => _.name == accessoriesName).skinObject,
-            accessories);
+
+        // アクセサリー生成
+        if (accessoriesName != "None") {
+            Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Accessories).skinList.First(_ => _.name == accessoriesName).skinObject,
+                accessories);
+        }
 
     }
 }
