@@ -1780,7 +1780,7 @@ MonoBehaviour:
   onSelect: 0
   onResult: 0
   onEnd: 1
-  radius: 15
+  radius: 30
   MinigamePrefab: {fileID: 8531964900129808126, guid: b8822b7a5372ea14bab556bf08b99f29, type: 3}
   CenterObj: {fileID: 1277725972}
   selectPoint: {fileID: 2553432454474539405}
@@ -17214,7 +17214,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f21813b9874a4c74d921f27bd3f5c318, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SelectId: 0
+  sceneName: 
+  titleName: 
 --- !u!1 &4739754563660414513
 GameObject:
   m_ObjectHideFlags: 0
