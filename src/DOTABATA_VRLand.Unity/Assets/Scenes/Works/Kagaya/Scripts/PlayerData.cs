@@ -9,5 +9,4 @@ public class PlayerData {
     // オブジェクト
     public GameObject playerObj;
     public JoinedUser joinedUser;
-
 }

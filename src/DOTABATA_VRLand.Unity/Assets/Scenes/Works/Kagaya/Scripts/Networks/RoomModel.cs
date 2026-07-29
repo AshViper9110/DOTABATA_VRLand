@@ -182,6 +182,12 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action<string> OnMovedScene { get; set; }
 
+
+    /// <summary>
+    /// スキン変更通知
+    /// </summary>
+    public Action<Guid, Color, string, string> OnChangedSkin {  get; set; }
+
     /*
      * 処理
      */
@@ -1011,5 +1017,24 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         {
             OnMovedScene(name);
         }
+    }
+
+    /// <summary>
+    /// スキン変更同期
+    /// </summary>
+    public async UniTask ChangeSkinAsync(Color headColor, string hatName, string accessoriesName) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.ChangeSkinAsync(headColor, hatName, accessoriesName);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// スキン変更通知
+    /// </summary>
+    public void OnChangeSkin(Guid playerConId, Color headColor, string hatName, string accessoriesName) {
+        OnChangedSkin?.Invoke(playerConId, headColor, hatName, accessoriesName);
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
     /// <summary>
@@ -187,6 +188,11 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// シーン移動
         /// </summary>
         public void OnMoveSceneAsync(string name);
+
+        /// <summary>
+        /// スキン変更通知
+        /// </summary>
+        public void OnChangeSkin(Guid playerConId, Color headColor, string hatName, string accessoriesName);
     }
 
 }
