@@ -921,5 +921,15 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             }
         }
+
+        /// <summary>
+        /// スキン変更同期
+        /// </summary>
+        public Task ChangeSkinAsync(Color headColor, string hatName, string accessoriesName) {
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnChangeSkin(this.ConnectionId, headColor, hatName, accessoriesName);
+
+            return Task.CompletedTask;
+        }
     }
 }

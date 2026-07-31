@@ -182,7 +182,15 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action<string> OnMovedScene { get; set; }
 
+<<<<<<< HEAD
     public Action<Guid, Vector3,Vector3> OnCutingFood { get; set; }
+=======
+
+    /// <summary>
+    /// スキン変更通知
+    /// </summary>
+    public Action<Guid, Color, string, string> OnChangedSkin {  get; set; }
+>>>>>>> main
 
     /*
      * 処理
@@ -1022,6 +1030,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         }
     }
 
+<<<<<<< HEAD
     public async UniTask CutFood(Guid ID, Vector3 planePoint, Vector3 planeNormal)
     {
 
@@ -1038,5 +1047,24 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         {
             OnCutingFood(ID, planePoint,planeNormal);
         }
+=======
+    /// <summary>
+    /// スキン変更同期
+    /// </summary>
+    public async UniTask ChangeSkinAsync(Color headColor, string hatName, string accessoriesName) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.ChangeSkinAsync(headColor, hatName, accessoriesName);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// スキン変更通知
+    /// </summary>
+    public void OnChangeSkin(Guid playerConId, Color headColor, string hatName, string accessoriesName) {
+        OnChangedSkin?.Invoke(playerConId, headColor, hatName, accessoriesName);
+>>>>>>> main
     }
 }

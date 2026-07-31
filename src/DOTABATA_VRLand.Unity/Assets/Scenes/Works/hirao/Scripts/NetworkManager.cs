@@ -2,6 +2,7 @@
 using DOTABATA_VRLand.Shared.Models.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -18,6 +19,8 @@ public class NetworkManager : Singleton<NetworkManager>
     [SerializeField] private AudioSource myAudioSource;
     [SerializeField] private List<AudioClip> audioClips;
 
+    // 入室したプレイヤーにつけるマテリアル
+    [SerializeField] private List<PlayerSetMaterial> playerSetMaterials = new List<PlayerSetMaterial>();
 
     /// <summary>
     /// TextにLogを表示
@@ -149,7 +152,16 @@ public class NetworkManager : Singleton<NetworkManager>
                 joinedUser = user,
             };
             InRoomPlayerData.I.AddPlayer(user.ConnectionId, data);
-          
+
+            PlayerSetMaterial setMaterial = playerSetMaterials.First(_=>_.playerConId == Guid.Empty);
+            setMaterial.playerConId = user.ConnectionId;
+
+            player.GetComponentsInChildren<MeshRenderer>()
+            .Where(_ => _.gameObject.name == "Head" ||
+            _.gameObject.name == "LeftHand" ||
+            _.gameObject.name == "RightHand")
+            .ToList()
+            .ForEach(_ => _.material = setMaterial.material);
         }
         else
         {
@@ -190,6 +202,8 @@ public class NetworkManager : Singleton<NetworkManager>
         if (connectionId == myConnectionId) return;
             TextLogs($"ConnectionId：{connectionId} が退室");
         InRoomPlayerData.I.RemovePlayer(connectionId);
+
+        playerSetMaterials.First(_ => _.playerConId == connectionId).playerConId = Guid.Empty;
     }
 
     /// <summary>

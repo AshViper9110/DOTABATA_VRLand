@@ -212,7 +212,14 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
         Task MoveSceneAsync(string name);
 
+<<<<<<< HEAD
 
         Task CutFood(Guid ID,Vector3 planePoint, Vector3 planeNormal);
+=======
+        /// <summary>
+        /// スキン変更同期
+        /// </summary>
+        Task ChangeSkinAsync(Color headColor, string hatName, string accessoriesName);
+>>>>>>> main
     }
 }

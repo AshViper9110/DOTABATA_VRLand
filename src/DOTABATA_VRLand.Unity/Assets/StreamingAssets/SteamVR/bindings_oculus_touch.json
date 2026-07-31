@@ -181,26 +181,23 @@
             },
             {
                "inputs" : {
-                  "click" : {
-                     "output" : "/actions/default/in/interactui"
+                  "pull" : {
+                     "output" : "/actions/default/in/squeeze"
                   }
                },
-               "mode" : "button",
+               "mode" : "trigger",
                "parameters" : {},
-               "path" : "/user/hand/right/input/trigger"
+               "path" : "/user/hand/left/input/grip"
             },
             {
                "inputs" : {
-                  "click" : {
-                     "output" : "/actions/default/in/grabpinch"
+                  "position" : {
+                     "output" : "/actions/default/in/move"
                   }
                },
-               "mode" : "button",
-               "parameters" : {
-                  "click_activate_threshold" : "0.8",
-                  "click_deactivate_threshold" : "0.7"
-               },
-               "path" : "/user/hand/right/input/trigger"
+               "mode" : "joystick",
+               "parameters" : {},
+               "path" : "/user/hand/left/input/joystick"
             },
             {
                "inputs" : {
@@ -209,21 +206,8 @@
                   }
                },
                "mode" : "button",
-               "parameters" : {
-                  "click_activate_threshold" : "0.8",
-                  "click_deactivate_threshold" : "0.7"
-               },
-               "path" : "/user/hand/right/input/grip"
-            },
-            {
-               "inputs" : {
-                  "pull" : {
-                     "output" : "/actions/default/in/squeeze"
-                  }
-               },
-               "mode" : "trigger",
                "parameters" : {},
-               "path" : "/user/hand/left/input/grip"
+               "path" : "/user/hand/right/input/grip"
             },
             {
                "inputs" : {
@@ -243,21 +227,32 @@
                },
                "mode" : "joystick",
                "parameters" : {},
-               "path" : "/user/hand/left/input/joystick"
+               "path" : "/user/hand/right/input/joystick"
             },
             {
                "inputs" : {
-                  "east" : {
-                     "output" : "/actions/default/in/snapturnright"
-                  },
-                  "west" : {
-                     "output" : "/actions/default/in/snapturnleft"
+                  "click" : {
+                     "output" : "/actions/default/in/interactui"
                   }
                },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
+               "mode" : "button",
+               "parameters" : {},
+               "path" : "/user/hand/right/input/trigger"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/default/in/grabpinch"
+                  }
                },
+               "mode" : "button",
+               "parameters" : {},
+               "path" : "/user/hand/right/input/trigger"
+            },
+            {
+               "inputs" : {},
+               "mode" : "joystick",
+               "parameters" : {},
                "path" : "/user/hand/right/input/joystick"
             }
          ]

@@ -191,9 +191,15 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         public void OnMoveSceneAsync(string name);
 
         /// <summary>
+<<<<<<< HEAD
         /// 食材のカット
         /// </summary>
         public void OnCutFood(Guid ID,UnityEngine.Vector3 planePoint, UnityEngine.Vector3 planeNormal);
+=======
+        /// スキン変更通知
+        /// </summary>
+        public void OnChangeSkin(Guid playerConId, Color headColor, string hatName, string accessoriesName);
+>>>>>>> main
     }
 
 }
