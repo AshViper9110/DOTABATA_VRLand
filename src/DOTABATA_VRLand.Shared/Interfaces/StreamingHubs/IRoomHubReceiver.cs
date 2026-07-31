@@ -193,7 +193,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// 食材のカット
         /// </summary>
-        public void OnCutFood(UnityEngine.Vector3 planePoint, UnityEngine.Vector3 planeNormal);
+        public void OnCutFood(Guid ID,UnityEngine.Vector3 planePoint, UnityEngine.Vector3 planeNormal);
     }
 
 }

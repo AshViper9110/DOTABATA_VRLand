@@ -66,72 +66,7 @@ public class Cutter : MonoBehaviour
 
         //TODO:‚±‚±‚Åa‚Á‚½’Ê’m‘—‚Á‚Ä‚İ‚½‚¢
 
-        var (fragment, original) = MeshCut.CutMesh(
-            other.gameObject,
-            planePoint,
-            planeNormal,
-            true,
-            cut.cutMaterial);
-
-        if (fragment == null || original == null)
-            return;
-
-        cut.cutCount++;
-        cutCount++; 
-
-
-
-        // Ÿ‚ÉØ’f‚Å‚«‚é‚ğİ’è 
-        float nextTime = Time.time + cut.coolTime;
-
-        Cuttable originalCut = original.GetComponent<Cuttable>();
-        if (originalCut != null)
-        {
-            originalCut.nextCutTime = nextTime;
-            originalCut.cutCount = cut.cutCount;
-            originalCut.cutMaterial = cut.cutMaterial;
-            
-            if (originalCut.arrow != null)
-            {
-                Destroy(originalCut.arrow);
-            }
-        }
-
-        Cuttable fragmentCut = fragment.GetComponent<Cuttable>();
-        if (fragmentCut != null)
-        {
-            fragmentCut.nextCutTime = nextTime;
-            fragmentCut.cutCount = cut.cutCount;
-            fragmentCut.cutMaterial = cut.cutMaterial;
-            if (fragmentCut.arrow != null)
-            {
-                Destroy(fragmentCut.arrow);
-            }
-        }
-
-        SppatoManager.Register(original);
-        SppatoManager.Register(fragment);
-
-        // Collider‚ğ1•¨—ƒtƒŒ[ƒ€‚¾‚¯–³Œø‰»
-        StartCoroutine(EnableColliderNextFrame(original));
-        StartCoroutine(EnableColliderNextFrame(fragment));
     }
 
-    IEnumerator EnableColliderNextFrame(GameObject obj)
-    {
-        if (obj == null)
-            yield break;
-
-        Collider col = obj.GetComponent<Collider>();
-
-        if (col == null)
-            yield break;
-
-        col.enabled = false;
-
-        yield return new WaitForFixedUpdate();
-
-        if (col != null)
-            col.enabled = true;
-    }
+   
 }

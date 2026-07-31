@@ -182,7 +182,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action<string> OnMovedScene { get; set; }
 
-    public Action<Vector3,Vector3> OnCutingFood { get; set; }
+    public Action<Guid, Vector3,Vector3> OnCutingFood { get; set; }
 
     /*
      * 処理
@@ -1022,17 +1022,21 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         }
     }
 
-    public async UniTask CutFood(Vector3 planePoint, Vector3 planeNormal)
+    public async UniTask CutFood(Guid ID, Vector3 planePoint, Vector3 planeNormal)
     {
-        
 
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.CutFood(ID,planePoint,planeNormal);
     }
 
-    public void OnCutFood(Vector3 planePoint, Vector3 planeNormal)
+    public void OnCutFood(Guid ID, Vector3 planePoint, Vector3 planeNormal)
     {
-        if (OnMovedScene != null)
+        if (OnCutingFood != null)
         {
-            OnMovedScene(name);
+            OnCutingFood(ID, planePoint,planeNormal);
         }
     }
 }
