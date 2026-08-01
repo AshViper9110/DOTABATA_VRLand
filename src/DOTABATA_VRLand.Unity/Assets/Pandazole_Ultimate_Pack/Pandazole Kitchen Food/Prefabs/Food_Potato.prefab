@@ -224,9 +224,10 @@ GameObject:
   - component: {fileID: 6287802495518823136}
   - component: {fileID: 6165243837795658614}
   - component: {fileID: 2467131727736782271}
+  - component: {fileID: -183724478993131256}
   m_Layer: 0
   m_Name: Food_Potato
-  m_TagString: Cuttable
+  m_TagString: food
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -368,6 +369,26 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 48
   m_CollisionDetection: 0
+--- !u!114 &-183724478993131256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8041849481946025025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minigame: 9
+  objectListId: 7
+  SendCreate: 1
+  SendTransform: 1
+  SendSpan: 0.1
+  SendDestroy: 1
+  stringObjectId: 
+  Initialized: 0
 --- !u!1001 &2320687865615497660
 PrefabInstance:
   m_ObjectHideFlags: 0

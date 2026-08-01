@@ -14,9 +14,10 @@ GameObject:
   - component: {fileID: 772503743153209991}
   - component: {fileID: 2634545661273650529}
   - component: {fileID: -3469579863723759566}
+  - component: {fileID: -700782155894634183}
   m_Layer: 0
   m_Name: Food_Cheese
-  m_TagString: Cuttable
+  m_TagString: food
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -158,6 +159,26 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 48
   m_CollisionDetection: 0
+--- !u!114 &-700782155894634183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485319667670839895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minigame: 9
+  objectListId: 4
+  SendCreate: 1
+  SendTransform: 1
+  SendSpan: 0.1
+  SendDestroy: 1
+  stringObjectId: 
+  Initialized: 0
 --- !u!1 &3784904330483726412
 GameObject:
   m_ObjectHideFlags: 0

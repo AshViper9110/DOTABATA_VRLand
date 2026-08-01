@@ -116,9 +116,10 @@ GameObject:
   - component: {fileID: 9168040148441582429}
   - component: {fileID: 5172282683649046605}
   - component: {fileID: -1688838302551276437}
+  - component: {fileID: -3608125929209020565}
   m_Layer: 0
   m_Name: Food_Pumpkin
-  m_TagString: Cuttable
+  m_TagString: food
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -260,6 +261,26 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 48
   m_CollisionDetection: 0
+--- !u!114 &-3608125929209020565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6077825517818676015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minigame: 9
+  objectListId: 8
+  SendCreate: 1
+  SendTransform: 1
+  SendSpan: 0.1
+  SendDestroy: 1
+  stringObjectId: 
+  Initialized: 0
 --- !u!1 &6830602456023678118
 GameObject:
   m_ObjectHideFlags: 0

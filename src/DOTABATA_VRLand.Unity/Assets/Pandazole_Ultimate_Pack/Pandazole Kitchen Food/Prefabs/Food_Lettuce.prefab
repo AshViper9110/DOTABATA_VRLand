@@ -116,9 +116,10 @@ GameObject:
   - component: {fileID: 7324794292293698571}
   - component: {fileID: -2092783595913802764}
   - component: {fileID: 4216883039177875875}
+  - component: {fileID: -6052154667285048866}
   m_Layer: 0
   m_Name: Food_Lettuce
-  m_TagString: Cuttable
+  m_TagString: food
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -260,6 +261,26 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 48
   m_CollisionDetection: 0
+--- !u!114 &-6052154667285048866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4492821927860754639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minigame: 9
+  objectListId: 6
+  SendCreate: 1
+  SendTransform: 1
+  SendSpan: 0.1
+  SendDestroy: 1
+  stringObjectId: 
+  Initialized: 0
 --- !u!1 &6741836615799248055
 GameObject:
   m_ObjectHideFlags: 0

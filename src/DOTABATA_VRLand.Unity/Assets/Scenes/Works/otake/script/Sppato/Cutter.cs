@@ -8,7 +8,7 @@ public class Cutter : MonoBehaviour
     public bool CutOk = false;
 
     public int cutCount = 0;
-    public int maxCutCount = 100;
+    public int maxCutCount = 10;
 
     void Start()
     {
@@ -34,6 +34,9 @@ public class Cutter : MonoBehaviour
         Cuttable cut = other.GetComponent<Cuttable>();
         if (cut == null)
             return;
+
+        SyncObject syncObject = other.GetComponent<SyncObject>();
+        if (syncObject == null) return;
 
         // ’Ç‰ÁFØ’f‰ñ”§ŒÀ
         if (cut.cutCount >= cut.maxCutCount)
@@ -65,6 +68,9 @@ public class Cutter : MonoBehaviour
         Vector3 planeNormal = Vector3.Cross(moveDir.normalized, bladeDirection).normalized;
 
         //TODO:‚±‚±‚ÅŽa‚Á‚½’Ê’m‘—‚Á‚Ä‚Ý‚½‚¢
+        RoomModel.I.CutFood(syncObject.ObjectId,planePoint,planeNormal);
+
+        cutCount++;
 
     }
 

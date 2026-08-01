@@ -903,10 +903,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
 
-        public Task CutFood(Guid ID, Vector3 planePoint, Vector3 planeNormal)
+        public Task CutFood(Guid playerId, Guid ID, Vector3 planePoint, Vector3 planeNormal)
         {
             // 全員に通知
-            this._roomContext.Group.All.OnCutFood(ID,planePoint, planeNormal);
+            this._roomContext.Group.All.OnCutFood(playerId,ID,planePoint, planeNormal);
             return Task.CompletedTask;
         }
 
@@ -929,6 +929,15 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             // 自分以外に通知
             this._roomContext.Group.Except([this.ConnectionId]).OnChangeSkin(this.ConnectionId, headColor, hatName, accessoriesName);
 
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 食材再生成
+        /// </summary>
+        public Task CreateFood()
+        {
+            this._roomContext.Group.All.OnCreateFood();
             return Task.CompletedTask;
         }
     }

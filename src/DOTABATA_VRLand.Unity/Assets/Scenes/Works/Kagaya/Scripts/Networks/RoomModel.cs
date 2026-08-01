@@ -182,15 +182,17 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action<string> OnMovedScene { get; set; }
 
-<<<<<<< HEAD
-    public Action<Guid, Vector3,Vector3> OnCutingFood { get; set; }
-=======
+
+    public Action<Guid,Guid, Vector3,Vector3> OnCutingFood { get; set; }
+
 
     /// <summary>
     /// スキン変更通知
     /// </summary>
     public Action<Guid, Color, string, string> OnChangedSkin {  get; set; }
->>>>>>> main
+
+    public Action OncreatedFood {  get; set; }
+
 
     /*
      * 処理
@@ -1030,7 +1032,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         }
     }
 
-<<<<<<< HEAD
+
     public async UniTask CutFood(Guid ID, Vector3 planePoint, Vector3 planeNormal)
     {
 
@@ -1038,16 +1040,17 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         {
             throw new Exception("RoomHubがnullです。");
         }
-        await roomHub.CutFood(ID,planePoint,planeNormal);
+        await roomHub.CutFood(NetworkManager.I.myConnectionId,ID,planePoint,planeNormal);
     }
 
-    public void OnCutFood(Guid ID, Vector3 planePoint, Vector3 planeNormal)
+    public void OnCutFood(Guid playerId, Guid ID, Vector3 planePoint, Vector3 planeNormal)
     {
         if (OnCutingFood != null)
         {
-            OnCutingFood(ID, planePoint,planeNormal);
+            OnCutingFood(playerId,ID, planePoint, planeNormal);
         }
-=======
+    }
+
     /// <summary>
     /// スキン変更同期
     /// </summary>
@@ -1065,6 +1068,30 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public void OnChangeSkin(Guid playerConId, Color headColor, string hatName, string accessoriesName) {
         OnChangedSkin?.Invoke(playerConId, headColor, hatName, accessoriesName);
->>>>>>> main
+
+    }
+
+
+    /// <summary>
+    /// 食材再生成
+    /// </summary>
+    public async UniTask CreateFood()
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.CreateFood();
+    }
+
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 食材再生成通知
+    /// </summary>
+    public void OnCreateFood()
+    {
+        OncreatedFood();
     }
 }

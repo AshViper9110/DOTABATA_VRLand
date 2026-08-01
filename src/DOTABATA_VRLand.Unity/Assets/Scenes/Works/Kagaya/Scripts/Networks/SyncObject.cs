@@ -141,6 +141,7 @@ public class SyncObject : MonoBehaviour {
         }
 
         Initialized = true;
+
     }
 
     /// <summary>
