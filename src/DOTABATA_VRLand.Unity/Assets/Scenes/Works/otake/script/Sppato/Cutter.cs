@@ -1,4 +1,6 @@
+using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Multiplayer.Center.NetcodeForGameObjectsExample.DistributedAuthority;
 using UnityEngine;
 
@@ -9,6 +11,9 @@ public class Cutter : MonoBehaviour
 
     public int cutCount = 0;
     public int maxCutCount = 10;
+
+    public List<Material> handleMaterials = new List<Material> ();
+    [SerializeField] GameObject handle;
 
     void Start()
     {
@@ -74,5 +79,8 @@ public class Cutter : MonoBehaviour
 
     }
 
-   
+   public void ChengeHandle(int index)
+    {
+        handle.GetComponent<MeshRenderer>().material = handleMaterials[index];
+    }
 }

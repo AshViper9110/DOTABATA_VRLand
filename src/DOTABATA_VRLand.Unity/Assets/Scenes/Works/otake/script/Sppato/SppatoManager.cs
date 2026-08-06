@@ -10,11 +10,14 @@ public class SppatoManager : MonoBehaviour
 
     public static List<GameObject> MineFragments = new List<GameObject>();
 
-    [SerializeField] Transform setpos;
+    Transform setpos;
     [SerializeField] GameObject prefab;
-    [SerializeField] Cutter Cutter;
+    [SerializeField] Cutter cutter;
 
     [SerializeField] List<GameObject> FoodPrefabs;
+    [SerializeField] List<GameObject> PlayerPoses;
+    [SerializeField] List<GameObject> ResetPoses;
+    [SerializeField] List<GameObject> KnifPoses;
 
     SyncObjectManager objectManager;
     GameObject myFood;
@@ -30,6 +33,8 @@ public class SppatoManager : MonoBehaviour
 
     int round;
     bool isScoreSend;
+
+    [SerializeField] GameObject KnifePrefab;
 
     private void OnEnable()
     {
@@ -55,6 +60,8 @@ public class SppatoManager : MonoBehaviour
         point = 0;
         round = 0;
         isScoreSend = false;
+
+        int pleIndex = InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1;
         if (InRoomPlayerData.I.PlayerList != null)
         {
             foreach(var player in InRoomPlayerData.I.PlayerList)
@@ -62,6 +69,17 @@ public class SppatoManager : MonoBehaviour
                 CheckList.Add(player.Value.joinedUser.ConnectionId,false);
             }
         }
+        InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position =
+            PlayerPoses[pleIndex].transform.position;
+        setpos = ResetPoses[pleIndex].transform;
+
+        GameObject Knife = Instantiate(KnifePrefab,
+            KnifPoses[pleIndex].transform.position, Quaternion.identity);
+
+        Cutter KifeMane = Knife.GetComponent<Cutter>();
+        KifeMane.ChengeHandle(pleIndex);
+        cutter = KifeMane;
+
     }
 
     // Update is called once per frame
@@ -96,8 +114,8 @@ public class SppatoManager : MonoBehaviour
 
         GameObject food =Å@Instantiate(FoodPrefabs[index],setpos.position,Quaternion.identity);
         
-        Cutter.CutOk = false;
-        Cutter.cutCount = 0;
+        cutter.CutOk = false;
+        cutter.cutCount = 0;
         SppatoManager.Register(food);
         myFood = food;
         sendReset = false;
