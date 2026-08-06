@@ -935,9 +935,9 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 食材再生成
         /// </summary>
-        public Task CreateFood()
+        public Task CreateFood(int Index)
         {
-            this._roomContext.Group.All.OnCreateFood();
+            this._roomContext.Group.All.OnCreateFood(Index);
             return Task.CompletedTask;
         }
     }

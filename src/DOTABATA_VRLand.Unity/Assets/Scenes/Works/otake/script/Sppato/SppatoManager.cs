@@ -2,11 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Multiplayer.Center.NetcodeForGameObjectsExample.DistributedAuthority;
 using Unity.VisualScripting;
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 
 public class SppatoManager : MonoBehaviour
 {
+    bool isInit;
 
     public static List<GameObject> MineFragments = new List<GameObject>();
 
@@ -36,6 +39,10 @@ public class SppatoManager : MonoBehaviour
 
     [SerializeField] GameObject KnifePrefab;
 
+    [SerializeField]MinigameFlowController flowController;
+
+    Interactable myKnife;
+
     private void OnEnable()
     {
         if (RoomModel.I == null) return;
@@ -60,6 +67,7 @@ public class SppatoManager : MonoBehaviour
         point = 0;
         round = 0;
         isScoreSend = false;
+        isInit = false;
 
         int pleIndex = InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1;
         if (InRoomPlayerData.I.PlayerList != null)
@@ -80,11 +88,66 @@ public class SppatoManager : MonoBehaviour
         KifeMane.ChengeHandle(pleIndex);
         cutter = KifeMane;
 
+        myKnife = Knife.GetComponent<Interactable>();
+        
+        flowController = GetComponent<MinigameFlowController>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!flowController.isGameStarted)
+        {
+           
+
+            if (!flowController.willReady)
+            {
+
+                if (myKnife.attachedToHand)
+                //|| InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == order)
+                {
+                    flowController.OnReadyButton();
+                }
+
+            }
+            else
+            {
+                if (flowController.AllReady && InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+                {
+                    flowController.GameStrat();
+                }
+
+
+                if (!myKnife.attachedToHand )
+                //|| InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == order)
+                {
+                    if (!flowController.OnStarted)
+                    {
+                        flowController.OnReadyButton();
+
+                    }
+                    return;
+                }
+
+
+            }
+            return;
+        }
+
+
+        if (flowController.isGameStarted && !isInit)
+        {
+            if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+            {
+
+                int index = UnityEngine.Random.Range(0, FoodPrefabs.Count);
+
+                RoomModel.I.CreateFood(index);
+            }
+            isInit = true;
+        }
+
         timerTex.text = point.ToString(); 
 
 
@@ -106,11 +169,11 @@ public class SppatoManager : MonoBehaviour
         MineFragments.Clear();
     }
 
-    public void ResteObject()
+    public void ResteObject(int index)
     {
         SppatoManager.DestroyAll();
 
-        int index = UnityEngine.Random.Range(0, FoodPrefabs.Count);
+
 
         GameObject food =Å@Instantiate(FoodPrefabs[index],setpos.position,Quaternion.identity);
         
@@ -236,6 +299,13 @@ public class SppatoManager : MonoBehaviour
                 {
                     RoomModel.I.SendScore(point);
                     isScoreSend = true;
+
+                    if (myKnife.attachedToHand != null)
+                    {
+                        myKnife.attachedToHand.DetachObject(myKnife.gameObject);
+                    }
+
+                    Destroy(myKnife.gameObject);
                     return;
                 }
                 isCut = true;
@@ -288,7 +358,10 @@ public class SppatoManager : MonoBehaviour
     {
         yield return new WaitForSeconds(2);
 
-            RoomModel.I.CreateFood();
+        int index = UnityEngine.Random.Range(0, FoodPrefabs.Count);
+
+        RoomModel.I.CreateFood(index);
+
 
 
     }

@@ -203,7 +203,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
         /// スキン変更通知
         /// </summary>
-        public void OnCreateFood();
+        public void OnCreateFood(int index);
 
     }
 

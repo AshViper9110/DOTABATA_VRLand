@@ -226,7 +226,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// 食べ物再生成
         /// </summary>
-        Task CreateFood();
+        Task CreateFood(int Index);
 
     }
 }

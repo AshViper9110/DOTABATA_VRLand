@@ -191,7 +191,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<Guid, Color, string, string> OnChangedSkin {  get; set; }
 
-    public Action OncreatedFood {  get; set; }
+    public Action<int> OncreatedFood {  get; set; }
 
 
     /*
@@ -1075,14 +1075,14 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// 食材再生成
     /// </summary>
-    public async UniTask CreateFood()
+    public async UniTask CreateFood(int Index)
     {
         if (roomHub == null)
         {
             throw new Exception("RoomHubがnullです。");
         }
 
-        await roomHub.CreateFood();
+        await roomHub.CreateFood(Index);
     }
 
 
@@ -1090,8 +1090,8 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// 食材再生成通知
     /// </summary>
-    public void OnCreateFood()
+    public void OnCreateFood(int index)
     {
-        OncreatedFood();
+        OncreatedFood(index);
     }
 }
