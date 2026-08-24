@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Multiplayer.Center.NetcodeForGameObjectsExample.DistributedAuthority;
@@ -15,6 +16,8 @@ public class Cutter : MonoBehaviour
     public List<Material> handleMaterials = new List<Material> ();
     [SerializeField] GameObject handle;
 
+    public SppatoManager sppatoManager;
+
     void Start()
     {
         previousPosition = transform.position;
@@ -29,6 +32,7 @@ public class Cutter : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        bool isSend = true;
         if (other.gameObject.tag == "CutOk")
         { CutOk = true; }
 
@@ -41,7 +45,10 @@ public class Cutter : MonoBehaviour
             return;
 
         SyncObject syncObject = other.GetComponent<SyncObject>();
-        if (syncObject == null) return;
+        if (syncObject == null)
+        {
+            isSend = false;
+        }
 
         // í«â¡ÅFêÿífâÒêîêßå¿
         if (cut.cutCount >= cut.maxCutCount)
@@ -72,8 +79,15 @@ public class Cutter : MonoBehaviour
         // êÿífñ ÇÃñ@ê¸
         Vector3 planeNormal = Vector3.Cross(moveDir.normalized, bladeDirection).normalized;
 
-        //TODO:Ç±Ç±Ç≈éaÇ¡ÇΩí ímëóÇ¡ÇƒÇ›ÇΩÇ¢
-        RoomModel.I.CutFood(syncObject.ObjectId,planePoint,planeNormal);
+        if (isSend)
+        {
+            //TODO:Ç±Ç±Ç≈éaÇ¡ÇΩí ímëóÇ¡ÇƒÇ›ÇΩÇ¢
+            RoomModel.I.CutFood(syncObject.ObjectId, planePoint, planeNormal);
+        }
+        else
+        {
+            sppatoManager.CutFood(Guid.Empty, Guid.Empty, planePoint,planeNormal,other.gameObject);
+        }
 
         cutCount++;
 

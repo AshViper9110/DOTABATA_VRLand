@@ -227,4 +227,11 @@ public class SyncObject : MonoBehaviour {
         }
         IsOwner = false;
     }
+
+    public void invalidCreate()
+    {
+        SendCreate = false;
+        SendDestroy = false;
+        SendTransform = false;
+    }
 }

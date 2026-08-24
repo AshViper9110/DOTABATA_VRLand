@@ -69,6 +69,8 @@ public class SppatoManager : MonoBehaviour
         isScoreSend = false;
         isInit = false;
 
+        AudioManager.StopBgm();
+
         int pleIndex = InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder - 1;
         if (InRoomPlayerData.I.PlayerList != null)
         {
@@ -86,6 +88,7 @@ public class SppatoManager : MonoBehaviour
 
         Cutter KifeMane = Knife.GetComponent<Cutter>();
         KifeMane.ChengeHandle(pleIndex);
+        KifeMane.sppatoManager = this;
         cutter = KifeMane;
 
         myKnife = Knife.GetComponent<Interactable>();
@@ -146,6 +149,7 @@ public class SppatoManager : MonoBehaviour
                 RoomModel.I.CreateFood(index);
             }
             isInit = true;
+            AudioManager.ChangeBGM(AudioManager.BGM.Spatto);
         }
 
         timerTex.text = point.ToString(); 
@@ -191,30 +195,32 @@ public class SppatoManager : MonoBehaviour
 
     }
 
-    public void CutFood(Guid playerId, Guid ID, Vector3 planePoint, Vector3 planeNormal)
+    public void CutFood(Guid playerId, Guid ID, Vector3 planePoint, Vector3 planeNormal,GameObject Target = null)
     {
-        
-
-        List<GameObject> foods  = new List<GameObject>();
-
-       GameObject.FindGameObjectsWithTag("food", foods);
-        GameObject other = foods[0];
-
-        foreach (var item in foods)
+        GameObject other = Target;
+        if (Target == null)
         {
-            if (item.GetComponent<SyncObject>())
+            List<GameObject> foods = new List<GameObject>();
+
+            GameObject.FindGameObjectsWithTag("food", foods);
+            other = foods[0];
+
+            foreach (var item in foods)
             {
-                if (item.GetComponent<SyncObject>().ObjectId == ID)
+                if (item.GetComponent<SyncObject>())
                 {
-                    other = item;
+                    if (item.GetComponent<SyncObject>().ObjectId == ID)
+                    {
+                        other = item;
+                    }
+
                 }
-     
+
             }
 
+            if (other == null) { return; }
+
         }
-
-  　　  if(other == null) {  return; }
-
   
 
 
@@ -238,8 +244,8 @@ public class SppatoManager : MonoBehaviour
             return;
 
         cut.cutCount++;
-        
 
+        AudioManager.PlaySE(AudioManager.SE.Spatto_cut);
 
         // 次に切断できる時刻を設定 
         float nextTime = Time.time + cut.coolTime;
@@ -250,6 +256,11 @@ public class SppatoManager : MonoBehaviour
             originalCut.nextCutTime = nextTime;
             originalCut.cutCount = cut.cutCount;
             originalCut.cutMaterial = cut.cutMaterial;
+            SyncObject oriSync = original.GetComponent<SyncObject>();
+            if (oriSync != null)
+            {
+                Destroy(oriSync);
+            }
 
             if (originalCut.arrow != null)
             {
@@ -263,6 +274,13 @@ public class SppatoManager : MonoBehaviour
             fragmentCut.nextCutTime = nextTime;
             fragmentCut.cutCount = cut.cutCount;
             fragmentCut.cutMaterial = cut.cutMaterial;
+
+            SyncObject fraSync = fragment.GetComponent<SyncObject>();
+            if (fraSync != null)
+            {
+                Destroy(fraSync);
+            }
+
             if (fragmentCut.arrow != null)
             {
                 Destroy(fragmentCut.arrow);
@@ -275,6 +293,8 @@ public class SppatoManager : MonoBehaviour
         // Colliderを1物理フレームだけ無効化
         StartCoroutine(EnableColliderNextFrame(original));
         StartCoroutine(EnableColliderNextFrame(fragment));
+
+        if(playerId == Guid.Empty)return;
 
         if (!CheckList[playerId])
         {
@@ -295,7 +315,7 @@ public class SppatoManager : MonoBehaviour
                 }
 
                 point += 5 - cnt;
-                if (round >= 4)
+                if (round >= 5)
                 {
                     RoomModel.I.SendScore(point);
                     isScoreSend = true;

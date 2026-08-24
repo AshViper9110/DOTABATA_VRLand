@@ -183,7 +183,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     public Action<string> OnMovedScene { get; set; }
 
 
-    public Action<Guid,Guid, Vector3,Vector3> OnCutingFood { get; set; }
+    public Action<Guid,Guid, Vector3,Vector3,GameObject> OnCutingFood { get; set; }
 
 
     /// <summary>
@@ -1047,7 +1047,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     {
         if (OnCutingFood != null)
         {
-            OnCutingFood(playerId,ID, planePoint, planeNormal);
+            OnCutingFood(playerId,ID, planePoint, planeNormal,null);
         }
     }
 

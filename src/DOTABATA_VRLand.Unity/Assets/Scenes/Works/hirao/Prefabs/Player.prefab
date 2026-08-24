@@ -3475,6 +3475,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1ae54fc43431b3b42b792634aaa99cf3, type: 3}
   - {fileID: 8300000, guid: f1fab9bfb1344e343b9f05534a992a17, type: 3}
   - {fileID: 8300000, guid: db5215926910a7844a260df78a41315e, type: 3}
+  - {fileID: 8300000, guid: 22b63490911cc2241ab3d5f47aaeee65, type: 3}
   bgmClips:
   - {fileID: 8300000, guid: 9a9d09cd238c67645a12566a9a3fd3ae, type: 3}
   - {fileID: 8300000, guid: 87305fce6b0589d45bce43e184db18c9, type: 3}
@@ -3485,6 +3486,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: f2fc43e7ab7e06e469a77ad81ae6ab6a, type: 3}
   - {fileID: 8300000, guid: 4e1223bfcd58af442bf3347368b08d2e, type: 3}
   - {fileID: 8300000, guid: b7e25b8e0c2456345837ff8318002919, type: 3}
+  - {fileID: 8300000, guid: 1e8e4c042a30e2c47b7d94aaeff4ee39, type: 3}
 --- !u!82 &-19333364670627467
 AudioSource:
   m_ObjectHideFlags: 0
