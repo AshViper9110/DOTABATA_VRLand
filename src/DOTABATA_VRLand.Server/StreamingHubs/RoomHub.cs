@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Xml.Linq;
+using UnityEngine;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DOTABATA_VRLand.Server.StreamingHubs {
@@ -878,6 +879,16 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                     game.IsPlayed = false;
                 }
             }
+        }
+
+        /// <summary>
+        /// スキン変更同期
+        /// </summary>
+        public Task ChangeSkinAsync(Color headColor, string hatName, string accessoriesName) {
+            // 自分以外に通知
+            this._roomContext.Group.Except([this.ConnectionId]).OnChangeSkin(this.ConnectionId, headColor, hatName, accessoriesName);
+
+            return Task.CompletedTask;
         }
     }
 }

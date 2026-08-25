@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
 
@@ -6,74 +6,107 @@ public class SmoothLocomotion : MonoBehaviour
 {
     public Transform bodyCollider;
 
-    // ¶ƒXƒeƒBƒbƒNˆÚ“®
+    // å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯ç§»å‹•
     public SteamVR_Action_Vector2 walkAction;
 
     public float walkSpeed = 2.0f;
 
-    void Start()
-    {
+    private void Start() {
+        // HMDã®åˆæœŸä½ç½®ã‚’åŸç‚¹ã«åˆã‚ã›ã‚‹
         Vector3 pos = transform.position;
 
         pos.x -= Player.instance.hmdTransform.localPosition.x;
         pos.z -= Player.instance.hmdTransform.localPosition.z;
-        pos.y = transform.position.y;
 
         transform.position = pos;
-
-        Vector3 colpos = bodyCollider.transform.position;
-
-        colpos.x = Player.instance.hmdTransform.position.x;
-        colpos.z = Player.instance.hmdTransform.position.z;
-
-        bodyCollider.transform.position = colpos;
     }
 
-    void LateUpdate()
-    {
-        Vector3 player_pos = transform.position;
+    private void FixedUpdate() {
+        Vector2 input = walkAction.axis;
 
-        player_pos.x -=
-            Player.instance.hmdTransform.position.x
-            - bodyCollider.transform.position.x;
+        if (input.sqrMagnitude < 0.001f)
+            return;
 
-        player_pos.z -=
-            Player.instance.hmdTransform.position.z
-            - bodyCollider.transform.position.z;
+        // HMDã®å‘ãã ã‘å–å¾—ï¼ˆä¸Šä¸‹ã¯ç„¡è¦–ï¼‰
+        Vector3 forward = Player.instance.hmdTransform.forward;
+        forward.y = 0;
+        forward.Normalize();
 
-        player_pos.y = bodyCollider.transform.position.y;
+        Vector3 right = Player.instance.hmdTransform.right;
+        right.y = 0;
+        right.Normalize();
 
-        transform.position = player_pos;
+        Vector3 move = (right * input.x + forward * input.y) *
+                       walkSpeed * Time.fixedDeltaTime;
+
+        transform.position += move;
     }
 
-    void FixedUpdate()
-    {
-        Vector3 player_pos = transform.position;
-        Vector3 body_pos = bodyCollider.transform.position;
+    //void Start()
+    //{
+    //    Vector3 pos = transform.position;
 
-        // bodyˆÊ’u“¯Šú
-        body_pos.x = Player.instance.hmdTransform.position.x;
-        body_pos.z = Player.instance.hmdTransform.position.z;
+    //    pos.x -= Player.instance.hmdTransform.localPosition.x;
+    //    pos.z -= Player.instance.hmdTransform.localPosition.z;
+    //    pos.y = transform.position.y;
 
-        bodyCollider.transform.position = body_pos;
+    //    transform.position = pos;
 
-        // ¶ƒXƒeƒBƒbƒNˆÚ“®
-        Vector2 moveInput = walkAction.axis;
+    //    Vector3 colpos = bodyCollider.transform.position;
 
-        Vector3 direction =
-            Player.instance.hmdTransform.TransformDirection(
-                new Vector3(moveInput.x, 0, moveInput.y)
-            );
+    //    colpos.x = Player.instance.hmdTransform.position.x;
+    //    colpos.z = Player.instance.hmdTransform.position.z;
 
-        player_pos.x +=
-            walkSpeed * Time.deltaTime * direction.x;
+    //    bodyCollider.transform.position = colpos;
+    //}
 
-        player_pos.z +=
-            walkSpeed * Time.deltaTime * direction.z;
+    //void LateUpdate()
+    //{
 
-        // ‚‚³ŒÅ’è
-        player_pos.y = bodyCollider.transform.position.y;
+    //    return;
+    //    Vector3 player_pos = transform.position;
 
-        transform.position = player_pos;
-    }
+    //    player_pos.x -=
+    //        Player.instance.hmdTransform.position.x
+    //        - bodyCollider.transform.position.x;
+
+    //    player_pos.z -=
+    //        Player.instance.hmdTransform.position.z
+    //        - bodyCollider.transform.position.z;
+
+    //    player_pos.y = bodyCollider.transform.position.y;
+
+    //    transform.position = player_pos;
+    //}
+
+    //void FixedUpdate()
+    //{
+    //    Vector3 player_pos = transform.position;
+    //    Vector3 body_pos = bodyCollider.transform.position;
+
+    //    // bodyä½ç½®åŒæœŸ
+    //    body_pos.x = Player.instance.hmdTransform.position.x;
+    //    body_pos.z = Player.instance.hmdTransform.position.z;
+
+    //    bodyCollider.transform.position = body_pos;
+
+    //    // å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯ç§»å‹•
+    //    Vector2 moveInput = walkAction.axis;
+
+    //    Vector3 direction =
+    //        Player.instance.hmdTransform.TransformDirection(
+    //            new Vector3(moveInput.x, 0, moveInput.y)
+    //        );
+
+    //    player_pos.x +=
+    //        walkSpeed * Time.deltaTime * direction.x;
+
+    //    player_pos.z +=
+    //        walkSpeed * Time.deltaTime * direction.z;
+
+    //    // é«˜ã•å›ºå®š
+    //    player_pos.y = bodyCollider.transform.position.y;
+
+    //    transform.position = player_pos;
+    //}
 }
