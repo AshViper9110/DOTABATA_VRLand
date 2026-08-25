@@ -1,4 +1,7 @@
+using NUnit.Framework;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Multiplayer.Center.NetcodeForGameObjectsExample.DistributedAuthority;
 using UnityEngine;
 
@@ -8,7 +11,12 @@ public class Cutter : MonoBehaviour
     public bool CutOk = false;
 
     public int cutCount = 0;
-    public int maxCutCount = 100;
+    public int maxCutCount = 10;
+
+    public List<Material> handleMaterials = new List<Material> ();
+    [SerializeField] GameObject handle;
+
+    public SppatoManager sppatoManager;
 
     void Start()
     {
@@ -20,8 +28,11 @@ public class Cutter : MonoBehaviour
         previousPosition = transform.position;
     }
 
+
+
     void OnTriggerEnter(Collider other)
     {
+        bool isSend = true;
         if (other.gameObject.tag == "CutOk")
         { CutOk = true; }
 
@@ -32,6 +43,12 @@ public class Cutter : MonoBehaviour
         Cuttable cut = other.GetComponent<Cuttable>();
         if (cut == null)
             return;
+
+        SyncObject syncObject = other.GetComponent<SyncObject>();
+        if (syncObject == null)
+        {
+            isSend = false;
+        }
 
         // ’Ç‰ÁFØ’f‰ñ”§ŒÀ
         if (cut.cutCount >= cut.maxCutCount)
@@ -62,61 +79,22 @@ public class Cutter : MonoBehaviour
         // Ø’f–Ê‚Ì–@ü
         Vector3 planeNormal = Vector3.Cross(moveDir.normalized, bladeDirection).normalized;
 
-
-        var (fragment, original) = MeshCut.CutMesh(
-            other.gameObject,
-            planePoint,
-            planeNormal,
-            true,
-            null);
-
-        if (fragment == null || original == null)
-            return;
-
-        cut.cutCount++;
-        cutCount++; 
-
-
-        // Ÿ‚ÉØ’f‚Å‚«‚é‚ğİ’è 
-        float nextTime = Time.time + cut.coolTime;
-
-        Cuttable originalCut = original.GetComponent<Cuttable>();
-        if (originalCut != null)
+        if (isSend)
         {
-            originalCut.nextCutTime = nextTime;
-            originalCut.cutCount = cut.cutCount;
+            //TODO:‚±‚±‚Åa‚Á‚½’Ê’m‘—‚Á‚Ä‚İ‚½‚¢
+            RoomModel.I.CutFood(syncObject.ObjectId, planePoint, planeNormal);
+        }
+        else
+        {
+            sppatoManager.CutFood(Guid.Empty, Guid.Empty, planePoint,planeNormal,other.gameObject);
         }
 
-        Cuttable fragmentCut = fragment.GetComponent<Cuttable>();
-        if (fragmentCut != null)
-        {
-            fragmentCut.nextCutTime = nextTime;
-            fragmentCut.cutCount = cut.cutCount;
-        }
+        cutCount++;
 
-        SppatoManager.Register(original);
-        SppatoManager.Register(fragment);
-
-        // Collider‚ğ1•¨—ƒtƒŒ[ƒ€‚¾‚¯–³Œø‰»
-        StartCoroutine(EnableColliderNextFrame(original));
-        StartCoroutine(EnableColliderNextFrame(fragment));
     }
 
-    IEnumerator EnableColliderNextFrame(GameObject obj)
+   public void ChengeHandle(int index)
     {
-        if (obj == null)
-            yield break;
-
-        Collider col = obj.GetComponent<Collider>();
-
-        if (col == null)
-            yield break;
-
-        col.enabled = false;
-
-        yield return new WaitForFixedUpdate();
-
-        if (col != null)
-            col.enabled = true;
+        handle.GetComponent<MeshRenderer>().material = handleMaterials[index];
     }
 }

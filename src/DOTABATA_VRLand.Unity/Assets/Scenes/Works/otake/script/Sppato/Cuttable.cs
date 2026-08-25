@@ -10,4 +10,7 @@ public class Cuttable : MonoBehaviour
 
     public int cutCount = 0;
     public int maxCutCount = 10;
+
+    public Material cutMaterial;
+    public GameObject arrow;
 }

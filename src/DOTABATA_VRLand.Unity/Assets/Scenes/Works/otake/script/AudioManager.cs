@@ -23,6 +23,7 @@ public class AudioManager : MonoBehaviour
         Button_Click,
         Bomb_Catch,
         Garage_Open,
+        Spatto_cut,
     }
 
     public enum BGM
@@ -36,6 +37,7 @@ public class AudioManager : MonoBehaviour
         Arcana,
         Bank,
         Bowling,
+        Spatto,
     }
 
     [SerializeField] public List<AudioClip> seClips = new List<AudioClip>();
