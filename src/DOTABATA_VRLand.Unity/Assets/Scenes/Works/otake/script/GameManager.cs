@@ -390,6 +390,10 @@ public class GameManager : MonoBehaviour
             PlayedMiniGame = new List<string>();
             RoomModel.I.LeaveRoomAsync();
         }
+        else
+        {
+            InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<SmoothLocomotion>().enabled = false;
+        }
     }
 
     public async Task SetMiniGameAsync()

@@ -61,7 +61,7 @@ public class SppatoManager : MonoBehaviour
 
     void Start()
     {
-        InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<SmoothLocomotion>().enabled = false;
+      
 
         objectManager = GameObject.Find("NetworkManager").GetComponent<SyncObjectManager>();
         timer = 0;
