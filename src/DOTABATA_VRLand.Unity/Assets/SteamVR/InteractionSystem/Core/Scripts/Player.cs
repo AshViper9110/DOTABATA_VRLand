@@ -43,6 +43,8 @@ namespace Valve.VR.InteractionSystem
 		public bool allowToggleTo2D = true;
 
 		public GameObject head;
+		public GameObject lEye;
+		public GameObject rEye;
 
 		//-------------------------------------------------
 		// Singleton instance of the Player. Only one can exist at a time.

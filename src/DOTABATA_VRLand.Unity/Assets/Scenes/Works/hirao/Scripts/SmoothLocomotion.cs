@@ -26,7 +26,7 @@ public class SmoothLocomotion : MonoBehaviour
     private void FixedUpdate() {
         Vector2 input = walkAction.axis;
 
-        if (input.sqrMagnitude < 0.001f)
+        if (input.sqrMagnitude < 0.01f)
             return;
 
         // HMDの向きだけ取得（上下は無視）
