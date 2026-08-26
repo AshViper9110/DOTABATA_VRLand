@@ -55,5 +55,6 @@ public class SyncObjectManager : MonoBehaviour {
         syncObject.ApplyGuidToInspector();
 
         syncObject.Initialized = true;
+
     }
 }

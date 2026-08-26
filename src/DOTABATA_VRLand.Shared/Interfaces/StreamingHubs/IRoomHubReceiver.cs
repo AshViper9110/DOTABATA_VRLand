@@ -1,6 +1,7 @@
 ﻿using DOTABATA_VRLand.Shared.Models.Entities;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
@@ -190,9 +191,20 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         public void OnMoveSceneAsync(string name);
 
         /// <summary>
+        /// 食材のカット
+        /// </summary>
+        public void OnCutFood(Guid playerId, Guid ID,UnityEngine.Vector3 planePoint, UnityEngine.Vector3 planeNormal);
+
+        /// </summary>
         /// スキン変更通知
         /// </summary>
         public void OnChangeSkin(Guid playerConId, Color headColor, string hatName, string accessoriesName);
+
+        /// </summary>
+        /// スキン変更通知
+        /// </summary>
+        public void OnCreateFood(int index);
+
     }
 
 }

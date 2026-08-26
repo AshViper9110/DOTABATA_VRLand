@@ -16,7 +16,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
     public class RoomHub : StreamingHubBase<IRoomHub, IRoomHubReceiver>, IRoomHub
     {
         private readonly RoomContextRepository _roomContextRepository;
-        private readonly GameDbContext _dbContext;                                                                  
+        private readonly GameDbContext _dbContext;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
         private RoomContext? _roomContext;
@@ -49,7 +49,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         public Task<List<MiniGameInfo>> GetAllMiniGameAsync()
         {
             List<MiniGameInfo> minigameList = new List<MiniGameInfo>();
-            foreach(var context in _roomContext.miniGameInfoList)
+            foreach (var context in _roomContext.miniGameInfoList)
             {
                 if (!context.IsPlayed) continue;
 
@@ -69,14 +69,17 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ルームを全取得
         /// </summary>
-        public Task<List<RoomInfo>> GetAllRoomAsync() {
+        public Task<List<RoomInfo>> GetAllRoomAsync()
+        {
             //
             List<RoomInfo> roomInfoList = new List<RoomInfo>();
             //
-            foreach (var context in _roomContextRepository.GetAllContext()) {
+            foreach (var context in _roomContextRepository.GetAllContext())
+            {
                 if (context.Value.isStarted) continue;
 
-                RoomInfo roomInfo = new RoomInfo() {
+                RoomInfo roomInfo = new RoomInfo()
+                {
                     Name = context.Value.Name,
                     UsePassword = context.Value.Password != "",
                     GameModeId = context.Value.GameModeId,
@@ -103,7 +106,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 {
                     // なかったら生成
                     this._roomContext = _roomContextRepository.CreateContext(roomConfig);
-                    
+
                 }
             }
 
@@ -135,13 +138,13 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 }
 
                 Console.WriteLine($"[DB] Room Created Id:{room.Id} Name:{room.Name}");
-            }           
+            }
         }
 
         /// <summary>
         /// ルーム削除
         /// </summary>
-        public　async Task DeleteRoomAsync()
+        public async Task DeleteRoomAsync()
         {
             _roomContextRepository.RemoveContext(_roomContext.Id);
 
@@ -168,7 +171,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             await CreateRoomAsync(roomConfig);
 
             // 4人以上いたら入室させない
-            if (_roomContext.RoomUserDataList.Count >= 4) {
+            if (_roomContext.RoomUserDataList.Count >= 4)
+            {
                 throw new Exception("満室です。");
             }
 
@@ -180,7 +184,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             }
 
             // すでにいるか
-            if (this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId)) {
+            if (this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId))
+            {
                 throw new Exception("すでに入室済みです。");
             }
 
@@ -189,7 +194,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
 
             var joinedUser = new JoinedUser();
 
-            if(steamId != null)
+            if (steamId != null)
             {
                 var hash = HashSteamId(steamId.Value);///ハッシュ
 
@@ -241,7 +246,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 await _dbContext.SaveChangesAsync();
 
                 Console.WriteLine($"[DB] Room Join Room:{room.Name} Name:{user.Name}");
-            }else
+            }
+            else
             {
                 User user = new User();
                 user.Name = "Gest";
@@ -272,10 +278,12 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 退出処理
         /// </summary>
-        public async Task LeaveRoomAsync() {
+        public async Task LeaveRoomAsync()
+        {
             if (this._roomContext == null) return;
             // ルームにいなかったら無視
-            if (!this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId)) {
+            if (!this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId))
+            {
                 return;
             }
 
@@ -468,7 +476,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ミニゲームの結果を反映
         /// </summary>
-        public Task RegisterClearTimeAsync(DateTime time, bool firstWin) {
+        public Task RegisterClearTimeAsync(DateTime time, bool firstWin)
+        {
             var rankOrder = _roomContext.ApplyMiniGameResultTime(ConnectionId, time, firstWin);
 
             if (rankOrder == null) return Task.CompletedTask;  // まだ全員ゴールしていない
@@ -495,7 +504,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             Client.OnGetAllRoundRanking(users, winCounts);
             return Task.CompletedTask;
             // 順位送信
-           
+
         }
 
         /// <summary>
@@ -508,7 +517,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             if (joinedUser == null) return Task.CompletedTask;//nullチェック
 
             // 呼び出した本人にだけ送信
-            Client.OnGetLastMiniGameRanking(joinedUser,ranking); 
+            Client.OnGetLastMiniGameRanking(joinedUser, ranking);
             return Task.CompletedTask;
         }
 
@@ -581,7 +590,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// オブジェクトの削除
         /// </summary>
-        public Task DestroyObjectAsync(Guid objectId, bool needOwnerShip) {
+        public Task DestroyObjectAsync(Guid objectId, bool needOwnerShip)
+        {
             // そのオブジェクトがあるか
             if (!this._roomContext.RoomObjectDataList.ContainsKey(objectId)) return Task.CompletedTask;
 
@@ -601,15 +611,18 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 所有権を取得する
         /// </summary>
-        public Task<bool> GetOwnershipAsync(Guid objectId, bool forcibly = false) {
+        public Task<bool> GetOwnershipAsync(Guid objectId, bool forcibly = false)
+        {
             // そのプレイヤーとオブジェとが存在するか
             if (!this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId) ||
-                !this._roomContext.RoomObjectDataList.ContainsKey(objectId)) {
+                !this._roomContext.RoomObjectDataList.ContainsKey(objectId))
+            {
                 return Task.FromResult<bool>(false);
             }
 
             // もし所有者だったら何もしない
-            if (this._roomContext.RoomObjectDataList[objectId].ownerConnectionId == this.ConnectionId) {
+            if (this._roomContext.RoomObjectDataList[objectId].ownerConnectionId == this.ConnectionId)
+            {
                 return Task.FromResult<bool>(true);
             }
 
@@ -617,11 +630,14 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             Guid beforeOwner = this._roomContext.RoomObjectDataList[objectId].ownerConnectionId;
 
             // 同時に所有権を取得しないように排他制御
-            lock (this._roomContext.RoomObjectDataList) {
+            lock (this._roomContext.RoomObjectDataList)
+            {
                 // 強制じゃなければ
-                if (!forcibly) {
+                if (!forcibly)
+                {
                     // 別のプレイヤーが所有者を有していたら無効
-                    if (this._roomContext.RoomObjectDataList[objectId].ownerExist) {
+                    if (this._roomContext.RoomObjectDataList[objectId].ownerExist)
+                    {
                         return Task.FromResult<bool>(false);
                     }
                 }
@@ -639,19 +655,23 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 所有権を放棄する
         /// </summary>
-        public Task OwnershipAbandonmentAsync(Guid objectId) {
-            if (this._roomContext == null) {
+        public Task OwnershipAbandonmentAsync(Guid objectId)
+        {
+            if (this._roomContext == null)
+            {
                 return Task.CompletedTask;
             }
 
             // そのプレイヤーとオブジェとが存在するか
             if (!this._roomContext.RoomUserDataList.ContainsKey(this.ConnectionId) ||
-                !this._roomContext.RoomObjectDataList.ContainsKey(objectId)) {
+                !this._roomContext.RoomObjectDataList.ContainsKey(objectId))
+            {
                 return Task.CompletedTask;
             }
 
             // もし所有者じゃなかったら何もしない
-            if (this._roomContext.RoomObjectDataList[objectId].ownerConnectionId != this.ConnectionId) {
+            if (this._roomContext.RoomObjectDataList[objectId].ownerConnectionId != this.ConnectionId)
+            {
                 return Task.CompletedTask;
             }
 
@@ -688,24 +708,26 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         ///<summary>
         ///ニットの更新
         /// </summary>
-        public Task UpdateNit(Guid connectionId,float point)
+        public Task UpdateNit(Guid connectionId, float point)
         {
-           
+
             // 全員（自分も含む）に通知
-            this._roomContext.Group.All.OnUpdateNit(connectionId,point);
+            this._roomContext.Group.All.OnUpdateNit(connectionId, point);
             return Task.CompletedTask;
         }
 
         /// <summary>
         /// シーン移行が完了したことを他プレイヤーに伝える
         /// </summary>
-        public Task CompleteSceneTransition() {
+        public Task CompleteSceneTransition()
+        {
             bool allComplete = this._roomContext.ChangeIsCompleteSceneTransition(this.ConnectionId);
 
             // 自分以外に完了通知
             this._roomContext.Group.Except([this.ConnectionId]).OnCompleteSceneTransition(this.ConnectionId);
             // もし全員が完了してたら
-            if (allComplete) {
+            if (allComplete)
+            {
                 // 全員に通知
                 this._roomContext.Group.All.OnAllCompleteSceneTransition();
             }
@@ -716,7 +738,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// アルカナスケッチの初期化
         /// </summary>
-        public Task ArcanaInitGameAsync() {
+        public Task ArcanaInitGameAsync()
+        {
             this._roomContext.MiniGameContexts._arcanaContext = new ArcanaContext(this._roomContext.RoomUserDataList);
             return Task.CompletedTask;
         }
@@ -724,15 +747,18 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 死亡同期
         /// </summary>
-        public Task DeathAsync() {
+        public Task DeathAsync()
+        {
             // 自分以外に通知
             this._roomContext.Group.Except([this.ConnectionId]).OnDeath(this.ConnectionId);
 
-            lock (this._roomContext.MiniGameContexts._arcanaContext) {
+            lock (this._roomContext.MiniGameContexts._arcanaContext)
+            {
                 // コンテストからプレイヤーを削除
                 Guid resultConId = this._roomContext.MiniGameContexts._arcanaContext.DeathPlayerAndIsGameSet(this.ConnectionId);
                 // 一人になったら
-                if (resultConId != Guid.Empty) {
+                if (resultConId != Guid.Empty)
+                {
                     // ゲーム終了と勝者のIdを全員に通知
                     this._roomContext.Group.All.OnArcanaGameSet(resultConId);
                 }
@@ -744,7 +770,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 絵描き板の表示非表示同期
         /// </summary>
-        public Task SwitchDrawBoadActiveAsync(bool active) {
+        public Task SwitchDrawBoadActiveAsync(bool active)
+        {
             // 自分以外に通知
             this._roomContext.Group.Except([this.ConnectionId]).OnSwitchDrawBoadActive(this.ConnectionId, active);
 
@@ -754,7 +781,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// 魔法オブジェクトのフィールド同期
         /// </summary>
-        public Task SyncMagicBallAsync(Guid objectId, string gestureClassName, int rndNum) {
+        public Task SyncMagicBallAsync(Guid objectId, string gestureClassName, int rndNum)
+        {
             // 自分以外に通知
             this._roomContext.Group.Except([this.ConnectionId]).OnSyncMagicBall(objectId, this.ConnectionId, gestureClassName, rndNum);
 
@@ -764,7 +792,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// シールドのアクティブ状態同期
         /// </summary>
-        public Task ShieldActiveStateAsync(bool activeState) {
+        public Task ShieldActiveStateAsync(bool activeState)
+        {
             // 自分以外に通知
             this._roomContext.Group.Except([this.ConnectionId]).OnShieldActiveState(this.ConnectionId, activeState);
 
@@ -809,7 +838,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         }
 
         //爆弾ドッチボールの死亡処理
-        public Task HitBomber(Guid connectionId) {
+        public Task HitBomber(Guid connectionId)
+        {
             this._roomContext.Group.All.OnHitBomber(connectionId);
             return Task.CompletedTask;
         }
@@ -817,7 +847,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// プレイヤーのステータス同期
         /// </summary>
-        public Task SyncPlayerStatusAsync(int hp) {
+        public Task SyncPlayerStatusAsync(int hp)
+        {
             // 自分以外に通知
             this._roomContext.Group.Except([this.ConnectionId]).OnSyncPlayerStatus(this.ConnectionId, hp);
 
@@ -849,7 +880,8 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ブロック崩しスコア送信
         /// </summary>
-        public Task BlockBreakSendScoreAsync(int score) {
+        public Task BlockBreakSendScoreAsync(int score)
+        {
             // 全員に通知
             this._roomContext.Group.All.OnBlockBreakSendScore(this.ConnectionId, score);
             return Task.CompletedTask;
@@ -870,6 +902,14 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             return Task.CompletedTask;
         }
 
+
+        public Task CutFood(Guid playerId, Guid ID, Vector3 planePoint, Vector3 planeNormal)
+        {
+            // 全員に通知
+            this._roomContext.Group.All.OnCutFood(playerId,ID,planePoint, planeNormal);
+            return Task.CompletedTask;
+        }
+
         public void ResetPlayed(List<MiniGameInfo> miniGames, string sceneName)
         {
             foreach (var game in miniGames)
@@ -878,6 +918,7 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 {
                     game.IsPlayed = false;
                 }
+
             }
         }
 
@@ -888,6 +929,15 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             // 自分以外に通知
             this._roomContext.Group.Except([this.ConnectionId]).OnChangeSkin(this.ConnectionId, headColor, hatName, accessoriesName);
 
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 食材再生成
+        /// </summary>
+        public Task CreateFood(int Index)
+        {
+            this._roomContext.Group.All.OnCreateFood(Index);
             return Task.CompletedTask;
         }
     }

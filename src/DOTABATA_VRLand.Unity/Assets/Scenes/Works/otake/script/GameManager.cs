@@ -163,6 +163,7 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<SmoothLocomotion>().enabled = true;
        audio = GetComponent<AudioSource>();
         SteamVR_Fade.View(new Color(0,0,0,0),2);
         EndProgress = false;

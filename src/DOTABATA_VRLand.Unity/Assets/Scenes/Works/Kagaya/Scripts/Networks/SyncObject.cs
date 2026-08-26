@@ -141,6 +141,7 @@ public class SyncObject : MonoBehaviour {
         }
 
         Initialized = true;
+
     }
 
     /// <summary>
@@ -225,5 +226,12 @@ public class SyncObject : MonoBehaviour {
             return;
         }
         IsOwner = false;
+    }
+
+    public void invalidCreate()
+    {
+        SendCreate = false;
+        SendDestroy = false;
+        SendTransform = false;
     }
 }
