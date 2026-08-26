@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 1342604480685304539}
   - component: {fileID: 6835628533785243993}
   - component: {fileID: 5902582773957183894}
-  - component: {fileID: 5573867990389029484}
   m_Layer: 8
   m_Name: BodyCollider
   m_TagString: Player
@@ -72,33 +71,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   head: {fileID: 3046298036624274945}
---- !u!54 &5573867990389029484
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 155016319309093204}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &167687871250034833
 GameObject:
   m_ObjectHideFlags: 0
@@ -2962,7 +2934,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3046298036624274945}
   - component: {fileID: 1385852293791371402}
-  - component: {fileID: 882429319789932274}
   m_Layer: 8
   m_Name: HeadCollider
   m_TagString: Player
@@ -3006,33 +2977,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.25
   m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &882429319789932274
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6903338837001949509}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!1 &7013617010597738729
 GameObject:
   m_ObjectHideFlags: 0
@@ -3323,6 +3267,7 @@ GameObject:
   - component: {fileID: 134242869622984630}
   - component: {fileID: -3480112010719364063}
   - component: {fileID: -19333364670627467}
+  - component: {fileID: 5587862864106582247}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -3382,6 +3327,8 @@ MonoBehaviour:
     needsReinit: 1
   allowToggleTo2D: 1
   head: {fileID: 4871343572080717953}
+  lEye: {fileID: 167687871250034833}
+  rEye: {fileID: 3991253708180285809}
 --- !u!114 &7384881945713339583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3399,6 +3346,7 @@ MonoBehaviour:
     actionPath: /actions/default/in/Move
     needsReinit: 0
   walkSpeed: 2
+  rb: {fileID: 5587862864106582247}
 --- !u!114 &7293839853374543432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3584,6 +3532,33 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!54 &5587862864106582247
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7072114806391354250}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 2
 --- !u!1 &7252673175841146701
 GameObject:
   m_ObjectHideFlags: 0
