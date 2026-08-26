@@ -385,6 +385,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ribbon
       objectReference: {fileID: 0}
+    - target: {fileID: 1385545872402823229, guid: b1036de1bb0f1fc4598c9b6e3c05f811, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4300872994506681040, guid: b1036de1bb0f1fc4598c9b6e3c05f811, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.471
@@ -993,9 +997,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8981706058116620752}
     m_Modifications:
+    - target: {fileID: 1526795648048700863, guid: e334dc400902bb14b84c90fbe3afa9ed, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2679566118293915248, guid: e334dc400902bb14b84c90fbe3afa9ed, type: 3}
       propertyPath: m_Name
       value: StoneMask
+      objectReference: {fileID: 0}
+    - target: {fileID: 2679566118293915248, guid: e334dc400902bb14b84c90fbe3afa9ed, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3342915143651859658, guid: e334dc400902bb14b84c90fbe3afa9ed, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1035,6 +1047,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3342915143651859658, guid: e334dc400902bb14b84c90fbe3afa9ed, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3869445377460683389, guid: e334dc400902bb14b84c90fbe3afa9ed, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5426657727292421636, guid: e334dc400902bb14b84c90fbe3afa9ed, type: 3}
+      propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -2155,6 +2175,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Goodbyewing
       objectReference: {fileID: 0}
+    - target: {fileID: 6373169932145117810, guid: 53e0aa6e63a72d346a0198eaf25cc197, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8649808096137977587, guid: 53e0aa6e63a72d346a0198eaf25cc197, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2256,6 +2280,10 @@ PrefabInstance:
     - target: {fileID: 1696300540809323115, guid: 05907c075e339b542aa52f2259ddee65, type: 3}
       propertyPath: m_Name
       value: Stylized sword
+      objectReference: {fileID: 0}
+    - target: {fileID: 1696300540809323115, guid: 05907c075e339b542aa52f2259ddee65, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2606,6 +2634,10 @@ PrefabInstance:
     - target: {fileID: 389728852197160420, guid: 45a90351748d89947a795c852037f03b, type: 3}
       propertyPath: m_Name
       value: Sombrero
+      objectReference: {fileID: 0}
+    - target: {fileID: 389728852197160420, guid: 45a90351748d89947a795c852037f03b, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4744583830707899489, guid: 45a90351748d89947a795c852037f03b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3023,9 +3055,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8981706058116620752}
     m_Modifications:
+    - target: {fileID: 192106387542971737, guid: fe5b98b4eeb7b084ab22c6cac4cec949, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2072682172929288146, guid: fe5b98b4eeb7b084ab22c6cac4cec949, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2849555907973950358, guid: fe5b98b4eeb7b084ab22c6cac4cec949, type: 3}
       propertyPath: m_Name
       value: SunGlass
+      objectReference: {fileID: 0}
+    - target: {fileID: 2849555907973950358, guid: fe5b98b4eeb7b084ab22c6cac4cec949, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3943031376098647944, guid: fe5b98b4eeb7b084ab22c6cac4cec949, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6385243636081378686, guid: fe5b98b4eeb7b084ab22c6cac4cec949, type: 3}
       propertyPath: m_LocalPosition.x
