@@ -3327,6 +3327,8 @@ MonoBehaviour:
     needsReinit: 1
   allowToggleTo2D: 1
   head: {fileID: 4871343572080717953}
+  lEye: {fileID: 167687871250034833}
+  rEye: {fileID: 3991253708180285809}
 --- !u!114 &7384881945713339583
 MonoBehaviour:
   m_ObjectHideFlags: 0
