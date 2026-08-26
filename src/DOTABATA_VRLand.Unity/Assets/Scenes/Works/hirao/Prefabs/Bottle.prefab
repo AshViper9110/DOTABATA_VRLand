@@ -5120,6 +5120,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 541735f607e139c4ba7e98509c4d70c3, type: 3}
   shakeThreshold: 3
   cooldown: 0.2
+  targetShake: 10
+  popbottle: {fileID: 0}
 --- !u!82 &2742161906177193277
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5234,7 +5236,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1661303194185682174
 Transform:
   m_ObjectHideFlags: 0
