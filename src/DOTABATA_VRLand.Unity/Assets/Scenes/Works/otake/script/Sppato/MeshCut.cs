@@ -271,6 +271,18 @@ public class MeshCut : MonoBehaviour
             //frontMesh.SetIndices(_frontSubmeshIndices[i].unsafe_array, 0, _frontSubmeshIndices[i].unsafe_count, MeshTopology.Triangles, i, false);//unity2019.4以降
         }
 
+        for (int i = 0; i < frontMesh.subMeshCount; i++)
+        {
+            var tris = frontMesh.GetTriangles(i);
+
+            for (int t = 0; t < tris.Length; t += 3)
+            {
+                Debug.DrawLine(frontMesh.vertices[tris[t]],
+                               frontMesh.vertices[tris[t + 1]],
+                               i == 0 ? Color.green : Color.red,
+                               100);
+            }
+        }
 
         Mesh backMesh = new Mesh();
         backMesh.name = "Split Mesh back";
@@ -432,6 +444,12 @@ public class MeshCut : MonoBehaviour
             }
         }
 
+        Debug.Log(originMesh.subMeshCount);
+        Debug.Log(fragMesh.subMeshCount);
+
+        Debug.Log(renderer.sharedMaterials.Length);
+        Debug.Log(fragment.GetComponent<MeshRenderer>().sharedMaterials.Length);
+
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
         mesh.RecalculateTangents();
@@ -441,9 +459,6 @@ public class MeshCut : MonoBehaviour
         //    //頂点が1点に重なっている場合にはエラーが出るので, 直したい場合はmesh.RecalculateBoundsのあとでmesh.bounds.size.magnitude<0.00001などで条件分けして対処してください
         //    targetGameObject.GetComponent<MeshCollider>().sharedMesh = originMesh;
         //    fragment.GetComponent<MeshCollider>().sharedMesh = fragMesh;
-        //}
-
-
 
         return (fragment, targetGameObject);
 
@@ -452,31 +467,58 @@ public class MeshCut : MonoBehaviour
 
    static Mesh ValidateMesh(Mesh mesh)
     {
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-        mesh.RecalculateTangents();
+        //mesh.RecalculateNormals();
+        //mesh.RecalculateBounds();
+        //mesh.RecalculateTangents();
 
-        // ゼロ面積の三角形を除去
-        List<int> tris = new List<int>();
-        var vertices = mesh.vertices;
-        var indices = mesh.triangles;
+        //// ゼロ面積の三角形を除去
+        //List<int> tris = new List<int>();
+        //var vertices = mesh.vertices;
+        //var indices = mesh.triangles;
 
-        for (int i = 0; i < indices.Length; i += 3)
+        //for (int i = 0; i < indices.Length; i += 3)
+        //{
+        //    Vector3 a = vertices[indices[i]];
+        //    Vector3 b = vertices[indices[i + 1]];
+        //    Vector3 c = vertices[indices[i + 2]];
+
+        //    float area = Vector3.Cross(b - a, c - a).magnitude * 0.5f;
+        //    if (area > 0.00001f)
+        //    {
+        //        tris.Add(indices[i]);
+        //        tris.Add(indices[i + 1]);
+        //        tris.Add(indices[i + 2]);
+        //    }
+        //}
+
+        //mesh.triangles = tris.ToArray();
+        //return mesh;
+
+        for (int s = 0; s < mesh.subMeshCount; s++)
         {
-            Vector3 a = vertices[indices[i]];
-            Vector3 b = vertices[indices[i + 1]];
-            Vector3 c = vertices[indices[i + 2]];
+            var indices = mesh.GetTriangles(s);
 
-            float area = Vector3.Cross(b - a, c - a).magnitude * 0.5f;
-            if (area > 0.00001f)
+            List<int> valid = new List<int>();
+
+            for (int i = 0; i < indices.Length; i += 3)
             {
-                tris.Add(indices[i]);
-                tris.Add(indices[i + 1]);
-                tris.Add(indices[i + 2]);
+                Vector3 a = mesh.vertices[indices[i]];
+                Vector3 b = mesh.vertices[indices[i + 1]];
+                Vector3 c = mesh.vertices[indices[i + 2]];
+
+                float area = Vector3.Cross(b - a, c - a).magnitude;
+
+                if (area > 1e-5f)
+                {
+                    valid.Add(indices[i]);
+                    valid.Add(indices[i + 1]);
+                    valid.Add(indices[i + 2]);
+                }
             }
+
+            mesh.SetTriangles(valid, s);
         }
 
-        mesh.triangles = tris.ToArray();
         return mesh;
     }
 

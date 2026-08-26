@@ -19670,6 +19670,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: adad5448d95171447a8717dcd2cb2922, type: 2}
   - {fileID: 11400000, guid: 9cea24c79b288334ebc89c45f7ef8478, type: 2}
   - {fileID: 11400000, guid: 9a7c084083cca3a4586a4386a3c370a6, type: 2}
+  - {fileID: 11400000, guid: 0c72fa116ad70064ab2eeb537b23f613, type: 2}
 --- !u!114 &1596988698
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19714,6 +19715,10 @@ MonoBehaviour:
   myAudioSource: {fileID: 1596988702}
   audioClips:
   - {fileID: 8300000, guid: 3c9a2661b16fee148b93364c0bf012a1, type: 3}
+  playerSetMaterials:
+  - material: {fileID: 2100000, guid: c9eee65ef9e8a0840919b15b47d3816d, type: 2}
+  - material: {fileID: 2100000, guid: e02af44c7e4668943826d9e92918f829, type: 2}
+  - material: {fileID: 2100000, guid: bc82587bed659e247bd8af14d77a4c0c, type: 2}
 --- !u!4 &1596988701
 Transform:
   m_ObjectHideFlags: 0

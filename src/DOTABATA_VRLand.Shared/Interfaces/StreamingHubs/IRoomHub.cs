@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
     /// <summary>
@@ -210,5 +211,22 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// シーン移動
         /// </summary>
         Task MoveSceneAsync(string name);
+
+
+        /// <summary>
+        /// 食べ物カット
+        /// </summary>
+        Task CutFood(Guid playerId,Guid ID,Vector3 planePoint, Vector3 planeNormal);
+
+        /// <summary>
+        /// スキン変更同期
+        /// </summary>
+        Task ChangeSkinAsync(Color headColor, string hatName, string accessoriesName);
+
+        /// <summary>
+        /// 食べ物再生成
+        /// </summary>
+        Task CreateFood(int Index);
+
     }
 }

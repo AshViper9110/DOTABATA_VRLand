@@ -182,6 +182,18 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     public Action<string> OnMovedScene { get; set; }
 
+
+    public Action<Guid,Guid, Vector3,Vector3,GameObject> OnCutingFood { get; set; }
+
+
+    /// <summary>
+    /// スキン変更通知
+    /// </summary>
+    public Action<Guid, Color, string, string> OnChangedSkin {  get; set; }
+
+    public Action<int> OncreatedFood {  get; set; }
+
+
     /*
      * 処理
      */
@@ -1018,5 +1030,68 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         {
             OnMovedScene(name);
         }
+    }
+
+
+    public async UniTask CutFood(Guid ID, Vector3 planePoint, Vector3 planeNormal)
+    {
+
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+        await roomHub.CutFood(NetworkManager.I.myConnectionId,ID,planePoint,planeNormal);
+    }
+
+    public void OnCutFood(Guid playerId, Guid ID, Vector3 planePoint, Vector3 planeNormal)
+    {
+        if (OnCutingFood != null)
+        {
+            OnCutingFood(playerId,ID, planePoint, planeNormal,null);
+        }
+    }
+
+    /// <summary>
+    /// スキン変更同期
+    /// </summary>
+    public async UniTask ChangeSkinAsync(Color headColor, string hatName, string accessoriesName) {
+        if (roomHub == null) {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.ChangeSkinAsync(headColor, hatName, accessoriesName);
+    }
+
+    /// <summary>
+    /// [サーバー通知]
+    /// スキン変更通知
+    /// </summary>
+    public void OnChangeSkin(Guid playerConId, Color headColor, string hatName, string accessoriesName) {
+        OnChangedSkin?.Invoke(playerConId, headColor, hatName, accessoriesName);
+
+    }
+
+
+    /// <summary>
+    /// 食材再生成
+    /// </summary>
+    public async UniTask CreateFood(int Index)
+    {
+        if (roomHub == null)
+        {
+            throw new Exception("RoomHubがnullです。");
+        }
+
+        await roomHub.CreateFood(Index);
+    }
+
+
+    /// <summary>
+    /// [サーバー通知]
+    /// 食材再生成通知
+    /// </summary>
+    public void OnCreateFood(int index)
+    {
+        OncreatedFood(index);
     }
 }
