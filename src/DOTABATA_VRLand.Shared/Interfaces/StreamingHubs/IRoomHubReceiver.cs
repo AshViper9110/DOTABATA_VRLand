@@ -12,6 +12,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
     /// サーバーからクライアントへの通知関連
     /// </summary>
     public interface IRoomHubReceiver {
+
+        void OnReceiveMiniGame(MiniGameInfo info);   // 1件受信するたびに呼ばれる
+        void OnReceiveMiniGameCompleted();           // 全件送信完了の合図
+
         /// <summary>
         /// ユーザーの入室通知
         /// </summary>
