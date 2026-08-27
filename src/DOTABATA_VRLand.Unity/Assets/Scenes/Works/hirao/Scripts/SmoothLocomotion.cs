@@ -12,8 +12,12 @@ public class SmoothLocomotion : MonoBehaviour
 
     public float walkSpeed = 2.0f;
 
+<<<<<<< HEAD
     [SerializeField]
     private LayerMask obstacleMask;
+=======
+    [SerializeField] private Rigidbody rb;
+>>>>>>> main
 
     private void Start() {
         // HMDの初期位置を原点に合わせる
@@ -29,7 +33,7 @@ public class SmoothLocomotion : MonoBehaviour
     {
         Vector2 input = walkAction.axis;
 
-        if (input.sqrMagnitude < 0.001f)
+        if (input.sqrMagnitude < 0.01f)
             return;
 
         // HMDの向きだけ取得（上下は無視）
@@ -44,6 +48,7 @@ public class SmoothLocomotion : MonoBehaviour
         Vector3 move = (right * input.x + forward * input.y) *
                        walkSpeed * Time.fixedDeltaTime;
 
+<<<<<<< HEAD
         //transform.position += move;
 
         if (move.sqrMagnitude < 0.000001f)
@@ -140,6 +145,11 @@ public class SmoothLocomotion : MonoBehaviour
                 break;
             }
         }
+=======
+        rb.MovePosition(rb.position + move);
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+>>>>>>> main
     }
 
         //void Start()

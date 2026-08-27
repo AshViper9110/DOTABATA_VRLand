@@ -42,7 +42,7 @@ public class PanicSoda : MonoBehaviour
         int index = InRoomPlayerData.I.PlayerList[myId].joinedUser.JoinOrder - 1;
         var player = InRoomPlayerData.I.PlayerList[myId].playerObj.transform;
 
-        bottle = Instantiate(bottlePrefab, bottlePos[index]);
+        //bottle = Instantiate(bottlePrefab, bottlePos[index]);
         player.position = playerPos[index].position;
         player.rotation = playerPos[index].rotation;
         panel.transform.rotation = playerPos[index].rotation;
@@ -99,6 +99,10 @@ public class PanicSoda : MonoBehaviour
         if (remain <= 0)
         {
             AudioManager.ChangeBGM(AudioManager.BGM.Bank);
+            var myId = NetworkManager.I.myConnectionId;
+            int index = InRoomPlayerData.I.PlayerList[myId].joinedUser.JoinOrder - 1;
+
+            bottle = Instantiate(bottlePrefab, bottlePos[index]);
         }
     }
 

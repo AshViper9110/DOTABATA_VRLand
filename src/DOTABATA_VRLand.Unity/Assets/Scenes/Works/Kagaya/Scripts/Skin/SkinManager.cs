@@ -10,6 +10,8 @@ using Valve.VR.InteractionSystem;
 
 public class SkinManager : MonoBehaviour {
     private Player player;
+    private MeshRenderer HeadRenderer;
+    private List<MeshRenderer> eyeRendererList;
 
     /*
      * 自分
@@ -52,6 +54,12 @@ public class SkinManager : MonoBehaviour {
 
     private void Start() {
         player = Player.instance;
+
+        HeadRenderer = player.head.GetComponent<MeshRenderer>();
+        eyeRendererList = new List<MeshRenderer>() {
+            player.lEye.GetComponent<MeshRenderer>(),
+            player.rEye.GetComponent<MeshRenderer>()
+        };
     }
 
     /// <summary>
@@ -70,13 +78,14 @@ public class SkinManager : MonoBehaviour {
         // コンテンツを生成
         foreach (Skin skin in skinList) {
             GameObject createdBtn = Instantiate(skinSelectBtn, contentTransform);
-            // 名前設定
-            createdBtn.GetComponentInChildren<TextMeshProUGUI>().text = skin.skinObject.name ?? "None";
-            
+
             if (category == SkinCategory.HeadColor) {
+                // 名前設定
+                //createdBtn.GetComponentInChildren<TextMeshProUGUI>().text = $"Color({skin.color})";
+
                 // 画像設定
                 createdBtn.GetComponentsInChildren<Image>().Last().color = skin.color;
-                
+
                 // イベント設定
                 createdBtn.GetComponent<Button>().onClick.AddListener(async () => {
                     // フィールド保持
@@ -87,14 +96,22 @@ public class SkinManager : MonoBehaviour {
                     await RoomModel.I.ChangeSkinAsync(headColor, hatName, accessoriesName);
                 });
             }
-            else if (category == SkinCategory.Hat){
+            else if (category == SkinCategory.Hat) {
+                // 名前設定
+                string skinName = "None";
+
+                if (skin.skinObject != null) {
+                    skinName = skin.skinObject.name;
+                }
+                //createdBtn.GetComponentInChildren<TextMeshProUGUI>().text = skinName;
+
                 // 画像設定
                 createdBtn.GetComponentsInChildren<Image>().Last().sprite = skin.spriteImage;
 
                 // イベント設定
                 createdBtn.GetComponent<Button>().onClick.AddListener(async () => {
                     // フィールド保持
-                    this.hatName = skin.skinObject.name ?? "None";
+                    this.hatName = skinName;
 
                     // スキン変更
                     Transform hat = player.head.GetComponentsInChildren<Transform>().First(_ => _.gameObject.name == "Hat");
@@ -108,14 +125,32 @@ public class SkinManager : MonoBehaviour {
                     await RoomModel.I.ChangeSkinAsync(headColor, hatName, accessoriesName);
                 });
             }
-            else if (category == SkinCategory.Accessories){
+            else if (category == SkinCategory.Accessories) {
+                // 名前設定
+                string skinName = "None";
+
+                if (skin.skinObject != null) {
+                    skinName = skin.skinObject.name;
+                }
+                //createdBtn.GetComponentInChildren<TextMeshProUGUI>().text = skinName;
+
                 // 画像設定
                 createdBtn.GetComponentsInChildren<Image>().Last().sprite = skin.spriteImage;
 
                 // イベント設定
                 createdBtn.GetComponent<Button>().onClick.AddListener(async () => {
                     // フィールド保持
-                    accessoriesName = skin.skinObject.name ?? "None";
+                    this.accessoriesName = skinName;
+
+                    // 頭と目の表示非表示
+                    if (skinName == "Tutankhamun_mask") {
+                        HeadRenderer.enabled = false;
+                        eyeRendererList.ForEach(_ => _.enabled = false);
+                    }
+                    else {
+                        HeadRenderer.enabled = true;
+                        eyeRendererList.ForEach(_ => _.enabled = true);
+                    }
 
                     // スキン変更
                     Transform accessories = player.head.GetComponentsInChildren<Transform>().First(_ => _.gameObject.name == "Accessories");
@@ -186,8 +221,9 @@ public class SkinManager : MonoBehaviour {
 
         // 帽子生成
         if (hatName != "None") {
-            Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Hat).skinList.First(_ => _.skinObject.name == hatName).skinObject,
+            GameObject createdHat = Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Hat).skinList.First(_ => _.skinObject.name == hatName).skinObject,
                 hat);
+            createdHat.layer = 0;
         }
 
         // アクセサリー変更
@@ -198,8 +234,25 @@ public class SkinManager : MonoBehaviour {
 
         // アクセサリー生成
         if (accessoriesName != "None") {
-            Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Accessories).skinList.First(_ => _.skinObject.name == accessoriesName).skinObject,
+            GameObject createdAccessories = Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Accessories).skinList.First(_ => _.skinObject.name == accessoriesName).skinObject,
                 accessories);
+            createdAccessories.layer = 0;
+        }
+
+        MeshRenderer otherPlayerHeadRenderer = playerData.playerObj.GetComponentsInChildren<MeshRenderer>().First(_ => _.gameObject.name == "Head");
+        List<MeshRenderer> otherPlayerEyeRendererList = new List<MeshRenderer>() {
+            playerData.playerObj.GetComponentsInChildren<MeshRenderer>().First(_=>_.gameObject.name == "EyeR"),
+            playerData.playerObj.GetComponentsInChildren<MeshRenderer>().First(_=>_.gameObject.name == "EyeL")
+        };
+
+        // 頭と目の表示非表示
+        if (accessoriesName == "Tutankhamun_mask") {
+            otherPlayerHeadRenderer.enabled = false;
+            eyeRendererList.ForEach(_ => _.enabled = false);
+        }
+        else {
+            otherPlayerHeadRenderer.enabled = true;
+            eyeRendererList.ForEach(_ => _.enabled = true);
         }
 
     }
