@@ -111,6 +111,10 @@ public class NetworkManager : Singleton<NetworkManager>
         SyncPlayer syncPlayer = GameObject.Find("Player(Clone)").GetComponent<SyncPlayer>();
         syncPlayer.isLocalPlayer = true;
 
+        // スキン情報を送信
+        SkinManager skinManager = GameObject.Find("SkinEditor").GetComponent<SkinManager>();
+        skinManager.SendMySkinData();
+
         //List<MiniGameInfo> miniGames = await RoomModel.I.GetAllMiniGameAsync();
 
         //foreach (var game in miniGames)

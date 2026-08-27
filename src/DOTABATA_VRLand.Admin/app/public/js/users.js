@@ -1,29 +1,39 @@
+let allUsers = []; // 全件を保持
+
 // ユーザー一覧を取得して表示
 async function loadUsers() {
-    const res = await fetch("/api/users/get");
-    const users = await res.json();
-
-    const list = document.getElementById("list");
-
-    list.innerHTML = "";
-
-    if (users != null) {
-        users.forEach((user) => {
-            const tr = document.createElement("tr");
-
-            tr.innerHTML = `
-        <td>${user.id}</td>
-        <td>${user.name}</td>
-        <td>
-          <button onclick="detailUser(${user.id})">詳細</button>
-          <button onclick="deleteUser(${user.id})">削除</button>
-        </td>
-      `;
-
-            list.appendChild(tr);
-        });
+    try {
+        const res = await fetch("/api/users/get");
+        allUsers = await res.json();
+        renderUsers(allUsers);
+    } catch (err) {
+        console.error(err);
+        alert("ユーザー一覧の取得に失敗しました");
     }
 }
+
+function renderUsers(users) {
+    const list = document.getElementById("list");
+    list.innerHTML = "";
+
+    if (users == null || users.length === 0) {
+        list.innerHTML = `<tr><td colspan="3">データなし</td></tr>`;
+        return;
+    }
+
+    users.forEach((user) => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+      <td>${user.id}</td>
+      <td>${user.name}</td>
+     
+    `;
+
+        list.appendChild(tr);
+    });
+}
+
 // --- ユーザー編集処理 ---
 function detailUser(id) {
     console.log(id);
@@ -33,50 +43,28 @@ function detailUser(id) {
 function deleteUser(id) {
     console.log(id);
 }
-/*
-// --- ユーザー登録処理 ---
-document.getElementById("form").addEventListener("submit", async (e) => {
-    // フォームのデフォルト送信を停止
-    e.preventDefault();
 
-    // 入力値取得
-    const name = document.getElementById("name").value;
-
-    // APIへPOST送信（JSON形式）
-    await fetch("/api/user/add", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name }),
-    });
-
-
-});
-*/
-// --- ID検索 ---
-document.getElementById("idSearch").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    // 入力されたID取得
-    const id = document.getElementById("id").value;
-
-    // クエリパラメータでAPI呼び出し
-    const res = await fetch(`/api/user/search/id?value=${id}`);
-    const user = await res.json();
-
-    const list = document.getElementById("list");
-    list.innerHTML = "";
-
-    // 結果が存在する場合
-    if (user && user.length > 0) {
-        user.forEach((user) => {
-            const li = document.createElement("li");
-            li.textContent = `${user.name}`;
-            list.appendChild(li);
-        });
-    } else {
-        // 該当データなし
-        list.innerHTML = "<li>データなし</li>";
+// --- 名前検索(クライアント側フィルタ) ---
+function searchUsersByName() {
+    const keyword = document.getElementById("nameSearchInput").value.trim().toLowerCase();
+    if (!keyword) {
+        renderUsers(allUsers);
+        return;
     }
+    const filtered = allUsers.filter((user) =>
+        user.name.toLowerCase().includes(keyword)
+    );
+    renderUsers(filtered);
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+    await loadUsers();
+
+    document.getElementById("nameSearchBtn").addEventListener("click", searchUsersByName);
+    document.getElementById("nameSearchInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            searchUsersByName();
+        }
+    });
 });

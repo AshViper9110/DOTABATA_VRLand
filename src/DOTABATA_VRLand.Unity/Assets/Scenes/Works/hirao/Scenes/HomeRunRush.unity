@@ -888,6 +888,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 2013057099}
   ballPrefab: {fileID: 8574065545801860739, guid: 55f2250dc78ecc74fad63bee08d42096, type: 3}
+  batPrefab: {fileID: 199563380090117914, guid: 2af6fc35e25d8794e91215e5cebbecf1, type: 3}
+  batPos: {fileID: 2018820845}
   shotPower: 25
   shotHight: 3
   playerPos:
@@ -895,7 +897,7 @@ MonoBehaviour:
   - {fileID: 1923566768}
   - {fileID: 1097897479}
   - {fileID: 1392762151}
-  panel: {fileID: 0}
+  panel: {fileID: 2013057098}
 --- !u!135 &482827194
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -3284,6 +3286,7 @@ MonoBehaviour:
   willReady: 0
   AllReady: 0
   OnStarted: 0
+  OnMove: 0
 --- !u!114 &2013057100
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3396,6 +3399,37 @@ RectTransform:
   m_AnchoredPosition: {x: -0.5, y: 1}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &2018820844
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2018820845}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2018820845
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2018820844}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.504, z: 0.206}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2037719800
 GameObject:
   m_ObjectHideFlags: 0
@@ -3437,3 +3471,4 @@ SceneRoots:
   - {fileID: 680815035}
   - {fileID: 2013057104}
   - {fileID: 897898198}
+  - {fileID: 2018820845}

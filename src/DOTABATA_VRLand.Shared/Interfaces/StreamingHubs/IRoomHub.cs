@@ -13,7 +13,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
     public interface IRoomHub : IStreamingHub<IRoomHub, IRoomHubReceiver> {
 
 
-        Task<List<MiniGameInfo>> GetAllMiniGameAsync();
+        Task GetAllMiniGameAsync();
         /// <summary>
         /// ルームを全取得
         /// </summary>

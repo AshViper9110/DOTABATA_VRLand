@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,7 +92,9 @@ public class SkinManager : MonoBehaviour {
                     // 色変更
                     player.head.GetComponent<MeshRenderer>().material.color = skin.color;
                     // 同期
-                    await RoomModel.I.ChangeSkinAsync(headColor, hatName, accessoriesName);
+                    if (RoomModel.I.IsJoinRoom) {
+                        await RoomModel.I.ChangeSkinAsync(headColor, hatName, accessoriesName);
+                    }
                 });
             }
             else if (category == SkinCategory.Hat) {
@@ -122,7 +123,9 @@ public class SkinManager : MonoBehaviour {
                     }
 
                     // 同期
-                    await RoomModel.I.ChangeSkinAsync(headColor, hatName, accessoriesName);
+                    if (RoomModel.I.IsJoinRoom) {
+                        await RoomModel.I.ChangeSkinAsync(headColor, hatName, accessoriesName);
+                    }
                 });
             }
             else if (category == SkinCategory.Accessories) {
@@ -161,7 +164,9 @@ public class SkinManager : MonoBehaviour {
                     }
 
                     // 同期
-                    await RoomModel.I.ChangeSkinAsync(headColor, hatName, accessoriesName);
+                    if (RoomModel.I.IsJoinRoom) {
+                        await RoomModel.I.ChangeSkinAsync(headColor, hatName, accessoriesName);
+                    }
                 });
             }
         }
@@ -191,6 +196,15 @@ public class SkinManager : MonoBehaviour {
         // 削除されるまで待機
         await UniTask.NextFrame();
         await UniTask.WaitForFixedUpdate();
+    }
+
+    /// <summary>
+    /// 他のプレイヤーにスキン情報を送る
+    /// </summary>
+    public async void SendMySkinData() {
+        if (RoomModel.I.IsJoinRoom) {
+            await RoomModel.I.ChangeSkinAsync(headColor, hatName, accessoriesName);
+        }
     }
 
     /// <summary>

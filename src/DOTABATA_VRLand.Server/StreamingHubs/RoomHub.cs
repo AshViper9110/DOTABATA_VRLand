@@ -2,6 +2,7 @@
 using DOTABATA_VRLand.Server.Models.Entities;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
+using MagicOnion;
 using MagicOnion.Server.Hubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,23 +47,29 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// みにげーむを全取得
         /// </summary>
-        public Task<List<MiniGameInfo>> GetAllMiniGameAsync()
+        public async Task GetAllMiniGameAsync()
         {
-            List<MiniGameInfo> minigameList = new List<MiniGameInfo>();
             foreach (var context in _roomContext.miniGameInfoList)
             {
                 if (!context.IsPlayed) continue;
 
-                MiniGameInfo miniGameInfo = new MiniGameInfo()
+                var info = new MiniGameInfo()
                 {
                     BinaryImg = context.BinaryImg,
                     TitleName = context.TitleName,
                     SceneName = context.SceneName,
                     IsPlayed = context.IsPlayed,
                 };
-                minigameList.Add(miniGameInfo);
+
+                // このクライアントにだけ送るなら Client、
+                // 部屋全員に送るなら Broadcast(Group) を使う
+                Client.OnReceiveMiniGame(info);
+
+                // 送信間隔を空けたい場合や巨大データの詰まり防止に
+                // await Task.Delay(1) などを挟んでも良い
             }
-            return Task.FromResult<List<MiniGameInfo>>(minigameList);
+
+            Client.OnReceiveMiniGameCompleted();
         }
 
 
@@ -926,6 +933,11 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// スキン変更同期
         /// </summary>
         public Task ChangeSkinAsync(Color headColor, string hatName, string accessoriesName) {
+            // 保存
+            this._roomContext.RoomUserDataList[this.ConnectionId].joinedUser.HeadColor = headColor;
+            this._roomContext.RoomUserDataList[this.ConnectionId].joinedUser.HatName = hatName;
+            this._roomContext.RoomUserDataList[this.ConnectionId].joinedUser.AccessoriesName = accessoriesName;
+
             // 自分以外に通知
             this._roomContext.Group.Except([this.ConnectionId]).OnChangeSkin(this.ConnectionId, headColor, hatName, accessoriesName);
 
