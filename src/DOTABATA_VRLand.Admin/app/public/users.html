@@ -79,9 +79,10 @@
 
   <div class="card">
     <h2>ユーザー検索</h2>
-    <form id="idSearch" class="search-form">
-      <input type="text" id="id" placeholder="IDを入力" />
-      <button type="submit">検索</button>
+
+    <form class="search-form" onsubmit="return false;">
+      <input type="text" id="nameSearchInput" placeholder="名前で検索" />
+      <button type="button" id="nameSearchBtn">検索</button>
     </form>
   </div>
 
@@ -93,7 +94,6 @@
       <tr>
         <th>ID</th>
         <th>名前</th>
-        <th>操作</th>
       </tr>
       </thead>
       <tbody id="list">
