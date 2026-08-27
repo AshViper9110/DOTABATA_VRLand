@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:src/DOTABATA_VRLand.Unity/Assets/4p-house all in one/Original models.meta
+guid: 4a6fa32ea7c7dd343b3a27e5438006e8
+========
 guid: 5fbda4cd4c003a44bbe9a10100b413a3
+>>>>>>>> main:src/DOTABATA_VRLand.Unity/Assets/Scenes/Works/Kagaya/Images/Skin/Accessories.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

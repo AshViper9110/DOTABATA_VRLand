@@ -13,7 +13,8 @@ public class SyncObjectDataSO : ScriptableObject {
         PanicSoda,
         BlockBreak,
         GarageOpener,
-        SppatoCocking
+        SppatoCocking,
+        HomeRunRush
     }
 
     public Minigames minigame = Minigames.None;

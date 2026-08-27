@@ -43,6 +43,10 @@ public class SppatoManager : MonoBehaviour
 
     Interactable myKnife;
 
+    [SerializeField] GameObject HatPrefab;
+
+    Dictionary<Guid, ChefHatManager> HatList = new Dictionary<Guid, ChefHatManager>();
+
     private void OnEnable()
     {
         if (RoomModel.I == null) return;
@@ -61,7 +65,7 @@ public class SppatoManager : MonoBehaviour
 
     void Start()
     {
-        InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<SmoothLocomotion>().enabled = false;
+      
 
         objectManager = GameObject.Find("NetworkManager").GetComponent<SyncObjectManager>();
         timer = 0;
@@ -78,7 +82,19 @@ public class SppatoManager : MonoBehaviour
         {
             foreach(var player in InRoomPlayerData.I.PlayerList)
             {
+                PlayerTransform plTrans = player.Value.playerObj.GetComponent<PlayerTransform>();
                 CheckList.Add(player.Value.joinedUser.ConnectionId,false);
+
+                GameObject hat = Instantiate(HatPrefab,
+                    plTrans.crownParent.position,
+                    Quaternion.identity,
+                    plTrans.crownParent);
+                HatList.Add(player.Key,hat.GetComponent<ChefHatManager>());
+
+                if(player.Key == NetworkManager.I.myConnectionId)
+                {
+                    plTrans.forward = false;
+                }
             }
         }
         InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position =
@@ -97,11 +113,25 @@ public class SppatoManager : MonoBehaviour
         
         flowController = GetComponent<MinigameFlowController>();
 
+       
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(flowController.OnMove)
+        {
+            foreach(var c in HatList.Values)
+            {
+                Destroy(c.gameObject);
+      
+            }
+            InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<PlayerTransform>().forward = true;
+            enabled = false;
+            return;
+        }
+
         if (!flowController.isGameStarted)
         {
            
@@ -303,10 +333,8 @@ public class SppatoManager : MonoBehaviour
             CheckList[playerId] = true;
         }
 
-        if (!isCut)
-        {
-            if (playerId == NetworkManager.I.myConnectionId)
-            {
+      
+          
                 int cnt = 0;
                 foreach (bool check in CheckList.Values)
                 {
@@ -316,6 +344,14 @@ public class SppatoManager : MonoBehaviour
                     }
                 }
 
+        HatList[playerId].AddHatMid(5 - cnt); 
+
+
+        if (playerId == NetworkManager.I.myConnectionId)
+        {
+            if (!isCut)
+            {
+            
                 point += 5 - cnt;
                 if (round >= 5)
                 {
@@ -333,6 +369,7 @@ public class SppatoManager : MonoBehaviour
                 isCut = true;
             }
         }
+        
 
 
         if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)

@@ -378,6 +378,8 @@ public class GameManager : MonoBehaviour
         foreach (Guid guid in InRoomPlayerData.I.PlayerList.Keys)
         {
             DeleteCrown(guid, InRoomPlayerData.I.PlayerList[guid].joinedUser.JoinOrder);
+            PlayerTransform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>();
+            transform.StartSpotLight(0);
         }
         PlayedMiniGame.Add(scene);
 
@@ -390,6 +392,12 @@ public class GameManager : MonoBehaviour
             PlayedMiniGame = new List<string>();
             RoomModel.I.LeaveRoomAsync();
         }
+        else
+        {
+            InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<SmoothLocomotion>().enabled = false;
+        }
+
+        
     }
 
     public async Task SetMiniGameAsync()

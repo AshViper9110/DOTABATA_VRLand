@@ -43,6 +43,8 @@ public class MinigameFlowController : MonoBehaviour
     public bool AllReady = false;
     public bool OnStarted = false;
 
+    public　bool OnMove = false; 
+
     // =====================================================
     // Start
     // =====================================================
@@ -266,7 +268,11 @@ public class MinigameFlowController : MonoBehaviour
 
     IEnumerator EndGame()
     {
-        yield return new WaitForSecondsRealtime(2f);
+      
+        yield return new WaitForSecondsRealtime(1.8f);
+
+        OnMove = true;
+        yield return new WaitForSecondsRealtime(0.2f);
 
         SteamVR_Fade.View(new Color(1, 1, 1, 1), 2);
         SceneManager.LoadScene("GameScene");//シーン移行
