@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
     /// <summary>
@@ -23,5 +24,12 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// 参加順番
         /// </summary>
         [Key(2)] public int JoinOrder { get; set; }
+
+        [Key(3)]
+        public Color HeadColor = Color.white;
+        [Key(4)]
+        public string HatName = "None";
+        [Key(5)]
+        public string AccessoriesName = "None";
     }
 }

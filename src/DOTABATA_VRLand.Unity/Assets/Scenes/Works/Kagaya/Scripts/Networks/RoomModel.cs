@@ -306,6 +306,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
                     // 自分自身はスキップ
                     if (user.ConnectionId != ConnectionId) {
                         OnJoinedUser(user);
+                        OnChangedSkin(user.ConnectionId, user.HeadColor, user.HatName, user.AccessoriesName);
                     }
                 }
             }

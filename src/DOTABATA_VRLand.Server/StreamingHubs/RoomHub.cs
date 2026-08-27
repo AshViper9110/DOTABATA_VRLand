@@ -933,6 +933,11 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// スキン変更同期
         /// </summary>
         public Task ChangeSkinAsync(Color headColor, string hatName, string accessoriesName) {
+            // 保存
+            this._roomContext.RoomUserDataList[this.ConnectionId].joinedUser.HeadColor = headColor;
+            this._roomContext.RoomUserDataList[this.ConnectionId].joinedUser.HatName = hatName;
+            this._roomContext.RoomUserDataList[this.ConnectionId].joinedUser.AccessoriesName = accessoriesName;
+
             // 自分以外に通知
             this._roomContext.Group.Except([this.ConnectionId]).OnChangeSkin(this.ConnectionId, headColor, hatName, accessoriesName);
 
