@@ -2,6 +2,7 @@
 using DOTABATA_VRLand.Server.Models.Entities;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
+using MagicOnion;
 using MagicOnion.Server.Hubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,23 +47,29 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// みにげーむを全取得
         /// </summary>
-        public Task<List<MiniGameInfo>> GetAllMiniGameAsync()
+        public async Task GetAllMiniGameAsync()
         {
-            List<MiniGameInfo> minigameList = new List<MiniGameInfo>();
             foreach (var context in _roomContext.miniGameInfoList)
             {
                 if (!context.IsPlayed) continue;
 
-                MiniGameInfo miniGameInfo = new MiniGameInfo()
+                var info = new MiniGameInfo()
                 {
                     BinaryImg = context.BinaryImg,
                     TitleName = context.TitleName,
                     SceneName = context.SceneName,
                     IsPlayed = context.IsPlayed,
                 };
-                minigameList.Add(miniGameInfo);
+
+                // このクライアントにだけ送るなら Client、
+                // 部屋全員に送るなら Broadcast(Group) を使う
+                Client.OnReceiveMiniGame(info);
+
+                // 送信間隔を空けたい場合や巨大データの詰まり防止に
+                // await Task.Delay(1) などを挟んでも良い
             }
-            return Task.FromResult<List<MiniGameInfo>>(minigameList);
+
+            Client.OnReceiveMiniGameCompleted();
         }
 
 

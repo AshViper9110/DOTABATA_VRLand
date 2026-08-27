@@ -1,11 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
 using DOTABATA_VRLand.Shared.Models.Entities;
+using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Client;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -17,6 +19,32 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
     private GrpcChannelx channelx;
     private IRoomHub roomHub;
+
+    private List<MiniGameInfo> _receivedList = new();
+    private UniTaskCompletionSource _completionSource;
+
+    // Receiverの実装
+    public void OnReceiveMiniGame(MiniGameInfo info)
+    {
+        _receivedList.Add(info);
+    }
+
+    public void OnReceiveMiniGameCompleted()
+    {
+        _completionSource?.TrySetResult();
+    }
+
+    public async UniTask<List<MiniGameInfo>> GetAllMiniGameAsync()
+    {
+        _receivedList.Clear();
+        _completionSource = new UniTaskCompletionSource();
+
+        await roomHub.GetAllMiniGameAsync(); // 送信開始をリクエスト
+
+        await _completionSource.Task; // 完了通知が来るまで待つ
+
+        return new List<MiniGameInfo>(_receivedList);
+    }
 
     /// <summary>
     /// 　接続ID
@@ -249,9 +277,16 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
         return await roomHub.GetAllRoomAsync();
     }
 
-    public async UniTask<List<MiniGameInfo>> GetAllMiniGameAsync()
+    public async UniTask<List<MiniGameInfo>> FetchAllMiniGameAsync()
     {
-        return await roomHub.GetAllMiniGameAsync();
+        _receivedList.Clear();
+        _completionSource = new UniTaskCompletionSource();
+
+        await roomHub.GetAllMiniGameAsync(); // Hub呼び出しはそのまま
+
+        await _completionSource.Task;
+
+        return new List<MiniGameInfo>(_receivedList);
     }
 
 
