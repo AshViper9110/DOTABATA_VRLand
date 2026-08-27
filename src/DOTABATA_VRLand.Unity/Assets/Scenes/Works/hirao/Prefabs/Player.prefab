@@ -3399,6 +3399,9 @@ MonoBehaviour:
     actionPath: /actions/default/in/Move
     needsReinit: 0
   walkSpeed: 2
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4096
 --- !u!114 &7293839853374543432
 MonoBehaviour:
   m_ObjectHideFlags: 0

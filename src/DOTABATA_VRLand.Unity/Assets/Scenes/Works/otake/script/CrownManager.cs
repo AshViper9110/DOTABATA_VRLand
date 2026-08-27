@@ -33,16 +33,22 @@ public class CrownManager : MonoBehaviour
     {
         if (isNew)
         {
-            isNew = false;
-            Debug.Log("Ž~‚Ü‚è‚Ü‚·");
+            if (collision.gameObject.layer == 8)
+            {
+                isNew = false;
+          
+            }
         }
     }
     private void OnTriggerEnter(Collider other)
     {
         if (isNew)
         {
-            isNew = false;
-            Debug.Log("Ž~‚Ü‚è‚Ü‚·");
+            if (other.gameObject.layer == 8)
+            {
+                isNew = false;
+               
+            }
         }
     }
 }

@@ -17,9 +17,14 @@ public class PlayerTransform : MonoBehaviour {
     [SerializeField] float SpotDistans;
     float spotTomer;
 
+    public bool forward = true;
+
     private void Update()
     {
-        crownParent.position = Head.position+(Vector3.up*crownsDistance);
+        if (forward)
+        {
+            crownParent.position = Head.position + (Vector3.up * crownsDistance);
+        }
         SpotLight.transform.position = Head.position + (Vector3.up * SpotDistans);
         if (spotTomer >= 0)
         {
