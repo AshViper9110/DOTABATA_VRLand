@@ -175,27 +175,19 @@ public class SkinManager : MonoBehaviour {
     /// <summary>
     /// コンテンツの子要素を全削除
     /// </summary>
-    public async void DestroyContentChild() {
+    public void DestroyContentChild() {
         foreach (Transform child in contentTransform) {
             Destroy(child.gameObject);
         }
-
-        // 削除されるまで待機
-        await UniTask.NextFrame();
-        await UniTask.WaitForFixedUpdate();
     }
 
     /// <summary>
     /// スキンのオブジェクト削除
     /// </summary>
-    private async void DestroySkinObj(Transform categoryParent) {
+    private void DestroySkinObj(Transform categoryParent) {
         foreach (Transform child in categoryParent) {
             Destroy(child.gameObject);
         }
-
-        // 削除されるまで待機
-        await UniTask.NextFrame();
-        await UniTask.WaitForFixedUpdate();
     }
 
     /// <summary>
@@ -235,7 +227,7 @@ public class SkinManager : MonoBehaviour {
 
         // 帽子生成
         if (hatName != "None") {
-            GameObject createdHat = Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Hat).skinList.First(_ => _.skinObject.name == hatName).skinObject,
+            GameObject createdHat = Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Hat).skinList.First(_ => _.skinObject && _.skinObject.name == hatName).skinObject,
                 hat);
             createdHat.layer = 0;
         }
@@ -248,7 +240,7 @@ public class SkinManager : MonoBehaviour {
 
         // アクセサリー生成
         if (accessoriesName != "None") {
-            GameObject createdAccessories = Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Accessories).skinList.First(_ => _.skinObject.name == accessoriesName).skinObject,
+            GameObject createdAccessories = Instantiate(skinDataList.First(_ => _.skinCategory == SkinCategory.Accessories).skinList.First(_ => _.skinObject && _.skinObject.name == accessoriesName).skinObject,
                 accessories);
             createdAccessories.layer = 0;
         }
@@ -262,11 +254,11 @@ public class SkinManager : MonoBehaviour {
         // 頭と目の表示非表示
         if (accessoriesName == "Tutankhamun_mask") {
             otherPlayerHeadRenderer.enabled = false;
-            eyeRendererList.ForEach(_ => _.enabled = false);
+            otherPlayerEyeRendererList.ForEach(_ => _.enabled = false);
         }
         else {
             otherPlayerHeadRenderer.enabled = true;
-            eyeRendererList.ForEach(_ => _.enabled = true);
+            otherPlayerEyeRendererList.ForEach(_ => _.enabled = true);
         }
 
     }
