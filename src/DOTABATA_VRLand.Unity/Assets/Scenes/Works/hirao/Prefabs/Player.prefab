@@ -3348,7 +3348,7 @@ MonoBehaviour:
   walkSpeed: 2
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8192
   rb: {fileID: 5587862864106582247}
 --- !u!114 &7293839853374543432
 MonoBehaviour:
