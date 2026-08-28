@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,11 +23,12 @@ public class SppatoManager : MonoBehaviour
     [SerializeField] List<GameObject> ResetPoses;
     [SerializeField] List<GameObject> KnifPoses;
 
+    [SerializeField] Transform center;
     SyncObjectManager objectManager;
     GameObject myFood;
 
     float timer;
-    [SerializeField] TextMeshProUGUI timerTex;
+
     bool isCut;
 
     Dictionary<Guid, bool> CheckList = new Dictionary<Guid, bool>();
@@ -91,10 +93,9 @@ public class SppatoManager : MonoBehaviour
                     plTrans.crownParent);
                 HatList.Add(player.Key,hat.GetComponent<ChefHatManager>());
 
-                if(player.Key == NetworkManager.I.myConnectionId)
-                {
                     plTrans.forward = false;
-                }
+                
+                player.Value.playerObj.transform.LookAt(center);
             }
         }
         InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position =
@@ -127,7 +128,12 @@ public class SppatoManager : MonoBehaviour
                 Destroy(c.gameObject);
       
             }
-            InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<PlayerTransform>().forward = true;
+            foreach (var player in InRoomPlayerData.I.PlayerList)
+            {
+                PlayerTransform plTrans = player.Value.playerObj.GetComponent<PlayerTransform>();
+
+                plTrans.forward = true;
+            }
             enabled = false;
             return;
         }
@@ -184,7 +190,7 @@ public class SppatoManager : MonoBehaviour
             AudioManager.ChangeBGM(AudioManager.BGM.Spatto);
         }
 
-        timerTex.text = point.ToString(); 
+       
 
 
     }
@@ -212,7 +218,27 @@ public class SppatoManager : MonoBehaviour
 
 
         GameObject food =Å@Instantiate(FoodPrefabs[index],setpos.position,Quaternion.identity);
-        
+
+        switch(InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder)
+        {
+            case 1:
+                break;
+                case 2:
+                food.transform.Rotate(0,180,0);
+                break;
+                case 3:
+                food.transform.Rotate(0, 270, 0);
+                break;
+            case 4:
+                food.transform.Rotate(0, 90, 0);
+                break;
+                default:
+                break;
+        }
+
+ 
+
+
         cutter.CutOk = false;
         cutter.cutCount = 0;
         SppatoManager.Register(food);
