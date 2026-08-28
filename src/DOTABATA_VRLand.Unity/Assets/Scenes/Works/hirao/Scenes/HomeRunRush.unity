@@ -888,16 +888,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 2013057099}
   ballPrefab: {fileID: 8574065545801860739, guid: 55f2250dc78ecc74fad63bee08d42096, type: 3}
-  batPrefab: {fileID: 199563380090117914, guid: 2af6fc35e25d8794e91215e5cebbecf1, type: 3}
-  batPos: {fileID: 2018820845}
   shotPower: 25
   shotHight: 3
+  horizontalSpread: 0.01
+  verticalSpread: 0.01
+  shotInterval: 3
+  maxShots: 5
+  batPrefab: {fileID: 199563380090117914, guid: 2af6fc35e25d8794e91215e5cebbecf1, type: 3}
+  batPos: {fileID: 2018820845}
   playerPos:
   - {fileID: 2037719801}
   - {fileID: 1923566768}
   - {fileID: 1097897479}
   - {fileID: 1392762151}
   panel: {fileID: 2013057098}
+  panelOffset: 2
 --- !u!135 &482827194
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -917,8 +922,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 100
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 102.83772
+  m_Center: {x: -0, y: 0, z: -2.8377228}
 --- !u!1 &586517105
 GameObject:
   m_ObjectHideFlags: 0
