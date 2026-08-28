@@ -28,5 +28,9 @@ public class FreePlayMiniGame : MonoBehaviour
         {
             RoomModel.I.SelectFreeMinigame(name);
         }
+        else
+        {
+            Debug.Log((InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder));
+        }
     }
 }

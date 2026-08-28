@@ -49,10 +49,7 @@ public class FreePlayManager : MonoBehaviour
 
         Manager.MoveScene(name);
 
-        if(name == "TitleScene")
-        {
-            RoomModel.I.LeaveRoomAsync();
-        }
+
     }
 
     public async void SetMinigames()

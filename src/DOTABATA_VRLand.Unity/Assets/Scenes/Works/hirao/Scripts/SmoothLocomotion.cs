@@ -28,6 +28,36 @@ public class SmoothLocomotion : MonoBehaviour
         transform.position = pos;
     }
 
+    //private void FixedUpdate()
+    //{
+    //    Vector2 input = walkAction.axis;
+
+    //    if (input.sqrMagnitude < 0.01f)
+    //        return;
+
+    //    // HMDの向きだけ取得（上下は無視）
+    //    Vector3 forward = Player.instance.hmdTransform.forward;
+    //    forward.y = 0;
+    //    forward.Normalize();
+
+    //    Vector3 right = Player.instance.hmdTransform.right;
+    //    right.y = 0;
+    //    right.Normalize();
+
+    //    Vector3 move = (right * input.x + forward * input.y) *
+    //                   walkSpeed * Time.fixedDeltaTime;
+
+
+    //    //transform.position += move;
+    // 
+
+    //    // rb.MovePosition(rb.position + move);
+    //    rb.linearVelocity = Vector3.zero;
+    //    rb.angularVelocity = Vector3.zero;
+
+    //}
+
+
     private void FixedUpdate()
     {
         Vector2 input = walkAction.axis;
@@ -35,23 +65,29 @@ public class SmoothLocomotion : MonoBehaviour
         if (input.sqrMagnitude < 0.01f)
             return;
 
-        // HMDの向きだけ取得（上下は無視）
+        // HMDの水平向き
         Vector3 forward = Player.instance.hmdTransform.forward;
-        forward.y = 0;
+        forward.y = 0f;
+
+        if (forward.sqrMagnitude < 0.0001f)
+            return;
+
         forward.Normalize();
 
         Vector3 right = Player.instance.hmdTransform.right;
-        right.y = 0;
+        right.y = 0f;
         right.Normalize();
 
-        Vector3 move = (right * input.x + forward * input.y) *
-                       walkSpeed * Time.fixedDeltaTime;
+        Vector3 move =
+            (right * input.x + forward * input.y) *
+            walkSpeed *
+            Time.fixedDeltaTime;
 
-
-        //transform.position += move;
+        move.y = 0f;
 
         if (move.sqrMagnitude < 0.000001f)
             return;
+
 
         CapsuleCollider col =
             bodyCollider.GetComponent<CapsuleCollider>();
@@ -69,14 +105,25 @@ public class SmoothLocomotion : MonoBehaviour
 
         float skinWidth = 0.005f;
 
-        // 最大3回まで壁との衝突を処理
+
+        // =========================================
+        // Colliderの現在の中心
+        // =========================================
+
+        Vector3 startCenter =
+            col.transform.TransformPoint(col.center);
+
+        Vector3 center = startCenter;
+
+
+        // =========================================
+        // 壁との衝突処理
+        // =========================================
+
         for (int i = 0; i < 3; i++)
         {
             if (move.sqrMagnitude < 0.000001f)
                 break;
-
-            Vector3 center =
-                col.transform.TransformPoint(col.center);
 
             Vector3 point1 =
                 center + Vector3.up * halfHeight;
@@ -84,33 +131,42 @@ public class SmoothLocomotion : MonoBehaviour
             Vector3 point2 =
                 center - Vector3.up * halfHeight;
 
-            Vector3 direction = move.normalized;
-            float distance = move.magnitude;
+            Vector3 direction =
+                move.normalized;
 
-            // =========================================
-            // 移動方向に壁があるか
-            // =========================================
+            float distance =
+                move.magnitude;
 
-            if (Physics.CapsuleCast(
-                point1,
-                point2,
-                radius,
-                direction,
-                out RaycastHit hit,
-                distance + skinWidth,
-                Physics.DefaultRaycastLayers,
-                QueryTriggerInteraction.Ignore))
+
+            RaycastHit[] hits = Physics.CapsuleCastAll(
+     point1,
+     point2,
+     radius,
+     direction,
+     distance + skinWidth,
+     Physics.DefaultRaycastLayers,
+     QueryTriggerInteraction.Ignore
+ );
+
+            RaycastHit? nearestHit = null;
+            float nearestDistance = float.MaxValue;
+
+            foreach (RaycastHit h in hits)
             {
-                // 自分自身のColliderなら無視
-                if (hit.collider == col)
-                {
-                    transform.position += move;
-                    break;
-                }
+                // 自分自身は無視
+                if (IsOwnCollider(h.collider))
+                    continue;
 
-                // =====================================
-                // 壁の手前まで移動
-                // =====================================
+                if (h.distance < nearestDistance)
+                {
+                    nearestDistance = h.distance;
+                    nearestHit = h;
+                }
+            }
+
+            if (nearestHit.HasValue)
+            {
+                RaycastHit hit = nearestHit.Value;
 
                 float safeDistance =
                     Mathf.Max(0f, hit.distance - skinWidth);
@@ -118,104 +174,117 @@ public class SmoothLocomotion : MonoBehaviour
                 Vector3 moveToWall =
                     direction * safeDistance;
 
-                transform.position += moveToWall;
-
-                // =====================================
-                // 残りの移動量
-                // =====================================
+                center += moveToWall;
 
                 Vector3 remainingMove =
                     move - moveToWall;
-
-                // =====================================
-                // 壁に垂直な成分を削除
-                // =====================================
 
                 move = Vector3.ProjectOnPlane(
                     remainingMove,
                     hit.normal
                 );
+
+                move.y = 0f;
             }
             else
             {
-                move = new Vector3(move.x,0,move.z);
-                // 壁がないのでそのまま移動
-                transform.position += move;
+                center += move;
                 break;
             }
         }
 
-        rb.MovePosition(rb.position + move);
+
+        // =========================================
+        // Collider中心の移動量
+        // =========================================
+
+        Vector3 delta =
+            center - startCenter;
+
+
+        // =========================================
+        // Rigidbodyを移動
+        // =========================================
+
+        rb.MovePosition(
+            rb.position + delta
+        );
+
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-
     }
 
-        //void Start()
-        //{
-        //    Vector3 pos = transform.position;
-
-        //    pos.x -= Player.instance.hmdTransform.localPosition.x;
-        //    pos.z -= Player.instance.hmdTransform.localPosition.z;
-        //    pos.y = transform.position.y;
-
-        //    transform.position = pos;
-
-        //    Vector3 colpos = bodyCollider.transform.position;
-
-        //    colpos.x = Player.instance.hmdTransform.position.x;
-        //    colpos.z = Player.instance.hmdTransform.position.z;
-
-        //    bodyCollider.transform.position = colpos;
-        //}
-
-        //void LateUpdate()
-        //{
-
-        //    return;
-        //    Vector3 player_pos = transform.position;
-
-        //    player_pos.x -=
-        //        Player.instance.hmdTransform.position.x
-        //        - bodyCollider.transform.position.x;
-
-        //    player_pos.z -=
-        //        Player.instance.hmdTransform.position.z
-        //        - bodyCollider.transform.position.z;
-
-        //    player_pos.y = bodyCollider.transform.position.y;
-
-        //    transform.position = player_pos;
-        //}
-
-        //void FixedUpdate()
-        //{
-        //    Vector3 player_pos = transform.position;
-        //    Vector3 body_pos = bodyCollider.transform.position;
-
-        //    // body位置同期
-        //    body_pos.x = Player.instance.hmdTransform.position.x;
-        //    body_pos.z = Player.instance.hmdTransform.position.z;
-
-        //    bodyCollider.transform.position = body_pos;
-
-        //    // 左スティック移動
-        //    Vector2 moveInput = walkAction.axis;
-
-        //    Vector3 direction =
-        //        Player.instance.hmdTransform.TransformDirection(
-        //            new Vector3(moveInput.x, 0, moveInput.y)
-        //        );
-
-        //    player_pos.x +=
-        //        walkSpeed * Time.deltaTime * direction.x;
-
-        //    player_pos.z +=
-        //        walkSpeed * Time.deltaTime * direction.z;
-
-        //    // 高さ固定
-        //    player_pos.y = bodyCollider.transform.position.y;
-
-        //    transform.position = player_pos;
-        //}
+    private bool IsOwnCollider(Collider col)
+    {
+        return col.transform == transform ||
+               col.transform.IsChildOf(transform);
     }
+
+    //void Start()
+    //{
+    //    Vector3 pos = transform.position;
+
+    //    pos.x -= Player.instance.hmdTransform.localPosition.x;
+    //    pos.z -= Player.instance.hmdTransform.localPosition.z;
+    //    pos.y = transform.position.y;
+
+    //    transform.position = pos;
+
+    //    Vector3 colpos = bodyCollider.transform.position;
+
+    //    colpos.x = Player.instance.hmdTransform.position.x;
+    //    colpos.z = Player.instance.hmdTransform.position.z;
+
+    //    bodyCollider.transform.position = colpos;
+    //}
+
+    //void LateUpdate()
+    //{
+
+    //    return;
+    //    Vector3 player_pos = transform.position;
+
+    //    player_pos.x -=
+    //        Player.instance.hmdTransform.position.x
+    //        - bodyCollider.transform.position.x;
+
+    //    player_pos.z -=
+    //        Player.instance.hmdTransform.position.z
+    //        - bodyCollider.transform.position.z;
+
+    //    player_pos.y = bodyCollider.transform.position.y;
+
+    //    transform.position = player_pos;
+    //}
+
+    //void FixedUpdate()
+    //{
+    //    Vector3 player_pos = transform.position;
+    //    Vector3 body_pos = bodyCollider.transform.position;
+
+    //    // body位置同期
+    //    body_pos.x = Player.instance.hmdTransform.position.x;
+    //    body_pos.z = Player.instance.hmdTransform.position.z;
+
+    //    bodyCollider.transform.position = body_pos;
+
+    //    // 左スティック移動
+    //    Vector2 moveInput = walkAction.axis;
+
+    //    Vector3 direction =
+    //        Player.instance.hmdTransform.TransformDirection(
+    //            new Vector3(moveInput.x, 0, moveInput.y)
+    //        );
+
+    //    player_pos.x +=
+    //        walkSpeed * Time.deltaTime * direction.x;
+
+    //    player_pos.z +=
+    //        walkSpeed * Time.deltaTime * direction.z;
+
+    //    // 高さ固定
+    //    player_pos.y = bodyCollider.transform.position.y;
+
+    //    transform.position = player_pos;
+    //}
+}
