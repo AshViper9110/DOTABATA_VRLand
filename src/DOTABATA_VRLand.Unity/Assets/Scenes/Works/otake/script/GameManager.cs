@@ -387,7 +387,7 @@ public class GameManager : MonoBehaviour
         Initiate.Fade(scene, new Color(0, 0, 0, 0), 0.5f);
         AudioManager.PlaySE(AudioManager.SE.MoveScene);
 
-        if (name == "TitleScene")
+        if (scene == "TitleScene")
         {
             PlayedMiniGame = new List<string>();
             RoomModel.I.LeaveRoomAsync();
@@ -395,6 +395,7 @@ public class GameManager : MonoBehaviour
         else
         {
             InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<SmoothLocomotion>().enabled = false;
+            Debug.Log("ìÆÇ©Ç»Ç≠Ç»ÇÈÇÊ ÉVÅ[ÉìñºÅF" + scene);
         }
 
         
