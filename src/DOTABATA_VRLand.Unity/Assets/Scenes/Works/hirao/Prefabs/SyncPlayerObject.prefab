@@ -307,6 +307,7 @@ MonoBehaviour:
   crownsDistance: 0.2
   SpotLight: {fileID: 7425815740759651945}
   SpotDistans: 3.5
+  forward: 1
 --- !u!136 &8106485660988051092
 CapsuleCollider:
   m_ObjectHideFlags: 0
