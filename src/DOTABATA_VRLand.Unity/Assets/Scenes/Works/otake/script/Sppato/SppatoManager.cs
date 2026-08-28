@@ -96,10 +96,16 @@ public class SppatoManager : MonoBehaviour
                     plTrans.forward = false;
                 
                 player.Value.playerObj.transform.LookAt(center);
+
+                if (player.Value.joinedUser.ConnectionId == NetworkManager.I.myConnectionId)
+                {
+                    player.Value.playerObj.transform.position = PlayerPoses[player.Value.joinedUser.JoinOrder - 1].transform.position;
+                    player.Value.playerObj.transform.LookAt(center);
+                   
+                }
             }
         }
-        InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position =
-            PlayerPoses[pleIndex].transform.position;
+
         setpos = ResetPoses[pleIndex].transform;
 
         GameObject Knife = Instantiate(KnifePrefab,
