@@ -60,7 +60,8 @@ public class SmoothLocomotion : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector2 input = walkAction.axis;
+        Vector2 input =
+    walkAction.GetAxis(SteamVR_Input_Sources.LeftHand);
 
         if (input.sqrMagnitude < 0.01f)
             return;
