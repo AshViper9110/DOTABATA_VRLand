@@ -153,7 +153,7 @@ public class HomeRunRush : MonoBehaviour
         homeRunCount = 0;
 
         // 最初の球を少し待ってから投げる
-        nextShotTime = Time.time + 1f;
+        nextShotTime = Time.time + 4f;
 
         // プレイヤー位置を更新
         UpdatePlayerPosition(order);
@@ -304,6 +304,8 @@ public class HomeRunRush : MonoBehaviour
         );
 
         Rigidbody rb = ball.GetComponent<Rigidbody>();
+
+        rb.useGravity = true;
 
         if (rb == null)
         {
