@@ -49,6 +49,8 @@ public class SppatoManager : MonoBehaviour
 
     Dictionary<Guid, ChefHatManager> HatList = new Dictionary<Guid, ChefHatManager>();
 
+    [SerializeField] GameObject introCanvas;
+
     private void OnEnable()
     {
         if (RoomModel.I == null) return;
@@ -87,22 +89,31 @@ public class SppatoManager : MonoBehaviour
                 PlayerTransform plTrans = player.Value.playerObj.GetComponent<PlayerTransform>();
                 CheckList.Add(player.Value.joinedUser.ConnectionId,false);
 
-                GameObject hat = Instantiate(HatPrefab,
-                    plTrans.crownParent.position,
-                    Quaternion.identity,
-                    plTrans.crownParent);
-                HatList.Add(player.Key,hat.GetComponent<ChefHatManager>());
+    
 
                     plTrans.forward = false;
+              
                 
                 player.Value.playerObj.transform.LookAt(center);
 
-                if (player.Value.joinedUser.ConnectionId == NetworkManager.I.myConnectionId)
-                {
                     player.Value.playerObj.transform.position = PlayerPoses[player.Value.joinedUser.JoinOrder - 1].transform.position;
                     player.Value.playerObj.transform.LookAt(center);
-                   
+
+                GameObject hat = Instantiate(HatPrefab,
+                plTrans.crownParent.position,
+                   Quaternion.identity);
+                HatList.Add(player.Key, hat.GetComponent<ChefHatManager>());
+
+                hat.transform.position = plTrans.crownParent.position;
+
+                if (player.Value.joinedUser.ConnectionId == NetworkManager.I.myConnectionId)
+                {
+                    introCanvas.transform.LookAt(player.Value.playerObj.transform);
+                    introCanvas.transform.Rotate(0, 180, 0);
+                    introCanvas.transform.rotation = new Quaternion(0, introCanvas.transform.rotation.y, 0, introCanvas.transform.rotation.w);
                 }
+
+
             }
         }
 
@@ -119,6 +130,8 @@ public class SppatoManager : MonoBehaviour
         myKnife = Knife.GetComponent<Interactable>();
         
         flowController = GetComponent<MinigameFlowController>();
+
+
 
        
 
