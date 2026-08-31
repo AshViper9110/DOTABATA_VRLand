@@ -670,7 +670,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slideAxis: 0
   minPosition: -1.5
-  maxPosition: 1
+  maxPosition: 0
   laneSetManager: {fileID: 0}
   controller: {fileID: 0}
 --- !u!1 &4517599987925000541
