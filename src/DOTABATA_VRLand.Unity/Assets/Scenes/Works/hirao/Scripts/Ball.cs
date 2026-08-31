@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class Ball : MonoBehaviour
@@ -14,18 +15,22 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (!collision.gameObject.CompareTag("Bat"))
-            return;
+        if (collision.gameObject.CompareTag("Bat"))
+        {
+            // バットに当たる直前のボールの速度
+            Vector3 velocity = rb.linearVelocity;
 
-        // バットに当たる直前のボールの速度
-        Vector3 velocity = rb.linearVelocity;
+            // 飛んできた方向を完全に反転
+            Vector3 reverseDirection = -velocity.normalized;
 
-        // 飛んできた方向を完全に反転
-        Vector3 reverseDirection = -velocity.normalized;
+            // 元の速度 × 倍率
+            float speed = velocity.magnitude * hitPower;
 
-        // 元の速度 × 倍率
-        float speed = velocity.magnitude * hitPower;
-
-        rb.linearVelocity = reverseDirection * speed;
+            rb.linearVelocity = reverseDirection * speed;
+        }
+        else if(collision.gameObject.CompareTag("Ground"))
+        {
+            Destroy(gameObject);
+        }
     }
 }
