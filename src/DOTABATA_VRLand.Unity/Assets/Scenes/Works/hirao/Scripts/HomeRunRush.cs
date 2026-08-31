@@ -42,6 +42,9 @@ public class HomeRunRush : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI ScoreTextLog;
 
+    [SerializeField] GameObject fireWorkPrefab;
+    private GameObject fireWork;
+
     private bool waitingForLastBall = false;
 
     // åªç›âΩãÖñ⁄Ç©
@@ -461,6 +464,11 @@ public class HomeRunRush : MonoBehaviour
             transform.rotation
         );
 
+        if(fireWork != null)
+        {
+            Destroy( fireWork );
+        }
+
         Rigidbody rb = ball.GetComponent<Rigidbody>();
 
         if (rb == null)
@@ -544,7 +552,7 @@ public class HomeRunRush : MonoBehaviour
     private void HomeRun()
     {
         homeRunScore += 100;
-
+        fireWork = Instantiate(fireWorkPrefab);
         Debug.Log(
             $"[HomeRunRush] " +
             $"Player {currentOrder} " +
