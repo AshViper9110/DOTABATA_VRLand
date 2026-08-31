@@ -6738,6 +6738,7 @@ MonoBehaviour:
   willReady: 0
   AllReady: 0
   OnStarted: 0
+  OnMove: 0
 --- !u!114 &2044843777
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7573,7 +7574,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TutorialImages:
-  - {fileID: 21300000, guid: 424bc4de958d83e40a635d8903e25c90, type: 3}
+  - {fileID: 21300000, guid: 7115eea01606e0049bf6c759123f7b67, type: 3}
+  - {fileID: 21300000, guid: 1a40b2fe39b54254d86f91b0b16dc522, type: 3}
   tutorialImage: {fileID: 7996750016605909645}
 --- !u!1 &572610842817024030
 GameObject:
@@ -12069,7 +12071,7 @@ RectTransform:
   m_GameObject: {fileID: 4974660438154062598}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.015473319, y: 0.015473319, z: 0.015473319}
+  m_LocalScale: {x: 0.007, y: 0.007, z: 0.015473319}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2625612586998886478}
@@ -12128,7 +12130,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 226.77335, y: 127.560005}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
