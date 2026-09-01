@@ -237,6 +237,9 @@ public class SkinManager : MonoBehaviour {
             if (skin?.skinObject) {
                 GameObject createdHat = Instantiate(skin.skinObject, hat);
                 createdHat.layer = 0;
+                foreach (Transform child in createdHat.transform) {
+                    child.gameObject.layer = 0;
+                }
             }
             else {
                 Debug.Log($"帽子が見つかりませんでした。 {hatName}");
@@ -255,6 +258,9 @@ public class SkinManager : MonoBehaviour {
             if (skin?.skinObject) {
                 GameObject createdAccessories = Instantiate(skin.skinObject, accessories);
                 createdAccessories.layer = 0;
+                foreach (Transform child in createdAccessories.transform) {
+                    child.gameObject.layer = 0;
+                }
             }
             else {
                 Debug.Log($"アクセサリーが見つかりませんでした。 {accessoriesName}");
