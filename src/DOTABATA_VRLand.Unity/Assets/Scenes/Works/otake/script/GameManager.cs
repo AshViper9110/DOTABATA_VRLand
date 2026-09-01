@@ -597,7 +597,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < RankingList.Count; i++)
         {
             rankingUis[i].DOAnchorPosY(rankingPosList[RankingList[i + 1] - 1].anchoredPosition.y, 1f);
-            rankingUis[i].GetComponent<TextMeshProUGUI>().material = rankingMaterials[i];
+            rankingUis[i].GetComponent<TextMeshProUGUI>().material = rankingMaterials[RankingList[i + 1] - 1];
             
         }
 
