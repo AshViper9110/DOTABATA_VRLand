@@ -5121,7 +5121,7 @@ MonoBehaviour:
   shakeThreshold: 3
   cooldown: 0.2
   targetShake: 10
-  popbottle: {fileID: 0}
+  popbottle: {fileID: 7893939656524388272}
 --- !u!82 &2742161906177193277
 AudioSource:
   m_ObjectHideFlags: 0

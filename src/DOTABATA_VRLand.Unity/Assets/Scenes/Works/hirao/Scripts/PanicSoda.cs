@@ -79,7 +79,9 @@ public class PanicSoda : MonoBehaviour
 
             Debug.Log($"Clear Time : {elapsedTime:F2}s");
 
-            AudioManager.PlaySE(AudioManager.SE.Bank_Open);
+            AudioManager.PlaySE(
+                   AudioManager.SE.PanicOpen
+               );
 
 
             if (bottle.GetComponent<Interactable>().attachedToHand != null)
