@@ -98,7 +98,7 @@ public class PanicSoda : MonoBehaviour
     {
         if (remain <= 0)
         {
-            AudioManager.ChangeBGM(AudioManager.BGM.Bank);
+            AudioManager.ChangeBGM(AudioManager.BGM.Panic);
             var myId = NetworkManager.I.myConnectionId;
             int index = InRoomPlayerData.I.PlayerList[myId].joinedUser.JoinOrder - 1;
 

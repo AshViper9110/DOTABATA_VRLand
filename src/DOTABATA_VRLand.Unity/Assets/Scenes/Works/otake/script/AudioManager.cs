@@ -28,6 +28,9 @@ public class AudioManager : MonoBehaviour
         BBGetScore,
         BBChangeTurn,
         BBNextRound,
+        PanicOpen,
+        HomeRun,
+        BallShot
     }
 
     public enum BGM
@@ -43,6 +46,8 @@ public class AudioManager : MonoBehaviour
         Bowling,
         Spatto,
         BlockBreak,
+        Panic,
+        HomeRun,
     }
 
     [SerializeField] public List<AudioClip> seClips = new List<AudioClip>();
