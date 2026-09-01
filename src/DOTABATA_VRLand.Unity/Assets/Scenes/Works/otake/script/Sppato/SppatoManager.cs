@@ -111,23 +111,29 @@ public class SppatoManager : MonoBehaviour
                     introCanvas.transform.LookAt(player.Value.playerObj.transform);
                     introCanvas.transform.Rotate(0, 180, 0);
                     introCanvas.transform.rotation = new Quaternion(0, introCanvas.transform.rotation.y, 0, introCanvas.transform.rotation.w);
+
+                    setpos = ResetPoses[pleIndex].transform;
+
+                    GameObject Knife = Instantiate(KnifePrefab,
+                        KnifPoses[pleIndex].transform.position, Quaternion.identity);
+
+                    Knife.transform.LookAt(player.Value.playerObj.transform);
+
+                    Knife.transform.rotation = new Quaternion(0, introCanvas.transform.rotation.y, 0, introCanvas.transform.rotation.w);
+
+                    Cutter KifeMane = Knife.GetComponent<Cutter>();
+                    KifeMane.ChengeHandle(pleIndex);
+                    KifeMane.sppatoManager = this;
+                    cutter = KifeMane;
+
+                    myKnife = Knife.GetComponent<Interactable>();
                 }
 
 
             }
         }
 
-        setpos = ResetPoses[pleIndex].transform;
-
-        GameObject Knife = Instantiate(KnifePrefab,
-            KnifPoses[pleIndex].transform.position, Quaternion.identity);
-
-        Cutter KifeMane = Knife.GetComponent<Cutter>();
-        KifeMane.ChengeHandle(pleIndex);
-        KifeMane.sppatoManager = this;
-        cutter = KifeMane;
-
-        myKnife = Knife.GetComponent<Interactable>();
+      
         
         flowController = GetComponent<MinigameFlowController>();
 
@@ -460,7 +466,7 @@ public class SppatoManager : MonoBehaviour
 
     IEnumerator ResetFoodsTimer()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(4);
 
         int index = UnityEngine.Random.Range(0, FoodPrefabs.Count);
 
