@@ -2,10 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 using Valve.VR;
+using static AudioManager;
 
 public class BlockBreakGameManager : MonoBehaviour {
     [SerializeField] private MinigameFlowController minigameFlowController;
@@ -63,7 +62,7 @@ public class BlockBreakGameManager : MonoBehaviour {
 
     private async void Start() {
         InRoomPlayerData.I.ShowPlayerList();
-        AudioManager.StopBgm();
+        AudioManager.ChangeBGM(BGM.BlockBreak);
         SteamVR_Fade.View(new Color(0, 0, 0, 0), 1.0f);
 
         await UniTask.WaitUntil(() => minigameFlowController.isGameStarted == true);
@@ -137,14 +136,17 @@ public class BlockBreakGameManager : MonoBehaviour {
     /// 外の壁に当たったらスコア獲得
     /// </summary>
     public void OnEnterWallCollider(Collision collision) {
-        if (!myPlayerController.IsMyTurn()){
-            return;
-        }
-
         if (collision.gameObject.CompareTag("BBBullet")) {
+            if (!myPlayerController.IsMyTurn()) {
+                return;
+            }
             Destroy(collision.gameObject);
         }
         else if (collision.gameObject.CompareTag ("BBBlock")) {
+            AudioManager.PlaySE(SE.BBGetScore);
+            if (!myPlayerController.IsMyTurn()) {
+                return;
+            }
             myPlayerController.AddScore();
             Destroy(collision.gameObject);
         }
@@ -180,11 +182,14 @@ public class BlockBreakGameManager : MonoBehaviour {
             else {
                 objectsManager.ChangeKinematic(true);
             }
+
+            AudioManager.PlaySE(SE.BBChangeTurn);
         }
         else if (currentRound < 3) {
             currentRound++;
             CurrentTurnPlayerId = 0;
             uiManager.UpdateRoundText(currentRound);
+            AudioManager.PlaySE(SE.BBNextRound);
             NextTurn();
         }
         else {

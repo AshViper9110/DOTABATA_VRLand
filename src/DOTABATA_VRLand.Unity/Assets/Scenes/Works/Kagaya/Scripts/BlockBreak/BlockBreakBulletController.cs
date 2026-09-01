@@ -18,6 +18,7 @@ public class BlockBreakBulletController : MonoBehaviour {
     }
 
     private async void Start() {
+        AudioManager.PlaySE(AudioManager.SE.BBShot);
         await UniTask.WaitUntil(() => syncObject.Initialized == true);
         shotPlayerConId = syncObject.CreaterId;
         if (!syncObject.IsOwner) {
