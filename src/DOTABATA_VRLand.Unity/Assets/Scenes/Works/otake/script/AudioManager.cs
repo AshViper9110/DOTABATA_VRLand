@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.Collections.Generic;
 using Unity.Services.Multiplayer.Components;
 using UnityEngine;
@@ -24,6 +24,10 @@ public class AudioManager : MonoBehaviour
         Bomb_Catch,
         Garage_Open,
         Spatto_cut,
+        BBShot,
+        BBGetScore,
+        BBChangeTurn,
+        BBNextRound,
     }
 
     public enum BGM
@@ -38,6 +42,7 @@ public class AudioManager : MonoBehaviour
         Bank,
         Bowling,
         Spatto,
+        BlockBreak,
     }
 
     [SerializeField] public List<AudioClip> seClips = new List<AudioClip>();
