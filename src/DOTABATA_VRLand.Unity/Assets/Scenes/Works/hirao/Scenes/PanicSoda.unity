@@ -3104,14 +3104,14 @@ MonoBehaviour:
   m_text: "\u30B2\u30FC\u30E0\u30B9\u30BF\u30FC\u30C8"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 55ff2f08d08046e4a9d6bcc34fbe298f, type: 2}
-  m_sharedMaterial: {fileID: -4795938968160391167, guid: 55ff2f08d08046e4a9d6bcc34fbe298f, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 5ef5d46d6ee9eab48ba329bf18d54e00, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -4327,16 +4327,16 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: TutorialImages.Array.size
-      value: 6
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[0]'
       value: 
-      objectReference: {fileID: 21300000, guid: 424bc4de958d83e40a635d8903e25c90, type: 3}
+      objectReference: {fileID: 21300000, guid: c5dfb9564c3ecfa4ca15d267551f7cce, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[1]'
       value: 
-      objectReference: {fileID: 21300000, guid: c1118d367f0ca104094c7a8989e520bb, type: 3}
+      objectReference: {fileID: 21300000, guid: 456f5d37d9ebcc44abdbb373ce850365, type: 3}
     - target: {fileID: 550228402497999172, guid: 9ab6b340234e73a47ad00c3aa2ddd5c2, type: 3}
       propertyPath: 'TutorialImages.Array.data[2]'
       value: 

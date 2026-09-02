@@ -79,9 +79,7 @@ public class PanicSoda : MonoBehaviour
 
             Debug.Log($"Clear Time : {elapsedTime:F2}s");
 
-            AudioManager.PlaySE(
-                   AudioManager.SE.PanicOpen
-               );
+            RoomModel.I.AudioAsync(2);
 
 
             if (bottle.GetComponent<Interactable>().attachedToHand != null)
