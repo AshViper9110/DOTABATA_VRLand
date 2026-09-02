@@ -22212,6 +22212,8 @@ MonoBehaviour:
   myAudioSource: {fileID: 1596988702}
   audioClips:
   - {fileID: 8300000, guid: 3c9a2661b16fee148b93364c0bf012a1, type: 3}
+  - {fileID: 8300000, guid: f973d978477625f47b5e3605223e0a30, type: 3}
+  - {fileID: 8300000, guid: 09c5672d1d592c04f889718660d13312, type: 3}
   playerSetMaterials:
   - material: {fileID: 2100000, guid: c9eee65ef9e8a0840919b15b47d3816d, type: 2}
   - material: {fileID: 2100000, guid: e02af44c7e4668943826d9e92918f829, type: 2}

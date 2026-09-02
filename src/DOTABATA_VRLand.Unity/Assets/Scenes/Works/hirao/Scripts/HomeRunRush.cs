@@ -669,9 +669,7 @@ public class HomeRunRush : MonoBehaviour
         // ホームランSE
         // -----------------------------------------------------
         AudioManager.StopBgm();
-        AudioManager.PlaySE(
-            AudioManager.SE.HomeRun
-        );
+        RoomModel.I.AudioAsync(1);
 
         // -----------------------------------------------------
         // スコア加算
