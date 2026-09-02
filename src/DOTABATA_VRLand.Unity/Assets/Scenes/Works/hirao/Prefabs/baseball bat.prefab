@@ -296,8 +296,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19135e3240b787249b826a16bf17ac49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minigame: 0
-  objectListId: 0
+  minigame: 10
+  objectListId: 1
   SendCreate: 1
   SendTransform: 1
   SendSpan: 0.1

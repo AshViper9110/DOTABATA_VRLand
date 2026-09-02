@@ -1,7 +1,11 @@
 using DOTABATA_VRLand.Shared.Interfaces.StreamingHubs;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TMPro;
+using Unity.Multiplayer.Center.NetcodeForGameObjectsExample.DistributedAuthority;
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 
 public class HomeRunRush : MonoBehaviour
 {
@@ -22,6 +26,9 @@ public class HomeRunRush : MonoBehaviour
     [SerializeField] private float shotInterval = 2f;
     [SerializeField] private int maxShots = 5;
 
+    [Header("Home Run Pause")]
+    [SerializeField] private float homeRunPauseDuration = 5f;
+
     [Header("Bat")]
     [SerializeField] private GameObject batPrefab;
     [SerializeField] private Transform batPos;
@@ -33,19 +40,40 @@ public class HomeRunRush : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField] private float panelOffset = 2f;
 
+    [Header("Countdown")]
+    [SerializeField] private TextMeshProUGUI countdownText;
+    [SerializeField] private float countdownInterval = 1f;
+
+    [SerializeField] private TextMeshProUGUI ScoreTextLog;
+
+    [Header("Firework")]
+    [SerializeField] private GameObject fireWorkPrefab;
+
+    private GameObject fireWork;
+
+    // 5球目を投げ終わった後、最後のボールを待っている状態
     private bool waitingForLastBall = false;
+
+    // ホームラン演出中で投球を停止している状態
+    private bool isHomeRunPause = false;
+
+    // ホームラン後、投球を再開する時間
+    private float homeRunPauseEndTime = 0f;
 
     // 現在何球目か
     private int currentShot = 0;
 
-    // 現在のプレイヤーのホームラン数
-    private int homeRunCount = 0;
+    // 現在のプレイヤーのScore
+    private float homeRunScore = 0;
 
     // 次の投球時間
     private float nextShotTime = 0f;
 
     // 自分の番か
     private bool isMyTurn = false;
+
+    // カウントダウン中か
+    private bool isCountdown = false;
 
     // 5球終了処理をすでに実行したか
     private bool finishedTurn = false;
@@ -55,6 +83,9 @@ public class HomeRunRush : MonoBehaviour
 
     // 現在の打者
     private int currentOrder = 1;
+
+    // カウントダウンCoroutine
+    private Coroutine countdownCoroutine;
 
 
     // =========================================================
@@ -69,6 +100,7 @@ public class HomeRunRush : MonoBehaviour
         RoomModel.I.OnCountdownAction += StartCountdown;
         RoomModel.I.OnBallingNexted += OnBallingNexted;
         RoomModel.I.OnBallingPinAsynced += OnBallingPinAsync;
+        RoomModel.I.OnRegisterScoreAction += OnReceiveRanking;
     }
 
     private void OnDisable()
@@ -79,6 +111,13 @@ public class HomeRunRush : MonoBehaviour
         RoomModel.I.OnCountdownAction -= StartCountdown;
         RoomModel.I.OnBallingNexted -= OnBallingNexted;
         RoomModel.I.OnBallingPinAsynced -= OnBallingPinAsync;
+        RoomModel.I.OnRegisterScoreAction -= OnReceiveRanking;
+
+        if (countdownCoroutine != null)
+        {
+            StopCoroutine(countdownCoroutine);
+            countdownCoroutine = null;
+        }
     }
 
     private void Start()
@@ -91,9 +130,48 @@ public class HomeRunRush : MonoBehaviour
 
     private void Update()
     {
-        if (!controller.isGameStarted || !isMyTurn) return;
+        // ゲーム開始前
+        if (!controller.isGameStarted)
+            return;
 
+        // 自分の番ではない
+        if (!isMyTurn)
+            return;
+
+        // カウントダウン中
+        if (isCountdown)
+            return;
+
+        // =====================================================
+        // ホームラン後の5秒間停止
+        // =====================================================
+
+        if (isHomeRunPause)
+        {
+            // 5秒経過
+            if (Time.time >= homeRunPauseEndTime)
+            {
+                isHomeRunPause = false;
+
+                // ホームラン演出終了後、
+                // すぐに次のボールを投げられるようにする
+                nextShotTime = Time.time;
+
+                Debug.Log(
+                    "[HomeRunRush] ホームラン演出終了。投球再開"
+                );
+                AudioManager.ChangeBGM(
+                AudioManager.BGM.HomeRun
+            );
+            }
+
+            return;
+        }
+
+        // =====================================================
         // 5球目を投げ終わった後
+        // =====================================================
+
         if (waitingForLastBall)
         {
             if (Time.time >= nextShotTime)
@@ -104,7 +182,10 @@ public class HomeRunRush : MonoBehaviour
             return;
         }
 
+        // =====================================================
         // 次の投球時間まで待つ
+        // =====================================================
+
         if (Time.time < nextShotTime)
             return;
 
@@ -112,7 +193,10 @@ public class HomeRunRush : MonoBehaviour
 
         currentShot++;
 
+        // =====================================================
         // 5球目
+        // =====================================================
+
         if (currentShot >= maxShots)
         {
             waitingForLastBall = true;
@@ -123,6 +207,10 @@ public class HomeRunRush : MonoBehaviour
             return;
         }
 
+        // =====================================================
+        // 次の投球
+        // =====================================================
+
         nextShotTime = Time.time + shotInterval;
     }
 
@@ -132,33 +220,180 @@ public class HomeRunRush : MonoBehaviour
     // =========================================================
 
     /// <summary>
-    /// 次のプレイヤーが投球開始したときに呼ばれる
+    /// 次のプレイヤーの番になったときに呼ばれる
     /// </summary>
     private void OnBallingNexted(
         int order,
         JoinedUser joinedUser,
         int pinCount)
     {
-        Debug.Log($"[HomeRunRush] Player {order} の番");
+        Debug.Log(
+            $"[HomeRunRush] Player {order} の番"
+        );
+
+        if (ScoreTextLog != null)
+        {
+            ScoreTextLog.text +=
+                $"\n{joinedUser.Name} : {pinCount}Pt";
+        }
 
         currentOrder = order;
 
         // 5球カウントをリセット
         currentShot = 0;
 
+        // 最後のボール待ちをリセット
+        waitingForLastBall = false;
+
+        // ホームラン停止状態をリセット
+        isHomeRunPause = false;
+        homeRunPauseEndTime = 0f;
+
         // ターン終了フラグをリセット
         finishedTurn = false;
 
         // ホームラン数をリセット
-        homeRunCount = 0;
+        homeRunScore = 0;
 
-        // 最初の球を少し待ってから投げる
-        nextShotTime = Time.time + 4f;
+        // 次の投球時間もリセット
+        nextShotTime = 0f;
 
-        // プレイヤー位置を更新
+        // -----------------------------------------------------
+        // まずプレイヤー位置を更新
+        // -----------------------------------------------------
+
         UpdatePlayerPosition(order);
+
+        // -----------------------------------------------------
+        // 自分の番ならカウントダウン開始
+        // -----------------------------------------------------
+
+        var myId = NetworkManager.I.myConnectionId;
+
+        if (!InRoomPlayerData.I.PlayerList.TryGetValue(
+            myId,
+            out var playerData))
+        {
+            Debug.LogError(
+                "[HomeRunRush] 自分のPlayerDataが見つかりません"
+            );
+
+            return;
+        }
+
+        int myOrder = playerData.joinedUser.JoinOrder;
+
+        if (myOrder == order)
+        {
+            // カウントダウン中は投球不可
+            isMyTurn = false;
+
+            // 既にカウントダウンが動いていたら停止
+            if (countdownCoroutine != null)
+            {
+                StopCoroutine(countdownCoroutine);
+                countdownCoroutine = null;
+            }
+
+            countdownCoroutine =
+                StartCoroutine(StartPlayerTurnCountdown());
+        }
+        else
+        {
+            isMyTurn = false;
+        }
     }
 
+
+    // =========================================================
+    // Player Countdown
+    // =========================================================
+
+    /// <summary>
+    /// 自分の番が始まるときのカウントダウン
+    /// </summary>
+    private IEnumerator StartPlayerTurnCountdown()
+    {
+        isCountdown = true;
+
+        // ホームラン停止状態を解除
+        isHomeRunPause = false;
+        homeRunPauseEndTime = 0f;
+
+        Debug.Log(
+            "[HomeRunRush] 自分の番！ カウントダウン開始"
+        );
+
+        // -----------------------------------------------------
+        // 3
+        // -----------------------------------------------------
+
+        if (countdownText != null)
+        {
+            countdownText.gameObject.SetActive(true);
+            countdownText.text = "3";
+        }
+
+        yield return new WaitForSeconds(countdownInterval);
+
+        // -----------------------------------------------------
+        // 2
+        // -----------------------------------------------------
+
+        if (countdownText != null)
+        {
+            countdownText.text = "2";
+        }
+
+        yield return new WaitForSeconds(countdownInterval);
+
+        // -----------------------------------------------------
+        // 1
+        // -----------------------------------------------------
+
+        if (countdownText != null)
+        {
+            countdownText.text = "1";
+        }
+
+        yield return new WaitForSeconds(countdownInterval);
+
+        // -----------------------------------------------------
+        // START
+        // -----------------------------------------------------
+
+        if (countdownText != null)
+        {
+            countdownText.text = "START!";
+        }
+
+        Debug.Log(
+            "[HomeRunRush] カウントダウン終了。投球開始"
+        );
+
+        // 投球可能
+        isCountdown = false;
+        isMyTurn = true;
+
+        // すぐに1球目を投げる
+        nextShotTime = Time.time;
+
+        yield return new WaitForSeconds(0.5f);
+
+        // START表示を消す
+        if (countdownText != null)
+        {
+            countdownText.text = "";
+            countdownText.gameObject.SetActive(false);
+        }
+
+        countdownCoroutine = null;
+    }
+
+
+    // =========================================================
+    // Finish Turn
+    // =========================================================
 
     /// <summary>
     /// 自分の5球が終了した
@@ -172,16 +407,35 @@ public class HomeRunRush : MonoBehaviour
         finishedTurn = true;
         isMyTurn = false;
 
+        // ホームラン停止状態を解除
+        isHomeRunPause = false;
+
+        // バットが存在する場合のみ処理
+        if (bat != null)
+        {
+            Interactable interactable =
+                bat.GetComponent<Interactable>();
+
+            if (interactable != null &&
+                interactable.attachedToHand != null)
+            {
+                interactable.attachedToHand.DetachObject(bat);
+            }
+
+            Destroy(bat);
+            bat = null;
+        }
+
         Debug.Log(
             $"[HomeRunRush] Player {currentOrder} 終了 " +
-            $"HR: {homeRunCount}"
+            $"HR: {homeRunScore}"
         );
 
         var myId = NetworkManager.I.myConnectionId;
 
         if (!InRoomPlayerData.I.PlayerList.TryGetValue(
-                myId,
-                out var playerData))
+            myId,
+            out var playerData))
         {
             Debug.LogError(
                 "[HomeRunRush] 自分のPlayerDataが見つかりません"
@@ -190,10 +444,12 @@ public class HomeRunRush : MonoBehaviour
             return;
         }
 
-        Destroy(bat);
-        RoomModel.I.SendScore(homeRunCount);
+        RoomModel.I.SendScore(
+            (int)homeRunScore
+        );
+
         await RoomModel.I.BallingNext(
-            homeRunCount,
+            (int)homeRunScore,
             playerData.joinedUser
         );
     }
@@ -208,8 +464,8 @@ public class HomeRunRush : MonoBehaviour
         var myId = NetworkManager.I.myConnectionId;
 
         if (!InRoomPlayerData.I.PlayerList.TryGetValue(
-                myId,
-                out var playerData))
+            myId,
+            out var playerData))
         {
             Debug.LogError(
                 "[HomeRunRush] PlayerDataが見つかりません"
@@ -224,7 +480,8 @@ public class HomeRunRush : MonoBehaviour
          * 現在のプレイヤーが自分なら、
          * 自分のクライアントだけ投球処理を行う。
          */
-        isMyTurn = myOrder == order;
+
+        isMyTurn = myOrder == order && !isCountdown;
 
         int index;
 
@@ -234,7 +491,9 @@ public class HomeRunRush : MonoBehaviour
             index = 0;
 
             // バットがまだ存在しなければ生成
-            if (bat == null && batPrefab != null && batPos != null)
+            if (bat == null &&
+                batPrefab != null &&
+                batPos != null)
             {
                 bat = Instantiate(
                     batPrefab,
@@ -303,9 +562,14 @@ public class HomeRunRush : MonoBehaviour
             transform.rotation
         );
 
-        Rigidbody rb = ball.GetComponent<Rigidbody>();
+        // 前の花火を削除
+        if (fireWork != null)
+        {
+            Destroy(fireWork);
+            fireWork = null;
+        }
 
-        rb.useGravity = true;
+        Rigidbody rb = ball.GetComponent<Rigidbody>();
 
         if (rb == null)
         {
@@ -317,6 +581,8 @@ public class HomeRunRush : MonoBehaviour
 
             return;
         }
+
+        rb.useGravity = true;
 
         // -----------------------------------------------------
         // ランダムなブレ
@@ -350,13 +616,24 @@ public class HomeRunRush : MonoBehaviour
             Vector3.up * shotHight;
 
         Debug.Log(
-            $"[HomeRunRush] Shot {currentShot + 1}/{maxShots}"
+            $"[HomeRunRush] Shot " +
+            $"{currentShot + 1}/{maxShots}"
         );
     }
 
 
     // =========================================================
-    // Home Run
+    // Score
+    // =========================================================
+
+    public void AddScore(float score)
+    {
+        homeRunScore += score;
+    }
+
+
+    // =========================================================
+    // Home Run Detection
     // =========================================================
 
     private void OnTriggerExit(Collider other)
@@ -369,46 +646,82 @@ public class HomeRunRush : MonoBehaviour
         if (!isMyTurn)
             return;
 
+        // 既にホームラン停止中なら無視
+        if (isHomeRunPause)
+            return;
+
         Debug.Log(
             $"[HomeRunRush] ホームラン！ " +
             $"Player {currentOrder}"
         );
 
         HomeRun();
-
-        /*
-         * 必要ならボールを削除
-         *
-         * Destroy(other.gameObject);
-         *
-         * ただし別の場所でボールを管理している場合は
-         * そちらに任せてください。
-         */
     }
 
 
+    // =========================================================
+    // Home Run
+    // =========================================================
+
     private void HomeRun()
     {
-        homeRunCount++;
+        // -----------------------------------------------------
+        // ホームランSE
+        // -----------------------------------------------------
+        AudioManager.StopBgm();
+        AudioManager.PlaySE(
+            AudioManager.SE.HomeRun
+        );
+
+        // -----------------------------------------------------
+        // スコア加算
+        // -----------------------------------------------------
+
+        homeRunScore += 100;
+
+        // -----------------------------------------------------
+        // 前の花火があれば削除
+        // -----------------------------------------------------
+
+        if (fireWork != null)
+        {
+            Destroy(fireWork);
+            fireWork = null;
+        }
+
+        // -----------------------------------------------------
+        // 花火生成
+        // -----------------------------------------------------
+
+        if (fireWorkPrefab != null)
+        {
+            fireWork =
+                Instantiate(fireWorkPrefab);
+        }
+
+        // -----------------------------------------------------
+        // 5秒間投球停止
+        // -----------------------------------------------------
+
+        isHomeRunPause = true;
+
+        homeRunPauseEndTime =
+            Time.time + homeRunPauseDuration;
+
+        // -----------------------------------------------------
+        // ホームラン発生時点で次の投球時間も5秒後にする
+        // -----------------------------------------------------
+
+        nextShotTime =
+            homeRunPauseEndTime;
 
         Debug.Log(
             $"[HomeRunRush] " +
             $"Player {currentOrder} " +
-            $"ホームラン数: {homeRunCount}"
+            $"ホームラン！ " +
+            $"ホームラン数: {homeRunScore} " +
+            $"{homeRunPauseDuration}秒間投球停止"
         );
-
-        /*
-         * ここからゲーム側のホームラン処理を追加。
-         *
-         * 例:
-         *
-         * controller.HomeRun();
-         *
-         * UI更新
-         * スコア更新
-         * SE再生
-         * エフェクト
-         */
     }
 
 
@@ -420,13 +733,6 @@ public class HomeRunRush : MonoBehaviour
         int count,
         JoinedUser joinedUser)
     {
-        /*
-         * サーバー側から結果を受信したときの処理。
-         *
-         * ここで次のプレイヤーへの切り替え、
-         * 最終結果表示などを行う。
-         */
-
         Debug.Log(
             $"[HomeRunRush] BallingPinAsync " +
             $"count={count}"
@@ -443,8 +749,32 @@ public class HomeRunRush : MonoBehaviour
         if (remain <= 0)
         {
             AudioManager.ChangeBGM(
-                AudioManager.BGM.Bowling
+                AudioManager.BGM.HomeRun
             );
         }
+    }
+
+
+    // =========================================================
+    // Ranking
+    // =========================================================
+
+    private void OnReceiveRanking(
+        List<JoinedUser> rankOrder)
+    {
+        if (bat == null)
+            return;
+
+        Interactable interactable =
+            bat.GetComponent<Interactable>();
+
+        if (interactable != null &&
+            interactable.attachedToHand != null)
+        {
+            interactable.attachedToHand.DetachObject(bat);
+        }
+
+        Destroy(bat);
+        bat = null;
     }
 }

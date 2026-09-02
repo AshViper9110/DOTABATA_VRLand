@@ -79,7 +79,9 @@ public class PanicSoda : MonoBehaviour
 
             Debug.Log($"Clear Time : {elapsedTime:F2}s");
 
-            AudioManager.PlaySE(AudioManager.SE.Bank_Open);
+            AudioManager.PlaySE(
+                   AudioManager.SE.PanicOpen
+               );
 
 
             if (bottle.GetComponent<Interactable>().attachedToHand != null)
@@ -98,7 +100,7 @@ public class PanicSoda : MonoBehaviour
     {
         if (remain <= 0)
         {
-            AudioManager.ChangeBGM(AudioManager.BGM.Bank);
+            AudioManager.ChangeBGM(AudioManager.BGM.Panic);
             var myId = NetworkManager.I.myConnectionId;
             int index = InRoomPlayerData.I.PlayerList[myId].joinedUser.JoinOrder - 1;
 

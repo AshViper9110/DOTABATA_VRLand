@@ -49,6 +49,8 @@ public class SppatoManager : MonoBehaviour
 
     Dictionary<Guid, ChefHatManager> HatList = new Dictionary<Guid, ChefHatManager>();
 
+    [SerializeField] GameObject introCanvas;
+
     private void OnEnable()
     {
         if (RoomModel.I == null) return;
@@ -87,32 +89,55 @@ public class SppatoManager : MonoBehaviour
                 PlayerTransform plTrans = player.Value.playerObj.GetComponent<PlayerTransform>();
                 CheckList.Add(player.Value.joinedUser.ConnectionId,false);
 
-                GameObject hat = Instantiate(HatPrefab,
-                    plTrans.crownParent.position,
-                    Quaternion.identity,
-                    plTrans.crownParent);
-                HatList.Add(player.Key,hat.GetComponent<ChefHatManager>());
+    
 
                     plTrans.forward = false;
+              
                 
                 player.Value.playerObj.transform.LookAt(center);
+
+                    player.Value.playerObj.transform.position = PlayerPoses[player.Value.joinedUser.JoinOrder - 1].transform.position;
+                    player.Value.playerObj.transform.LookAt(center);
+
+                GameObject hat = Instantiate(HatPrefab,
+                plTrans.crownParent.position,
+                   Quaternion.identity);
+                HatList.Add(player.Key, hat.GetComponent<ChefHatManager>());
+
+                hat.transform.position = plTrans.crownParent.position;
+
+                if (player.Value.joinedUser.ConnectionId == NetworkManager.I.myConnectionId)
+                {
+                    introCanvas.transform.LookAt(player.Value.playerObj.transform);
+                    introCanvas.transform.Rotate(0, 180, 0);
+                    introCanvas.transform.rotation = new Quaternion(0, introCanvas.transform.rotation.y, 0, introCanvas.transform.rotation.w);
+
+                    setpos = ResetPoses[pleIndex].transform;
+
+                    GameObject Knife = Instantiate(KnifePrefab,
+                        KnifPoses[pleIndex].transform.position, Quaternion.identity);
+
+                    Knife.transform.LookAt(player.Value.playerObj.transform);
+
+                    Knife.transform.rotation = new Quaternion(0, introCanvas.transform.rotation.y, 0, introCanvas.transform.rotation.w);
+
+                    Cutter KifeMane = Knife.GetComponent<Cutter>();
+                    KifeMane.ChengeHandle(pleIndex);
+                    KifeMane.sppatoManager = this;
+                    cutter = KifeMane;
+
+                    myKnife = Knife.GetComponent<Interactable>();
+                }
+
+
             }
         }
-        InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.transform.position =
-            PlayerPoses[pleIndex].transform.position;
-        setpos = ResetPoses[pleIndex].transform;
 
-        GameObject Knife = Instantiate(KnifePrefab,
-            KnifPoses[pleIndex].transform.position, Quaternion.identity);
-
-        Cutter KifeMane = Knife.GetComponent<Cutter>();
-        KifeMane.ChengeHandle(pleIndex);
-        KifeMane.sppatoManager = this;
-        cutter = KifeMane;
-
-        myKnife = Knife.GetComponent<Interactable>();
+      
         
         flowController = GetComponent<MinigameFlowController>();
+
+
 
        
 
@@ -441,7 +466,7 @@ public class SppatoManager : MonoBehaviour
 
     IEnumerator ResetFoodsTimer()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(4);
 
         int index = UnityEngine.Random.Range(0, FoodPrefabs.Count);
 
