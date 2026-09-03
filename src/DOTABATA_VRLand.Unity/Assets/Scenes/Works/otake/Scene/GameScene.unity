@@ -1784,7 +1784,7 @@ MonoBehaviour:
   MinigamePrefab: {fileID: 8531964900129808126, guid: b8822b7a5372ea14bab556bf08b99f29, type: 3}
   CenterObj: {fileID: 1277725972}
   selectPoint: {fileID: 2553432454474539405}
-  SelPointHeght: 6
+  SelPointHeght: 8
   miniGameTitleImages:
   - {fileID: 21300000, guid: 424bc4de958d83e40a635d8903e25c90, type: 3}
   - {fileID: 21300000, guid: 73ee9c1bc49f7434c9e209fa345e23f2, type: 3}
@@ -4666,17 +4666,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 637519197}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -236}
-  m_LocalScale: {x: 0.55282813, y: 0.55282813, z: 0.55282813}
+  m_LocalRotation: {x: -0, y: -0.72261286, z: -0, w: 0.69125295}
+  m_LocalPosition: {x: 0, y: 0, z: -310.8}
+  m_LocalScale: {x: 0.14888768, y: 0.14888768, z: 0.14888768}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2018039858}
   m_Father: {fileID: 1659079838}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -92.541, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -19.6, y: -350.6}
+  m_AnchoredPosition: {x: -26.7, y: -326}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &637519199
@@ -10227,7 +10227,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1221296865
 Transform:
   m_ObjectHideFlags: 0
@@ -17518,7 +17518,7 @@ Transform:
   m_GameObject: {fileID: 2553432454474539405}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: 4.5589786, y: 7.8264265, z: 11.459299}
+  m_LocalPosition: {x: 4.5589786, y: 9.69, z: 11.459299}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
