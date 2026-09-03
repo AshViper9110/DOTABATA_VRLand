@@ -925,7 +925,15 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
                 {
                     game.IsPlayed = false;
                 }
+            }
 
+            // すべてのゲームが未プレイになったら、全てプレイ済みに戻す
+            if (miniGames.All(game => !game.IsPlayed))
+            {
+                foreach (var game in miniGames)
+                {
+                    game.IsPlayed = true;
+                }
             }
         }
 
