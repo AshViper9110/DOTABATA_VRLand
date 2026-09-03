@@ -28,10 +28,15 @@ public class BombBallManager : MonoBehaviour
 
     BombDodgeManager bombDodgeManager;
 
+    bool isHaving;
+    float haveTimer;
+    float notHaveTimer;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         InitBall();
+        haveTimer = 0;
         }
 
     private void OnDestroy()
@@ -112,7 +117,39 @@ public class BombBallManager : MonoBehaviour
         BombTimerText.transform.LookAt(Camera.main.transform);
         BombTimerText.transform.Rotate(0, 180, 0);
 
-        
+        if (interactable.attachedToHand)
+        {
+            isHaving = true;
+            notHaveTimer = 0;
+        }
+        else
+        {
+            isHaving = false;
+            BombTimerText.gameObject.SetActive(true);
+            haveTimer = 0;
+        }
+
+        if (isHaving)
+        {
+            haveTimer += Time.deltaTime;
+
+            if (haveTimer > 2f)
+            {
+                BombTimerText.gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            notHaveTimer += Time.deltaTime;
+
+            if (notHaveTimer > 2f)
+            {
+                BombTimerText.gameObject.SetActive(false);
+            }
+        }
+
+            
+
 
     }
 
