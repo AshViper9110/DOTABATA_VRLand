@@ -62,7 +62,6 @@ public class PanicSoda : MonoBehaviour
 
             ShakePower += speedY * Time.fixedDeltaTime;
 
-            Debug.Log($"ShakePower : {ShakePower:F2}");
         }
 
         // ƒNƒŠƒA”»’è

@@ -39,7 +39,7 @@ public class HostManager :MonoBehaviour
 
         
 
-        Debug.Log(Vec);
+     
         this.transform.DOMove(new Vector3(transform.position.x,transform.position.y + (range*Vec), transform.position.z), 2f).SetLoops(2,LoopType.Yoyo).OnComplete(() =>
         {
             MoveHost();

@@ -444,11 +444,7 @@ public class MeshCut : MonoBehaviour
             }
         }
 
-        Debug.Log(originMesh.subMeshCount);
-        Debug.Log(fragMesh.subMeshCount);
 
-        Debug.Log(renderer.sharedMaterials.Length);
-        Debug.Log(fragment.GetComponent<MeshRenderer>().sharedMaterials.Length);
 
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
