@@ -140,14 +140,14 @@ public class SmoothLocomotion : MonoBehaviour
 
 
             RaycastHit[] hits = Physics.CapsuleCastAll(
-     point1,
-     point2,
-     radius,
-     direction,
-     distance + skinWidth,
-     Physics.DefaultRaycastLayers,
-     QueryTriggerInteraction.Ignore
- );
+                point1,
+                point2,
+                radius,
+                direction,
+                distance + skinWidth,
+                obstacleMask,
+                QueryTriggerInteraction.Ignore
+            );
 
             RaycastHit? nearestHit = null;
             float nearestDistance = float.MaxValue;

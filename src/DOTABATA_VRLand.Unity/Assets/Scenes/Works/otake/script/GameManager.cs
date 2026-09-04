@@ -579,27 +579,65 @@ public class GameManager : MonoBehaviour
 
     public void SetRanking()
     {
-        //勝利数でソート→ID参照でランキング付け→テキスト入れ替え
+        ////勝利数でソート→ID参照でランキング付け→テキスト入れ替え
 
-        playerWinlist = playerWinlist.OrderByDescending(x => x.Value)
-                       .ToDictionary(x => x.Key, x => x.Value); ;
+        //playerWinlist = playerWinlist.OrderByDescending(x => x.Value)
+        //               .ToDictionary(x => x.Key, x => x.Value); ;
 
-        int index = 1;
-        int temp = 0;
+        //int index = 1;
+        //int temp = 0;
+        //foreach (int ID in playerWinlist.Keys)
+        //{
+
+        //    RankingList[ID] = index;
+        //    index++;
+
+        //}
+
+        //for (int i = 0; i < RankingList.Count; i++)
+        //{
+        //    rankingUis[i].DOAnchorPosY(rankingPosList[RankingList[i + 1] - 1].anchoredPosition.y, 1f);
+        //   // rankingUis[i].GetComponent<TextMeshProUGUI>().material = rankingMaterials[RankingList[i + 1] - 1];
+        //    TextMeshProUGUI text = rankingUis[i].GetComponent<TextMeshProUGUI>();
+
+        //    text.fontSharedMaterial = rankingMaterials[RankingList[i + 1] - 1];
+        //}
+
+
+        // 勝利数でソート
+        playerWinlist = playerWinlist
+            .OrderByDescending(x => x.Value)
+            .ToDictionary(x => x.Key, x => x.Value);
+
+        // プレイヤーID → 順位
+        int rank = 1;
+
         foreach (int ID in playerWinlist.Keys)
         {
-
-            RankingList[ID] = index;
-            index++;
-
+            RankingList[ID] = rank;
+            rank++;
         }
 
+        // プレイヤーごとのUIを順位の位置へ移動
         for (int i = 0; i < RankingList.Count; i++)
         {
-            rankingUis[i].DOAnchorPosY(rankingPosList[RankingList[i + 1] - 1].anchoredPosition.y, 1f);
-            rankingUis[i].GetComponent<TextMeshProUGUI>().material = rankingMaterials[i];
-            
+            int playerID = i + 1;
+            int playerRank = RankingList[playerID];
+
+            TextMeshProUGUI text =
+                rankingUis[i].GetComponent<TextMeshProUGUI>();
+
+            // 位置
+            rankingUis[i].DOAnchorPosY(
+                rankingPosList[playerRank - 1].anchoredPosition.y,
+                1f
+            );
+
+            // Material
+            text.fontSharedMaterial =
+                rankingMaterials[playerRank - 1];
         }
+
 
     }
 
@@ -657,7 +695,7 @@ public class GameManager : MonoBehaviour
                         }
 
                 SetRanking();
-                //一旦仮で入れてます。本実装は優勝者のGuidいれてください。
+  
 
 
 
@@ -696,7 +734,10 @@ public class GameManager : MonoBehaviour
         }
         else if (onSelect)
         {
-            RoomModel.I.MoveSceneAsync(selPointManager.sceneName);
+            if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+            {
+                RoomModel.I.MoveSceneAsync(selPointManager.sceneName);
+            }
             EndProgress = true;
         }
         else

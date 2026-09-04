@@ -156,7 +156,7 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.03
+  m_Radius: 0.04
   m_Height: 0
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -306,7 +306,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe480fa3955303240abff5cd3026c21f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitPower: 3
+  hitPower: 2.5
 --- !u!114 &8326540749240141106
 MonoBehaviour:
   m_ObjectHideFlags: 0

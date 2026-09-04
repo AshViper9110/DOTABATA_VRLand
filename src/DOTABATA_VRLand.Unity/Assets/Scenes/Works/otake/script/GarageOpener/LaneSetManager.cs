@@ -107,6 +107,7 @@ public class LaneSetManager : MonoBehaviour
             {
             RoomModel.I.SendScore((int)(10000-Timer)*100);
             enabled = false;
+            InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<SmoothLocomotion>().enabled = true;
             return;
                 }
         
