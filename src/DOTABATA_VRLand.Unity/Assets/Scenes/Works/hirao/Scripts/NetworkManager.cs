@@ -258,7 +258,7 @@ public class NetworkManager : Singleton<NetworkManager>
         int index = 0;
         foreach (JoinedUser user in ranking)
         {
-            Debug.Log(winCount[index]);
+           
             gameManager.RankingList[user.JoinOrder] = index+1;
             gameManager.playerWinlist[user.JoinOrder] = winCount[index];
             gameManager.SetCrown(user.ConnectionId,user.JoinOrder);

@@ -37,8 +37,10 @@ public class GameManager : MonoBehaviour
     InputAction action;
 
     [SerializeField] GameObject CrownPrefab;
+    [SerializeField] GameObject GroundCrownPrefab;
+    [SerializeField] GameObject EndObjects;
     public float crownDistance;
-
+    bool isSetCrown;
 
     static public List<string> PlayedMiniGame = new List<string>();
 
@@ -141,6 +143,8 @@ public class GameManager : MonoBehaviour
     int GetRankIndex;
 
 
+
+
     private void OnEnable()
     {
         if (RoomModel.I == null) return;
@@ -220,7 +224,7 @@ public class GameManager : MonoBehaviour
                 if (CenterObjRb.angularVelocity.y < 0.01f)
                 {
                     DummyText.text = "";
-                    Debug.Log(selPointManager.titleName + "にゲームが決まりました");
+                  
                     DummyText.DOText(selPointManager.titleName + "にゲームが決まりました", 1.0f);
 
                     audio.Stop();
@@ -240,7 +244,7 @@ public class GameManager : MonoBehaviour
             {
                 if (Input.GetMouseButtonDown(0) || grabAction.GetStateDown(handType))
                 {
-                    Debug.Log("会話進めます");
+                 
                     NetworkManager.I.SendHostProgress();
 
                 }
@@ -258,6 +262,7 @@ public class GameManager : MonoBehaviour
 
     public void InitRally()
     {
+      
         SetMiniGameAsync();
         CenterObjRb = CenterObj.GetComponent<Rigidbody>();
         selPointManager = selectPoint.GetComponent<SelPointManager>();
@@ -265,9 +270,10 @@ public class GameManager : MonoBehaviour
         onSelect = false;
         onResult = false;
         onEnd = false;
+        isSetCrown = false;
 
 
-    
+
 
         SetRanking();
 
@@ -310,6 +316,9 @@ public class GameManager : MonoBehaviour
 
     public void InitFreePlay()
     {
+        isSetCrown = false ;
+
+        Debug.Log("いニット");
         freePlayManager = GetComponent<FreePlayManager>();
 
         freePlayManager.SetMinigames();
@@ -395,7 +404,7 @@ public class GameManager : MonoBehaviour
         else
         {
             InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].playerObj.GetComponent<SmoothLocomotion>().enabled = false;
-            Debug.Log("動かなくなるよ シーン名：" + scene);
+           
         }
 
         
@@ -452,7 +461,13 @@ public class GameManager : MonoBehaviour
 
     public void SetCrown(Guid guid,int ID)
     {
-        Debug.Log("SetCrown");
+        if (guid == NetworkManager.I.myConnectionId)
+        {
+            if (isSetCrown) return;
+            isSetCrown = true;
+        }
+
+        Debug.Log("Setクラウン");
         List<GameObject> crowns = new List<GameObject>();
         
         Transform transform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>().crownParent;
@@ -461,7 +476,7 @@ public class GameManager : MonoBehaviour
         {
             if(guid == winPlayerId)
             {
-                Debug.Log("追加済みだから減算");
+             
                 playerWinlist[ID]--;
             }
         }
@@ -486,7 +501,8 @@ public class GameManager : MonoBehaviour
 
     public void AddCrown(Guid guid, int ID)
     {
-        Debug.Log("AddCrown");
+    
+   
         PlayerTransform playerTransform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>();
         Transform transform = playerTransform.crownParent;
         GameObject crown = Instantiate(CrownPrefab,
@@ -523,6 +539,23 @@ public class GameManager : MonoBehaviour
         playerTransform.StartSpotLight(3);
 
     }
+    public void AddEndCrown(Guid guid, int ID)
+    {
+        PlayerTransform playerTransform = InRoomPlayerData.I.PlayerList[guid].playerObj.GetComponent<PlayerTransform>();
+        Transform transform = playerTransform.crownParent;
+        GameObject crown = Instantiate(GroundCrownPrefab,
+               transform);
+
+
+
+
+        crown.transform.position = new Vector3(crown.transform.position.x, transform.position.y + (crownDistance * playerWinlist[ID]) + 3f, crown.transform.position.z);
+
+        CrownManager manager = crown.GetComponent<CrownManager>();
+        manager.isNew = true;
+        manager.ParentTrans = transform;
+    }
+
 
     public void DeleteCrown(Guid guid, int ID)
     {
@@ -656,7 +689,7 @@ public class GameManager : MonoBehaviour
                 audio.Stop();
                 audio.PlayOneShot(RollEnd);
                 DummyText.text = "";
-                Debug.Log(selPointManager.titleName + "にゲームが決まりました");
+        
                 DummyText.DOText(selPointManager.titleName + "にゲームが決まりました", 1.0f);
 
                 onSelect = true;
@@ -725,7 +758,8 @@ public class GameManager : MonoBehaviour
                 AudioManager.ChangeBGM(AudioManager.BGM.Main_End);
                 DummyText.DOText($"{InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.Name}!!" + FinishText[textIndex], 1.0f);
                 InRoomPlayerData.I.PlayerList[winPlayerId].playerObj.GetComponent<PlayerTransform>().StartSpotLight(10);
-
+                AddEndCrown(winPlayerId, InRoomPlayerData.I.PlayerList[winPlayerId].joinedUser.JoinOrder);
+                EndObjects.SetActive(true);
             }
             else
             {
