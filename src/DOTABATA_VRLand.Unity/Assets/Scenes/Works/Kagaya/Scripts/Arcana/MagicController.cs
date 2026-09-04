@@ -204,6 +204,8 @@ public class MagicController : MonoBehaviour {
         if (!syncObject.IsOwner) return;
         if (isHand) return;
 
+        SelectTarget();
+
         // ライフが0になったら削除
         lifeTimer += Time.deltaTime;
         if (lifeTimer >= life) {
@@ -218,6 +220,32 @@ public class MagicController : MonoBehaviour {
         Homing();
     }
 
+    /// <summary>
+    /// ターゲット選定
+    /// </summary>
+    private void SelectTarget() {
+        if (targetPlayer) return;
+
+        Transform target = null;
+        float targetDis = 999;
+
+        foreach (PlayerData player in InRoomPlayerData.I.PlayerList.Values) {
+            float dis = Vector3.Distance(this.transform.position, player.playerObj.transform.position);
+
+            if (dis < targetDis) {
+                target = player.playerObj.transform;
+                targetDis = dis;
+            }
+        }
+
+        if (targetDis < 8) {
+            targetPlayer = target;
+        }
+    }
+
+    /// <summary>
+    /// ホーミング処理
+    /// </summary>
     private void Homing() {
         if (!targetPlayer) return;
 
