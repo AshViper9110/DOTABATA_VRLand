@@ -4014,6 +4014,7 @@ MonoBehaviour:
   willReady: 0
   AllReady: 0
   OnStarted: 0
+  OnMove: 0
 --- !u!114 &1587051322
 MonoBehaviour:
   m_ObjectHideFlags: 0

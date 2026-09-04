@@ -238,7 +238,7 @@ public class MagicController : MonoBehaviour {
             }
         }
 
-        if (targetDis < 8) {
+        if (targetDis < 0.75f) {
             targetPlayer = target;
         }
     }
