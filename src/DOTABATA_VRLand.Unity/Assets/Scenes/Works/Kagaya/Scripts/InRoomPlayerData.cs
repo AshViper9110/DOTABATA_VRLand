@@ -36,7 +36,11 @@ public class InRoomPlayerData : Singleton<InRoomPlayerData> {
     /// プレイヤーリストから削除
     /// </summary>
     public void RemovePlayer(Guid connectionId) {
+
+        if (!PlayerList.ContainsKey(connectionId)) return;
         if (PlayerList[connectionId].joinedUser == null) return;
+
+      
 
         int joinOrder = PlayerList[connectionId].joinedUser.JoinOrder;
 
