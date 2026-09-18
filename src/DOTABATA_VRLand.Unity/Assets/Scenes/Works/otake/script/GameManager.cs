@@ -92,6 +92,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject MinigamePrefab;
 
     [SerializeField] GameObject CenterObj;
+    [SerializeField] GameObject CenterObjPrafab;
     Rigidbody CenterObjRb;
 
     [SerializeField] GameObject selectPoint;
@@ -149,12 +150,14 @@ public class GameManager : MonoBehaviour
     {
         if (RoomModel.I == null) return;
         RoomModel.I.OnMovedScene += MoveScene;
+        RoomModel.I.OnRotMiniGames += UpdateMiniGamesRot;
     }
 
     private void OnDisable()
     {
         if (RoomModel.I == null) return;
         RoomModel.I.OnMovedScene -= MoveScene;
+        RoomModel.I.OnRotMiniGames -= UpdateMiniGamesRot;
 
     }
 
@@ -214,9 +217,13 @@ public class GameManager : MonoBehaviour
         {
             if (!isSpin)
             {
-                if (CenterObjRb.angularVelocity.y < 0.29f)
+                if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
                 {
-                    CenterObjRb.angularVelocity = new Vector3(0, 0.3f, 0);
+                    if (CenterObjRb.angularVelocity.y < 0.29f)
+                    {
+                        CenterObjRb.angularVelocity = new Vector3(0, 0.3f, 0);
+                    }
+
                 }
             }
             else if (isSpin && !onSelect)
@@ -251,18 +258,33 @@ public class GameManager : MonoBehaviour
 
                 if (!isSpin)
                 {
-                    if (CenterObjRb.angularVelocity.y < 0.29f)
+                    if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
                     {
-                        CenterObjRb.angularVelocity = new Vector3(0, 0.3f, 0);
+                        if (CenterObjRb.angularVelocity.y < 0.29f)
+                        {
+                            CenterObjRb.angularVelocity = new Vector3(0, 0.3f, 0);
+                        }
                     }
                 }
+            }
+
+            if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+            {
+                RoomModel.I.SendMinigamesRotation(CenterObj.transform.rotation.y);
             }
         }
     }
 
     public void InitRally()
     {
-      
+        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+        {
+           GameObject cent =  Instantiate(CenterObjPrafab,
+                CenterObj.transform.position, Quaternion.identity);
+
+            CenterObj =  cent;
+        }
+
         SetMiniGameAsync();
         CenterObjRb = CenterObj.GetComponent<Rigidbody>();
         selPointManager = selectPoint.GetComponent<SelPointManager>();
@@ -308,7 +330,7 @@ public class GameManager : MonoBehaviour
             DummyText.text = "";
             textIndex = 0;
             DummyText.DOText(StartText[textIndex], 1.0f);
-        
+
 
        
         
@@ -379,7 +401,10 @@ public class GameManager : MonoBehaviour
 
         float spinPower = UnityEngine.Random.Range(5, 30);
 
-        CenterObjRb.angularVelocity = new Vector3(0, spinPower, 0);
+        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+        {
+            CenterObjRb.angularVelocity = new Vector3(0, spinPower, 0);
+        }
     }
 
     public void MoveScene(string scene)
@@ -440,6 +465,11 @@ public class GameManager : MonoBehaviour
             RawImage image = free.GetComponentInChildren<RawImage>();
             image.texture = CreateTextureFromBytes(miniGames[i].BinaryImg);
         }
+    }
+
+    public void UpdateMiniGamesRot(float rot)
+    {
+        CenterObj.transform.rotation = new Quaternion(0,rot, 0, 0);
     }
 
     private Texture2D CreateTextureFromBytes(byte[] imageBytes)

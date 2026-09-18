@@ -209,6 +209,10 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
         public void OnCreateFood(int index);
 
+        /// </summary>
+        /// 回転同期通知
+        /// </summary>
+        public void OnSendMinigamesRotation(float rot);
     }
 
 }

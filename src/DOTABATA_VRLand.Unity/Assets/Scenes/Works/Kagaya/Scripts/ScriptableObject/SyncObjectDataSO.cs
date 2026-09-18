@@ -14,7 +14,8 @@ public class SyncObjectDataSO : ScriptableObject {
         BlockBreak,
         GarageOpener,
         SppatoCocking,
-        HomeRunRush
+        HomeRunRush,
+        GameScene
     }
 
     public Minigames minigame = Minigames.None;
