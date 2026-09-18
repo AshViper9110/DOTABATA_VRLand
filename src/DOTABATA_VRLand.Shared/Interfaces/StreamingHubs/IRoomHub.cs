@@ -231,6 +231,6 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         ///<summary>
         ///ミニゲーム集の回転同期
         /// </summary>
-        Task SendMinigamesRotation(float rot);
+        Task SendMinigamesRotation(SimpleTransform rot);
     }
 }
