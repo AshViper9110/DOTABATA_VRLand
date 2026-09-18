@@ -95,6 +95,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject CenterObjPrafab;
     Rigidbody CenterObjRb;
 
+    int centCnt =0;
+
     [SerializeField] GameObject selectPoint;
     SelPointManager selPointManager;
     [SerializeField] float SelPointHeght;
@@ -228,19 +230,22 @@ public class GameManager : MonoBehaviour
             }
             else if (isSpin && !onSelect)
             {
-                if (CenterObjRb.angularVelocity.y < 0.01f)
+                if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
                 {
-                    DummyText.text = "";
-                  
-                    DummyText.DOText(selPointManager.titleName + "‚ÉƒQ[ƒ€‚ªŒˆ‚Ü‚è‚Ü‚µ‚½", 1.0f);
+                    if (CenterObjRb.angularVelocity.y < 0.01f)
+                    {
+                        DummyText.text = "";
 
-                    audio.Stop();
-                    audio.PlayOneShot(RollEnd);
+                        DummyText.DOText(selPointManager.titleName + "‚ÉƒQ[ƒ€‚ªŒˆ‚Ü‚è‚Ü‚µ‚½", 1.0f);
 
-                    onSelect = true;
-                    onResult = false;
-                    onEnd = false;
+                        audio.Stop();
+                        audio.PlayOneShot(RollEnd);
 
+                        onSelect = true;
+                        onResult = false;
+                        onEnd = false;
+
+                    }
                 }
             }
 
@@ -270,7 +275,14 @@ public class GameManager : MonoBehaviour
 
             if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
             {
-                RoomModel.I.SendMinigamesRotation(CenterObj.transform.rotation.y);
+                centCnt++;
+
+                if (centCnt >= 5)
+                {
+                    SimpleTransform transform = new SimpleTransform(CenterObj.transform.localPosition, CenterObj.transform.localRotation, CenterObj.transform.localScale);
+                    RoomModel.I.SendMinigamesRotation(transform);
+                    centCnt = 0;
+                }
             }
         }
     }
@@ -279,14 +291,15 @@ public class GameManager : MonoBehaviour
     {
         if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
         {
-           GameObject cent =  Instantiate(CenterObjPrafab,
-                CenterObj.transform.position, Quaternion.identity);
-
-            CenterObj =  cent;
+            CenterObjRb = CenterObj.GetComponent<Rigidbody>();
+        }
+        else
+        {
+            Destroy(CenterObj.GetComponent<Rigidbody>());
         }
 
         SetMiniGameAsync();
-        CenterObjRb = CenterObj.GetComponent<Rigidbody>();
+
         selPointManager = selectPoint.GetComponent<SelPointManager>();
         isSpin = false;
         onSelect = false;
@@ -467,9 +480,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void UpdateMiniGamesRot(float rot)
+    public void UpdateMiniGamesRot(SimpleTransform rot)
     {
-        CenterObj.transform.rotation = new Quaternion(0,rot, 0, 0);
+        CenterObj.transform.localPosition = rot.localPosition;
+        CenterObj.transform.localRotation = rot.localRotation;
+        CenterObj.transform.localScale = rot.localScale;
     }
 
     private Texture2D CreateTextureFromBytes(byte[] imageBytes)
@@ -714,7 +729,7 @@ public class GameManager : MonoBehaviour
         }
         else if (isSpin && !onSelect)
         {
-            if (CenterObjRb.angularVelocity.y < 0.01f)
+            //if (CenterObjRb.angularVelocity.y < 0.01f)
             {
                 audio.Stop();
                 audio.PlayOneShot(RollEnd);
@@ -737,7 +752,11 @@ public class GameManager : MonoBehaviour
         {
             if (textIndex >= AfterText.Count && !isSpin)
             {
-                SelectMiniGame();
+
+                if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+                {
+                    SelectMiniGame();
+                }
               
                 return;
             }
@@ -808,7 +827,11 @@ public class GameManager : MonoBehaviour
         {
             if (textIndex >= StartText.Count && !isSpin)
             {
-                SelectMiniGame();
+
+                if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+                {
+                    SelectMiniGame(); 
+                 }
                
                 return;
             }

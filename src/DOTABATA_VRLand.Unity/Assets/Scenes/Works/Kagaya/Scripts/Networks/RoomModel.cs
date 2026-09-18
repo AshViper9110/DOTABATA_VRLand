@@ -212,7 +212,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
 
 
     public Action<Guid,Guid, Vector3,Vector3,GameObject> OnCutingFood { get; set; }
-    public Action<float>　OnRotMiniGames { get; set; }
+    public Action<SimpleTransform>　OnRotMiniGames { get; set; }
 
 
 
@@ -1137,7 +1137,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     ///<summary>
     ///ミニゲーム集の回転同期
     /// </summary>
-    public async UniTask SendMinigamesRotation(float rot)
+    public async UniTask SendMinigamesRotation(SimpleTransform rot)
     {
 
         if (roomHub == null)
@@ -1151,7 +1151,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     /// 回転同期通知
     /// </summary>
-    public void OnSendMinigamesRotation(float rot)
+    public void OnSendMinigamesRotation(SimpleTransform rot)
     {
         OnRotMiniGames(rot);
     }

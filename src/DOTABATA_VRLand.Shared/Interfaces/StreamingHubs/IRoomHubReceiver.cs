@@ -212,7 +212,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// </summary>
         /// 回転同期通知
         /// </summary>
-        public void OnSendMinigamesRotation(float rot);
+        public void OnSendMinigamesRotation(SimpleTransform rot);
     }
 
 }
