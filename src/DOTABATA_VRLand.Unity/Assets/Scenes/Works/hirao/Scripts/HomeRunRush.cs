@@ -160,9 +160,10 @@ public class HomeRunRush : MonoBehaviour
                 Debug.Log(
                     "[HomeRunRush] ホームラン演出終了。投球再開"
                 );
+
                 AudioManager.ChangeBGM(
-                AudioManager.BGM.HomeRun
-            );
+                    AudioManager.BGM.HomeRun
+                );
             }
 
             return;
@@ -174,6 +175,10 @@ public class HomeRunRush : MonoBehaviour
 
         if (waitingForLastBall)
         {
+            // 念のためホームラン中は絶対に終了処理しない
+            if (isHomeRunPause)
+                return;
+
             if (Time.time >= nextShotTime)
             {
                 FinishTurnAsync();
