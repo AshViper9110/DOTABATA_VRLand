@@ -960,5 +960,18 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
             this._roomContext.Group.All.OnCreateFood(Index);
             return Task.CompletedTask;
         }
+
+        ///<summary>
+        ///ミニゲーム集の回転同期
+        /// </summary>
+        public Task SendMinigamesRotation(float rot)
+        {
+
+            this._roomContext.Group.Except([this.ConnectionId]).OnSendMinigamesRotation(rot);
+            return Task.CompletedTask;
+
+        }
+
+
     }
 }
