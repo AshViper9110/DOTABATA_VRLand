@@ -271,9 +271,9 @@ public class NetworkManager : Singleton<NetworkManager>
     /// <summary>
     ///ミニゲーム大会の司会進行通知送信
     /// </summary>
-    public void SendHostProgress()
+    public void SendHostProgress(int index)
     {
-        RoomModel.I.HostProgress();
+        RoomModel.I.HostProgress(index);
     }
 
 
@@ -281,11 +281,11 @@ public class NetworkManager : Singleton<NetworkManager>
     /// [サーバー通知]
     /// ミニゲーム大会の司会進行通知送信
     /// </summary>
-    public void OnHostProgress()
+    public void OnHostProgress(int index)
     {
 
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        gameManager.MoveText();
+        gameManager.MoveText(index);
     }
 
     ///<summary>

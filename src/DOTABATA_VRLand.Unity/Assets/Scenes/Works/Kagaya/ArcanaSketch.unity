@@ -5863,7 +5863,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TutorialImages:
-  - {fileID: 21300000, guid: 4b8418f3877e3a84ebb01702498a900f, type: 3}
+  - {fileID: 21300000, guid: 320bf542371322141979d49e1e7f69cf, type: 3}
+  - {fileID: 21300000, guid: 43fda43b68cff724aacd4b246704c28f, type: 3}
+  - {fileID: 21300000, guid: b3dfeaae7b230844082506a91bca142d, type: 3}
+  - {fileID: 21300000, guid: d52c3ac03efb8074ab5676770964084a, type: 3}
+  - {fileID: 21300000, guid: c3c3e49ccb6cea84ea7205c8946cadbd, type: 3}
   tutorialImage: {fileID: 7996750017170355131}
 --- !u!23 &766249781463016703
 MeshRenderer:
@@ -6694,14 +6698,14 @@ RectTransform:
   m_GameObject: {fileID: 4974660438654577200}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.13, y: 0.13, z: 0.015473319}
+  m_LocalScale: {x: 0.087085366, y: 0.087085366, z: 0.010365383}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2625612587566477688}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.03, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!212 &7996750017170355131
@@ -6753,7 +6757,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 12.8, y: 7.2}
+  m_Size: {x: 19.92, y: 14}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0

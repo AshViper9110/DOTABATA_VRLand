@@ -705,10 +705,10 @@ namespace DOTABATA_VRLand.Server.StreamingHubs {
         /// <summary>
         /// ゲーム大会の司会進行
         /// </summary>
-        public Task HostProgress()
+        public Task HostProgress(int index)
         {
             // 全員（自分も含む）に通知
-            this._roomContext.Group.All.OnHostProgress();
+            this._roomContext.Group.All.OnHostProgress(index);
             return Task.CompletedTask;
         }
 
