@@ -360,15 +360,52 @@ public class RoomInfoCanvas : MonoBehaviour {
     //Server通知
     private void OnJoinedUser(JoinedUser joinedUser)
     {
-        if(joinedUser.ConnectionId == RoomModel.I.ConnectionId)
+
+        Debug.Log($"プレイヤーが入室 残り{InRoomPlayerData.I.PlayerList.Count}");
+        if (joinedUser.ConnectionId == RoomModel.I.ConnectionId)
         {
             if (joinedUser.JoinOrder == 1) roomStartButton.SetActive(true);
+            if (InRoomPlayerData.I.PlayerList.Count >= 1)
+            {
+                if (joinedUser.JoinOrder == 1) roomStartButton.SetActive(true);
+            }
+            else
+            {
+                if (joinedUser.JoinOrder == 1) roomStartButton.SetActive(false);
+            }
+            return;
         }
+
+        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+        {
+            if (InRoomPlayerData.I.PlayerList.Count >= 1)
+            {
+                roomStartButton.SetActive(true);
+            }
+            else
+            {
+                 roomStartButton.SetActive(false);
+            }
+        }
+
     }
 
     private void OnLeavedUser(Guid connectionId, int joinOrder)
     {
+        if (connectionId == RoomModel.I.ConnectionId) return;
+        InRoomPlayerData.I.RemovePlayer(connectionId);
 
+     
+
+        Debug.Log($"プレイヤーが退出 残り{InRoomPlayerData.I.PlayerList.Count}");
+        if (InRoomPlayerData.I.PlayerList[NetworkManager.I.myConnectionId].joinedUser.JoinOrder == 1)
+        {
+            if (InRoomPlayerData.I.PlayerList.Count <= 1)
+            {
+                roomStartButton.SetActive(false);
+            }
+       
+        }
     }
 
     private void OnRoomStarted()

@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+using static AudioManager;
 using static GestureRecognizer;
 
 public class ArcanaGameManager : MonoBehaviour {
@@ -87,12 +88,12 @@ public class ArcanaGameManager : MonoBehaviour {
             await RoomModel.I.ArcanaInitGameAsync();
         }
         //mySelf.playerObj.transform.position = firstSpawnPoint.position;
-
+ 
         RoomModel.I.OnDead += OnDead;
         RoomModel.I.OnArcanaGameSeted += OnArcanaGameSeted;
 
         AudioManager.StopBgm();
-
+        AudioManager.ChangeBGM(BGM.Arcana);
         // スポーン位置に移動
         mySelf.playerObj.transform.position = spawnPoints[mySelf.joinedUser.JoinOrder - 1].position;
 

@@ -101,7 +101,7 @@ namespace DOTABATA_VRLand.Shared.Interfaces.StreamingHubs {
         /// <summary>
         /// ゲーム大会の司会進行
         /// </summary>
-        void OnHostProgress();
+        void OnHostProgress(int index);
 
         /// <summary>
         /// シーン移行完了通知

@@ -123,7 +123,7 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// </summary>
     public Action<List<JoinedUser>, List<int>> OnGetRanking { get; set; }
 
-    public Action OnHostProgressed { get; set; }
+    public Action<int> OnHostProgressed { get; set; }
 
     /// <summary>
     /// 個人準備完了状態切り替え通知
@@ -674,9 +674,9 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// <summary>
     /// ミニゲーム大会の司会進行
     /// </summary>
-    public async void HostProgress()
+    public async void HostProgress(int index)
     {
-       await roomHub.HostProgress();
+       await roomHub.HostProgress(index);
     }
 
 
@@ -684,9 +684,9 @@ public class RoomModel : Singleton<RoomModel>, IRoomHubReceiver {
     /// [サーバー通知]
     /// ミニゲーム大会の司会進行
     /// </summary>
-    public void OnHostProgress()
+    public void OnHostProgress(int index)
     {
-        OnHostProgressed?.Invoke();
+        OnHostProgressed?.Invoke(index);
     }
 
     /// <summary>

@@ -3410,6 +3410,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2071060649893836490, guid: 58e3b4f66cdce894a98e48a5fba888f0, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 55ff2f08d08046e4a9d6bcc34fbe298f, type: 2}
+    - target: {fileID: 2071060649893836490, guid: 58e3b4f66cdce894a98e48a5fba888f0, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 5ef5d46d6ee9eab48ba329bf18d54e00, type: 2}
+    - target: {fileID: 2071060649893836490, guid: 58e3b4f66cdce894a98e48a5fba888f0, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2182419662919834500, guid: 58e3b4f66cdce894a98e48a5fba888f0, type: 3}
       propertyPath: m_Name
       value: PlayerUI
@@ -7639,7 +7651,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TutorialImages:
   - {fileID: 21300000, guid: 7115eea01606e0049bf6c759123f7b67, type: 3}
-  - {fileID: 21300000, guid: 1a40b2fe39b54254d86f91b0b16dc522, type: 3}
+  - {fileID: 21300000, guid: 32f2c647b4b22db4f9982f1882cf559f, type: 3}
   tutorialImage: {fileID: 7996750016605909645}
 --- !u!1 &572610842817024030
 GameObject:

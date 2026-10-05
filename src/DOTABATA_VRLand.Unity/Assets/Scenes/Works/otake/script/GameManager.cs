@@ -244,7 +244,8 @@ public class GameManager : MonoBehaviour
                         onSelect = true;
                         onResult = false;
                         onEnd = false;
-
+                        textIndex = 99;
+                        NetworkManager.I.SendHostProgress(textIndex);
                     }
                 }
             }
@@ -256,8 +257,12 @@ public class GameManager : MonoBehaviour
             {
                 if (Input.GetMouseButtonDown(0) || grabAction.GetStateDown(handType))
                 {
-                 
-                    NetworkManager.I.SendHostProgress();
+                    if (!isSpin)
+                    {
+                        textIndex++;
+                    }
+                    else return;
+                    NetworkManager.I.SendHostProgress(textIndex);
 
                 }
 
@@ -277,7 +282,7 @@ public class GameManager : MonoBehaviour
             {
                 centCnt++;
 
-                if (centCnt >= 5)
+                if (centCnt >= 2)
                 {
                     SimpleTransform transform = new SimpleTransform(CenterObj.transform.localPosition, CenterObj.transform.localRotation, CenterObj.transform.localScale);
                     RoomModel.I.SendMinigamesRotation(transform);
@@ -719,31 +724,30 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void MoveText()
+    public void MoveText(int index)
     {
+        textIndex = index;
         hostManager.ChengeFace(HostManager.facial.Normal);
         if (EndProgress) return;
-        if (!isSpin)
-        {
-            textIndex++;
-        }
-        else if (isSpin && !onSelect)
+        else if (textIndex == 99)
         {
             //if (CenterObjRb.angularVelocity.y < 0.01f)
             {
                 audio.Stop();
                 audio.PlayOneShot(RollEnd);
                 DummyText.text = "";
-        
+
                 DummyText.DOText(selPointManager.titleName + "‚ÉƒQ[ƒ€‚ªŒˆ‚Ü‚è‚Ü‚µ‚½", 1.0f);
 
+                isSpin = true;
                 onSelect = true;
                 onResult = false;
                 onEnd = false;
-               
+
 
             }
         }
+
 
 
 
