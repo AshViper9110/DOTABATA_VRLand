@@ -444,6 +444,12 @@ public class HomeRunRush : MonoBehaviour
             return;
         }
 
+        if (fireWork != null)
+        {
+            Destroy(fireWork);
+            fireWork = null;
+        }
+
         RoomModel.I.SendScore(
             (int)homeRunScore
         );
